@@ -71,7 +71,10 @@ export function BlogPostCard({
           rel="noopener noreferrer"
           className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
         >
-          <Heading level={3} className="group-hover:text-primary transition-colors">
+          <Heading
+            level={3}
+            className="group-hover:text-primary transition-colors"
+          >
             {title}
           </Heading>
           <span className="sr-only">(opens in new tab)</span>

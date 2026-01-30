@@ -131,7 +131,9 @@ describe("BlogPostCard Component", () => {
       expect(timeElement).toBeInTheDocument();
       // datetime attribute should be in ISO format
       expect(timeElement).toHaveAttribute("dateTime");
-      expect(timeElement.getAttribute("dateTime")).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(timeElement.getAttribute("dateTime")).toMatch(
+        /^\d{4}-\d{2}-\d{2}$/
+      );
     });
   });
 
