@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Lora, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
@@ -19,6 +19,11 @@ const bodyFont = Source_Sans_3({
 export const metadata: Metadata = {
   title: "Easy Plant Life",
   description: "A calm approach to living with plants",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
