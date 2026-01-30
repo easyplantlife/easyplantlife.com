@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import BooksPage from "@/app/books/page";
+import { books } from "@/content/books";
 
 /**
  * Books Page Tests
@@ -11,9 +12,74 @@ import BooksPage from "@/app/books/page";
  * - [ ] Page title/intro explaining the books section
  * - [ ] Books list renders
  * - [ ] Responsive on all devices
+ *
+ * Additional acceptance criteria from Issue #40 (M6-05):
+ *
+ * - [ ] All books from data source are displayed
+ * - [ ] External links have target="_blank" and rel="noopener noreferrer"
  */
 
 describe("Books Page", () => {
+  /**
+   * Acceptance Criteria Tests (Issue #40 - M6-05)
+   *
+   * GIVEN the books page
+   * WHEN it loads
+   * THEN all books from data source are displayed
+   *
+   * GIVEN a book card with external links
+   * WHEN I inspect the links
+   * THEN they have target="_blank" and rel="noopener noreferrer"
+   */
+  describe("Acceptance Criteria (M6-05)", () => {
+    it("displays all books from the data source when the page loads", () => {
+      render(<BooksPage />);
+
+      // Verify each book from the data source is displayed
+      books.forEach((book) => {
+        expect(screen.getByText(book.title)).toBeInTheDocument();
+      });
+    });
+
+    it("renders the same number of book cards as books in the data source", () => {
+      render(<BooksPage />);
+
+      // BookCard renders as article elements
+      const articles = screen.getAllByRole("article");
+      expect(articles).toHaveLength(books.length);
+    });
+
+    it("external purchase links have target='_blank' attribute", () => {
+      render(<BooksPage />);
+
+      // Find all external links (purchase links)
+      const allLinks = screen.queryAllByRole("link");
+      const externalLinks = allLinks.filter((link) =>
+        link.getAttribute("href")?.startsWith("http")
+      );
+
+      // Each external link should open in a new tab
+      externalLinks.forEach((link) => {
+        expect(link).toHaveAttribute("target", "_blank");
+      });
+    });
+
+    it("external purchase links have rel='noopener noreferrer' for security", () => {
+      render(<BooksPage />);
+
+      // Find all external links (purchase links)
+      const allLinks = screen.queryAllByRole("link");
+      const externalLinks = allLinks.filter((link) =>
+        link.getAttribute("href")?.startsWith("http")
+      );
+
+      // Each external link should have proper security attributes
+      externalLinks.forEach((link) => {
+        expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      });
+    });
+  });
+
   /**
    * Acceptance Criteria Tests (Issue #39 - M6-04)
    */
