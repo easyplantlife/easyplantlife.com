@@ -12,3 +12,13 @@ export {
   ResendConfigError,
   type ResendConfigValidation,
 } from "./resend";
+
+export {
+  addToNewsletter,
+  sendEmail,
+  EmailServiceError,
+  type AddToNewsletterParams,
+  type AddToNewsletterResult,
+  type SendEmailParams,
+  type SendEmailResult,
+} from "./email";
