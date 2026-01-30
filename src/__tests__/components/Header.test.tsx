@@ -79,9 +79,7 @@ describe("Header Component", () => {
   describe("Mobile Menu", () => {
     it("renders a mobile menu button", () => {
       render(<Header />);
-      expect(
-        screen.getByRole("button", { name: /menu/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /menu/i })).toBeInTheDocument();
     });
 
     it("mobile menu button has aria-expanded attribute", () => {
@@ -141,8 +139,7 @@ describe("Header Component", () => {
       expect(nav).toHaveAttribute("aria-label");
     });
 
-    it("all navigation links are focusable", async () => {
-      const user = userEvent.setup();
+    it("all navigation links are focusable", () => {
       render(<Header />);
       const nav = screen.getByRole("navigation");
       const links = within(nav).getAllByRole("link");
@@ -153,8 +150,7 @@ describe("Header Component", () => {
       }
     });
 
-    it("mobile menu button is focusable via keyboard", async () => {
-      const user = userEvent.setup();
+    it("mobile menu button is focusable via keyboard", () => {
       render(<Header />);
       const menuButton = screen.getByRole("button", { name: /menu/i });
 
@@ -202,7 +198,9 @@ describe("Header Component", () => {
     it("header contains logo and navigation", () => {
       render(<Header />);
       const header = screen.getByRole("banner");
-      expect(within(header).getByLabelText(/easy plant life/i)).toBeInTheDocument();
+      expect(
+        within(header).getByLabelText(/easy plant life/i)
+      ).toBeInTheDocument();
       expect(within(header).getByRole("navigation")).toBeInTheDocument();
     });
 
