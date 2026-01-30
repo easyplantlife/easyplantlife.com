@@ -68,13 +68,13 @@ export function PageLayout({
   ...props
 }: PageLayoutProps) {
   return (
-    <main className={`${variantStyles[variant]} ${className}`.trim()} {...props}>
+    <main
+      className={`${variantStyles[variant]} ${className}`.trim()}
+      {...props}
+    >
       <Container>
         {title && (
-          <Heading
-            level={1}
-            className={`${titleStyles[variant]} mb-8`}
-          >
+          <Heading level={1} className={`${titleStyles[variant]} mb-8`}>
             {title}
           </Heading>
         )}
