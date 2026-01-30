@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About | Easy Plant Life",
-  description: "Learn about Easy Plant Life and our calm approach to living with plants.",
+  description:
+    "Learn about Easy Plant Life and our calm approach to living with plants.",
 };
 
 export default function AboutPage() {

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Blog | Easy Plant Life",
-  description: "Read our latest articles about plant care and living with plants.",
+  description:
+    "Read our latest articles about plant care and living with plants.",
 };
 
 export default function BlogPage() {
