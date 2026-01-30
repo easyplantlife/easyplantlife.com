@@ -63,7 +63,13 @@ const variantStyles: Record<ContainerVariant, string> = {
  */
 export const Container = forwardRef<HTMLElement, ContainerProps>(
   function Container(
-    { children, variant = "default", as: Component = "div", className = "", ...props },
+    {
+      children,
+      variant = "default",
+      as: Component = "div",
+      className = "",
+      ...props
+    },
     ref
   ) {
     const baseStyles = [
