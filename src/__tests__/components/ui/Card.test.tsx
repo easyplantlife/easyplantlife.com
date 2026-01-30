@@ -109,10 +109,7 @@ describe("Card Component", () => {
 
     it("image container has proper styling", () => {
       render(
-        <Card
-          data-testid="card"
-          image={<img src="/test.jpg" alt="Test" />}
-        >
+        <Card data-testid="card" image={<img src="/test.jpg" alt="Test" />}>
           Content
         </Card>
       );

@@ -1,4 +1,9 @@
-import { forwardRef, type ElementType, type HTMLAttributes, type ReactNode } from "react";
+import {
+  forwardRef,
+  type ElementType,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
 import NextLink from "next/link";
 
 /**
@@ -49,14 +54,7 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
  * ```
  */
 export const Card = forwardRef<HTMLElement, CardProps>(function Card(
-  {
-    children,
-    as: Component = "div",
-    image,
-    href,
-    className = "",
-    ...props
-  },
+  { children, as: Component = "div", image, href, className = "", ...props },
   ref
 ) {
   const baseStyles = [
@@ -87,13 +85,12 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
       ].join(" ")
     : "";
 
-  const combinedClassName = `${baseStyles} ${clickableStyles} ${className}`.trim();
+  const combinedClassName =
+    `${baseStyles} ${clickableStyles} ${className}`.trim();
 
   // Image container with negative margins to offset card padding
   const imageContainer = image ? (
-    <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-lg">
-      {image}
-    </div>
+    <div className="-mx-6 -mt-6 mb-4 overflow-hidden rounded-t-lg">{image}</div>
   ) : null;
 
   // Content wrapper
