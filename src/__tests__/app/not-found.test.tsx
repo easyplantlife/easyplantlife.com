@@ -27,10 +27,25 @@ jest.mock("next/font/google", () => ({
   }),
 }));
 
+// Mock next/link to avoid useContext issues in test environment
+jest.mock("next/link", () => {
+  const MockLink = ({
+    children,
+    href,
+    ...props
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  );
+  MockLink.displayName = "MockLink";
+  return MockLink;
+});
+
 describe("404 Not Found Page (M3-07)", () => {
-  beforeEach(() => {
-    jest.resetModules();
-  });
 
   describe("Rendering", () => {
     it("renders without error", async () => {
