@@ -126,7 +126,8 @@ describe("Brand Color Palette", () => {
     });
 
     test("primary color section has documentation", () => {
-      expect(tailwindConfig).toMatch(/\/[/*].*primary/i);
+      // Match JSDoc style comments that mention primary
+      expect(tailwindConfig).toMatch(/\*.*primary/i);
     });
 
     test("neutral color section has documentation", () => {
