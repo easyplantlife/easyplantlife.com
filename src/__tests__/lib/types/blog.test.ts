@@ -71,10 +71,11 @@ describe("BlogPost Type", () => {
     });
 
     test("BlogPost type has correct shape", async () => {
-      // Dynamic import to test the actual exported type
-      const { BlogPost } = (await import("@/lib/types/blog")) as {
-        BlogPost: unknown;
-      };
+      // Dynamic import to verify the module loads correctly
+      const blogModule = await import("@/lib/types/blog");
+
+      // Module should be defined (interface/type exports are erased at runtime)
+      expect(blogModule).toBeDefined();
 
       // For interface/type exports, we verify by creating a valid object
       // This test is mainly for documentation - actual type checking happens at compile time
