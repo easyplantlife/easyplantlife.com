@@ -1,4 +1,42 @@
+import type { Metadata } from "next";
 import { Hero, NewsletterCTA, SecondaryCTAs } from "@/components/home";
+
+/**
+ * Home Page SEO Metadata
+ *
+ * Configures title, description, Open Graph, and Twitter card metadata
+ * for optimal search engine and social media presentation.
+ */
+export const metadata: Metadata = {
+  title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
+  description:
+    "Easy Plant Life is about living vegan without turning it into a project. Simple, sustainable, calm guidance for a plant-based lifestyle.",
+  keywords: [
+    "plant-based",
+    "vegan",
+    "simple living",
+    "sustainable",
+    "lifestyle",
+  ],
+  openGraph: {
+    title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
+    description:
+      "Simple, sustainable, calm guidance for a plant-based lifestyle. No complexity, no perfection—just easy living.",
+    type: "website",
+    siteName: "Easy Plant Life",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
+    description:
+      "Simple, sustainable, calm guidance for a plant-based lifestyle.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 
 /**
  * Home Page
