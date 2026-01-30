@@ -65,10 +65,7 @@ export function NewsletterContent({
 
       {/* Newsletter signup form - prominent placement */}
       <div className="max-w-md">
-        <NewsletterForm
-          className="w-full"
-          onSubmit={handleNewsletterSubmit}
-        />
+        <NewsletterForm className="w-full" onSubmit={handleNewsletterSubmit} />
       </div>
     </article>
   );

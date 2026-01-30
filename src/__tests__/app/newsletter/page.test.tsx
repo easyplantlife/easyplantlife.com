@@ -53,11 +53,8 @@ describe("Newsletter Page", () => {
       render(<NewsletterPage />);
       // The description text should be relatively short
       const paragraphs = screen.getAllByRole("paragraph");
-      const valueProposition = paragraphs.find(
-        (p) =>
-          p.textContent?.match(
-            /thoughtful|updates|plant|living|simple|calm/i
-          )
+      const valueProposition = paragraphs.find((p) =>
+        p.textContent?.match(/thoughtful|updates|plant|living|simple|calm/i)
       );
       expect(valueProposition).toBeTruthy();
       // A single sentence shouldn't have multiple periods (excluding email domains)
@@ -84,8 +81,7 @@ describe("Newsletter Page", () => {
   describe("Brand Compliance - No Hype Language", () => {
     it("page contains no hype or marketing language", () => {
       render(<NewsletterPage />);
-      const pageContent =
-        document.body.textContent?.toLowerCase() || "";
+      const pageContent = document.body.textContent?.toLowerCase() || "";
       const hypeWords = [
         "free",
         "exclusive",
@@ -110,8 +106,7 @@ describe("Newsletter Page", () => {
 
     it("page contains no frequency pressure language", () => {
       render(<NewsletterPage />);
-      const pageContent =
-        document.body.textContent?.toLowerCase() || "";
+      const pageContent = document.body.textContent?.toLowerCase() || "";
       const pressureWords = [
         "daily",
         "weekly",
