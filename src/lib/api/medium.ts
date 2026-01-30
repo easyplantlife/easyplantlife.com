@@ -87,10 +87,7 @@ function decodeHtmlEntities(text: string): string {
     "&hellip;": "…",
   };
 
-  return text.replace(
-    /&[a-zA-Z0-9#]+;/g,
-    (match) => entities[match] || match
-  );
+  return text.replace(/&[a-zA-Z0-9#]+;/g, (match) => entities[match] || match);
 }
 
 /**
