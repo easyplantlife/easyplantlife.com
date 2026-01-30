@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type HTMLAttributes, type FormEvent } from "react";
+import { useState, useEffect, type HTMLAttributes, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { trackFormView, trackNewsletterSubmit } from "@/lib/analytics/events";
 
 export interface NewsletterFormProps extends Omit<
   HTMLAttributes<HTMLFormElement>,
@@ -54,6 +55,11 @@ export function NewsletterForm({
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Track form view on mount
+  useEffect(() => {
+    trackFormView("newsletter");
+  }, []);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
@@ -72,9 +78,11 @@ export function NewsletterForm({
         await onSubmit(email);
       }
       setStatus("success");
+      trackNewsletterSubmit("success");
     } catch {
       setStatus("error");
       setErrorMessage("Something went wrong. Please try again.");
+      trackNewsletterSubmit("error");
     }
   };
 
