@@ -1,3 +1,3 @@
 // Static content exports
-// Add content exports here (books data, etc.)
-export {};
+export { books } from "./books";
+export type { Book, PurchaseLink } from "./books";
