@@ -1,15 +1,16 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Easy Plant Life - Brand Color System
+ * Easy Plant Life - Design System Configuration
  *
- * This color palette reflects the brand's visual identity:
+ * This configuration reflects the brand's visual identity:
  * - Soft greens for accents and interactions
  * - Warm neutrals for backgrounds and text
  * - No loud contrast, calm and minimal aesthetic
+ * - Human, organic typography with serif headings and soft sans-serif body
  *
- * Colors are defined at the theme level (not extend) to prevent
- * default Tailwind colors from leaking into the design system.
+ * Colors and fonts are defined at the theme level (not extend) to prevent
+ * default Tailwind values from leaking into the design system.
  */
 const config: Config = {
   content: [
@@ -89,6 +90,57 @@ const config: Config = {
       current: "currentColor",
       white: "#FFFFFF",
       black: "#000000",
+    },
+
+    /**
+     * Font Families
+     *
+     * Typography that feels "human and organic" per brand guidelines:
+     * - Heading: Lora (serif) - warm, classic, readable
+     * - Body: Source Sans 3 (sans-serif) - friendly, highly readable
+     */
+    fontFamily: {
+      heading: ["var(--font-heading)", "Georgia", "serif"],
+      body: ["var(--font-body)", "system-ui", "sans-serif"],
+      // Semantic aliases
+      sans: ["var(--font-body)", "system-ui", "sans-serif"],
+      serif: ["var(--font-heading)", "Georgia", "serif"],
+    },
+
+    /**
+     * Font Sizes
+     *
+     * A harmonious type scale optimized for readability.
+     * Each size includes recommended line-height.
+     */
+    fontSize: {
+      xs: ["0.75rem", { lineHeight: "1rem" }], // 12px
+      sm: ["0.875rem", { lineHeight: "1.25rem" }], // 14px
+      base: ["1rem", { lineHeight: "1.75rem" }], // 16px - body text
+      lg: ["1.125rem", { lineHeight: "1.875rem" }], // 18px
+      xl: ["1.25rem", { lineHeight: "2rem" }], // 20px
+      "2xl": ["1.5rem", { lineHeight: "2.25rem" }], // 24px
+      "3xl": ["1.875rem", { lineHeight: "2.5rem" }], // 30px
+      "4xl": ["2.25rem", { lineHeight: "2.75rem" }], // 36px
+      "5xl": ["3rem", { lineHeight: "1.2" }], // 48px - large headings
+      "6xl": ["3.75rem", { lineHeight: "1.1" }], // 60px
+    },
+
+    /**
+     * Line Heights
+     *
+     * Generous line heights for optimal readability.
+     * Body text uses relaxed (1.75) for comfortable reading.
+     */
+    lineHeight: {
+      none: "1",
+      tight: "1.25",
+      snug: "1.375",
+      normal: "1.5",
+      relaxed: "1.75", // Optimized for body text readability
+      loose: "2",
+      body: "1.75", // Semantic alias for body text
+      heading: "1.25", // Tighter for headings
     },
   },
 };
