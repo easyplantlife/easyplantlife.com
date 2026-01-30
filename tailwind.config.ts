@@ -8,8 +8,9 @@ import type { Config } from "tailwindcss";
  * - Warm neutrals for backgrounds and text
  * - No loud contrast, calm and minimal aesthetic
  * - Human, organic typography with serif headings and soft sans-serif body
+ * - Strong use of white space with a harmonious spacing scale
  *
- * Colors and fonts are defined at the theme level (not extend) to prevent
+ * Colors, fonts, and spacing are defined at the theme level (not extend) to prevent
  * default Tailwind values from leaking into the design system.
  */
 const config: Config = {
@@ -141,6 +142,49 @@ const config: Config = {
       loose: "2",
       body: "1.75", // Semantic alias for body text
       heading: "1.25", // Tighter for headings
+    },
+
+    /**
+     * Spacing Scale
+     *
+     * A harmonious spacing scale for strong use of white space.
+     * Brand guidelines emphasize generous white space for a calm aesthetic.
+     *
+     * Core scale (in pixels): 4, 8, 16, 24, 32, 48, 64, 96, 128
+     * Converted to rem (base 16px) for accessibility.
+     *
+     * Semantic aliases:
+     * - section: Large spacing for page sections (desktop-friendly)
+     * - component: Medium spacing for component padding
+     * - element: Small spacing for related elements
+     */
+    spacing: {
+      // Zero
+      "0": "0",
+
+      // Core spacing scale
+      "1": "0.25rem", // 4px - tiny gaps
+      "2": "0.5rem", // 8px - small gaps
+      "3": "0.75rem", // 12px - between small and medium
+      "4": "1rem", // 16px - standard spacing
+      "5": "1.25rem", // 20px
+      "6": "1.5rem", // 24px - comfortable spacing
+      "8": "2rem", // 32px - larger gaps
+      "10": "2.5rem", // 40px
+      "12": "3rem", // 48px - section-like spacing
+      "16": "4rem", // 64px - generous spacing
+      "20": "5rem", // 80px
+      "24": "6rem", // 96px - major sections
+      "32": "8rem", // 128px - hero/large sections
+
+      // Fractional values for fine-tuning
+      px: "1px",
+      "0.5": "0.125rem", // 2px
+
+      // Semantic aliases for consistent usage
+      section: "6rem", // 96px - page section padding (desktop)
+      component: "1.5rem", // 24px - component internal padding
+      element: "0.5rem", // 8px - tight element relationships
     },
   },
 };
