@@ -34,6 +34,19 @@ jest.mock("next/font/google", () => ({
   }),
 }));
 
+// Mock the Medium service for Blog page
+jest.mock("@/lib/api/medium", () => ({
+  fetchMediumPosts: jest.fn().mockResolvedValue([
+    {
+      id: "test123",
+      title: "Test Blog Post",
+      excerpt: "Test excerpt for blog post.",
+      url: "https://medium.com/@test/test-post",
+      publishedDate: new Date("2024-01-15"),
+    },
+  ]),
+}));
+
 describe("Page Routes (M3-06)", () => {
   describe("About Page (/about)", () => {
     it("renders without error", async () => {
@@ -84,7 +97,8 @@ describe("Page Routes (M3-06)", () => {
   describe("Blog Page (/blog)", () => {
     it("renders without error", async () => {
       const BlogPage = (await import("@/app/blog/page")).default;
-      render(<BlogPage />);
+      const Page = await BlogPage();
+      render(Page);
       expect(
         screen.getByRole("heading", { name: /blog/i, level: 1 })
       ).toBeInTheDocument();
@@ -99,7 +113,8 @@ describe("Page Routes (M3-06)", () => {
 
     it("has descriptive placeholder content", async () => {
       const BlogPage = (await import("@/app/blog/page")).default;
-      render(<BlogPage />);
+      const Page = await BlogPage();
+      render(Page);
       expect(document.body.textContent).toBeTruthy();
     });
   });

@@ -58,10 +58,7 @@ export default async function BlogPage() {
 
   return (
     <PageLayout title="Blog">
-      <p
-        data-testid="blog-intro"
-        className="mb-12 text-lg text-text-secondary"
-      >
+      <p data-testid="blog-intro" className="mb-12 text-lg text-text-secondary">
         Our latest thoughts on plant care and living with nature. These articles
         are published on Medium—click any post to read the full article there.
       </p>
