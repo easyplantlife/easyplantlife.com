@@ -144,7 +144,7 @@ describe("Resend Configuration", () => {
 describe("Resend Environment Integration", () => {
   it("should use RESEND_API_KEY from environment", () => {
     // This test validates that the module reads from the correct env variable
-    const envVars: (keyof NodeJS.ProcessEnv)[] = ["RESEND_API_KEY"];
+    const envVars = ["RESEND_API_KEY"] as const;
 
     envVars.forEach((key) => {
       expect(typeof key).toBe("string");
