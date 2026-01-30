@@ -1,4 +1,8 @@
-import { forwardRef, type AnchorHTMLAttributes, type MouseEvent } from "react";
+import React, {
+  forwardRef,
+  type AnchorHTMLAttributes,
+  type MouseEvent,
+} from "react";
 import NextLink from "next/link";
 import { trackOutboundClick } from "@/lib/analytics/events";
 
@@ -42,14 +46,10 @@ function getTextContent(node: React.ReactNode): string {
   if (typeof node === "string") return node;
   if (typeof node === "number") return String(node);
   if (Array.isArray(node)) {
-    return node
-      .map(getTextContent)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
+    return node.map(getTextContent).join(" ").replace(/\s+/g, " ").trim();
   }
-  if (node && typeof node === "object" && "props" in node) {
-    return getTextContent((node as React.ReactElement).props.children);
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return getTextContent(node.props.children);
   }
   return "";
 }

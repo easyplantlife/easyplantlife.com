@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useEffect, type HTMLAttributes, type FormEvent } from "react";
+import {
+  useState,
+  useEffect,
+  type HTMLAttributes,
+  type FormEvent,
+} from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { trackFormView, trackNewsletterSubmit } from "@/lib/analytics/events";
