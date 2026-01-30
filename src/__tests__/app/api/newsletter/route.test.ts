@@ -205,9 +205,7 @@ describe("POST /api/newsletter", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe(
-        "Unable to subscribe. Please try again later."
-      );
+      expect(data.error).toBe("Unable to subscribe. Please try again later.");
     });
 
     it("should return 500 when email service is not configured", async () => {
@@ -221,9 +219,7 @@ describe("POST /api/newsletter", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe(
-        "Unable to subscribe. Please try again later."
-      );
+      expect(data.error).toBe("Unable to subscribe. Please try again later.");
     });
 
     it("should handle unexpected errors gracefully", async () => {
@@ -235,9 +231,7 @@ describe("POST /api/newsletter", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe(
-        "Unable to subscribe. Please try again later."
-      );
+      expect(data.error).toBe("Unable to subscribe. Please try again later.");
     });
   });
 

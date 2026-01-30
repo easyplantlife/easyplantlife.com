@@ -8,7 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { addToNewsletter, EmailServiceError } from "@/lib/api/email";
+import { addToNewsletter } from "@/lib/api/email";
 
 /**
  * Simple email validation regex.
