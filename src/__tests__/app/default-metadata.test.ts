@@ -180,7 +180,7 @@ describe("Default Site-Wide Metadata (M10-03)", () => {
   });
 });
 
-describe("Static Icon Files", () => {
+describe("Icon and Image Files", () => {
   const appDir = path.join(process.cwd(), "src", "app");
 
   it("favicon.ico exists in app directory", () => {
@@ -188,13 +188,15 @@ describe("Static Icon Files", () => {
     expect(fs.existsSync(faviconPath)).toBe(true);
   });
 
-  it("apple-icon.png exists in app directory", () => {
-    const appleIconPath = path.join(appDir, "apple-icon.png");
+  it("apple-icon generator exists (apple-icon.tsx)", () => {
+    // Next.js supports dynamic icon generation via .tsx files
+    const appleIconPath = path.join(appDir, "apple-icon.tsx");
     expect(fs.existsSync(appleIconPath)).toBe(true);
   });
 
-  it("opengraph-image.png exists in app directory", () => {
-    const ogImagePath = path.join(appDir, "opengraph-image.png");
+  it("opengraph-image generator exists (opengraph-image.tsx)", () => {
+    // Next.js supports dynamic OG image generation via .tsx files
+    const ogImagePath = path.join(appDir, "opengraph-image.tsx");
     expect(fs.existsSync(ogImagePath)).toBe(true);
   });
 });
