@@ -196,25 +196,30 @@ Default configuration (automatically detected or uses these defaults):
 ### Common Issues and Solutions
 
 **GitHub CLI not authenticated**
+
 - Run `gh auth login` and follow the prompts
 - Verify with `gh auth status`
 
 **Permission denied on repository**
+
 - Ensure you have write access to the repository
 - Check with repository owner if you need to be added as collaborator
 
 **Validation fails repeatedly (5+ attempts)**
+
 - The command will stop and report the issue
 - Review errors manually: `npm run lint`, `npm test`
 - Fix issues locally and commit
 - Resume with `/build --validate`
 
 **Resume interrupted workflow**
+
 - If on an issue branch (`issue-<N>-*`), the command automatically detects it
 - Check current branch: `git branch --show-current`
 - Resume from appropriate phase based on current state
 
 **Git conflicts or dirty working directory**
+
 - Stash changes: `git stash`
 - Or commit current work: `git add -A && git commit -m "WIP: <description>"`
 - Then re-run the command

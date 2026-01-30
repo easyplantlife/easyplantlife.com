@@ -5,6 +5,7 @@
 This document transforms the MasterDocument.md into executable specifications, acceptance tests, and atomic tasks suitable for TDD-driven development by junior developers.
 
 Each task is designed to be:
+
 - Completable in 1–2 hours
 - Self-contained with clear "done" criteria
 - Testable before implementation
@@ -14,19 +15,19 @@ Each task is designed to be:
 
 ## Milestone Overview
 
-| # | Milestone | Est. Tasks | Focus |
-|---|-----------|------------|-------|
-| M1 | Project Foundation | 8 | Setup, config, CI/CD |
-| M2 | Design System | 10 | Typography, colors, components |
-| M3 | Layout & Navigation | 7 | Header, footer, routing |
-| M4 | Home Page | 6 | Hero, CTAs, brand message |
-| M5 | About Page | 4 | Philosophy content |
-| M6 | Books Page | 5 | Book display, external links |
-| M7 | Blog Integration | 7 | Medium integration, post list |
-| M8 | Newsletter System | 8 | Resend integration, forms |
-| M9 | Contact Page | 5 | Contact form, email delivery |
-| M10 | Analytics & SEO | 6 | GA4, meta tags, sitemap |
-| M11 | Polish & Launch | 5 | Accessibility, performance, final QA |
+| #   | Milestone           | Est. Tasks | Focus                                |
+| --- | ------------------- | ---------- | ------------------------------------ |
+| M1  | Project Foundation  | 8          | Setup, config, CI/CD                 |
+| M2  | Design System       | 10         | Typography, colors, components       |
+| M3  | Layout & Navigation | 7          | Header, footer, routing              |
+| M4  | Home Page           | 6          | Hero, CTAs, brand message            |
+| M5  | About Page          | 4          | Philosophy content                   |
+| M6  | Books Page          | 5          | Book display, external links         |
+| M7  | Blog Integration    | 7          | Medium integration, post list        |
+| M8  | Newsletter System   | 8          | Resend integration, forms            |
+| M9  | Contact Page        | 5          | Contact form, email delivery         |
+| M10 | Analytics & SEO     | 6          | GA4, meta tags, sitemap              |
+| M11 | Polish & Launch     | 5          | Accessibility, performance, final QA |
 
 **Total: 71 tasks**
 
@@ -42,6 +43,7 @@ Each task is designed to be:
 Create a new Next.js project using the App Router architecture. The project must use TypeScript for type safety and be configured for static-first rendering as specified in the tech stack.
 
 **Acceptance Criteria:**
+
 - [ ] Project created with `create-next-app` using App Router
 - [ ] TypeScript enabled and configured
 - [ ] Default boilerplate removed (default pages, styles)
@@ -50,6 +52,7 @@ Create a new Next.js project using the App Router architecture. The project must
 - [ ] Project structure follows Next.js 14+ conventions
 
 **Test Cases:**
+
 ```
 GIVEN a fresh clone of the repository
 WHEN I run `npm install && npm run build`
@@ -72,6 +75,7 @@ THEN I see a blank page (no boilerplate content)
 Install and configure Tailwind CSS with a minimal custom theme. This establishes the foundation for the design system. Do not add brand colors yet—that comes in M2.
 
 **Acceptance Criteria:**
+
 - [ ] Tailwind CSS installed and configured
 - [ ] `tailwind.config.ts` created with TypeScript
 - [ ] Global CSS file imports Tailwind directives
@@ -80,6 +84,7 @@ Install and configure Tailwind CSS with a minimal custom theme. This establishes
 - [ ] Unused CSS purged in production builds
 
 **Test Cases:**
+
 ```
 GIVEN a component with className="text-red-500"
 WHEN the page renders
@@ -102,6 +107,7 @@ THEN unused Tailwind classes are not included
 Set up ESLint with Next.js recommended rules and Prettier for consistent formatting. Configure them to work together without conflicts.
 
 **Acceptance Criteria:**
+
 - [ ] ESLint configured with Next.js and TypeScript rules
 - [ ] Prettier configured with consistent style rules
 - [ ] ESLint and Prettier do not conflict
@@ -109,6 +115,7 @@ Set up ESLint with Next.js recommended rules and Prettier for consistent formatt
 - [ ] Pre-commit hook runs linting (optional but recommended)
 
 **Test Cases:**
+
 ```
 GIVEN a file with inconsistent formatting
 WHEN I run `npm run lint`
@@ -131,6 +138,7 @@ THEN the TypeScript error is caught
 Configure Jest with React Testing Library for component and integration testing. This is critical for TDD workflow—tests must be runnable before any feature work begins.
 
 **Acceptance Criteria:**
+
 - [ ] Jest installed and configured for Next.js
 - [ ] React Testing Library installed
 - [ ] `jest.config.ts` properly configured
@@ -139,6 +147,7 @@ Configure Jest with React Testing Library for component and integration testing.
 - [ ] Coverage reporting enabled
 
 **Test Cases:**
+
 ```
 GIVEN a test file with `describe` and `it` blocks
 WHEN I run `npm test`
@@ -161,6 +170,7 @@ THEN component renders and assertions pass
 Set up environment variable handling for different environments (development, production). Create `.env.example` with all required variables documented.
 
 **Acceptance Criteria:**
+
 - [ ] `.env.local` created and gitignored
 - [ ] `.env.example` created with all required variables (no secrets)
 - [ ] Environment variables typed in TypeScript
@@ -168,6 +178,7 @@ Set up environment variable handling for different environments (development, pr
 - [ ] Documentation for each variable in `.env.example`
 
 **Required Variables:**
+
 ```
 # Analytics
 NEXT_PUBLIC_GA_MEASUREMENT_ID=
@@ -191,6 +202,7 @@ MEDIUM_PUBLICATION_URL=
 Establish the folder structure that will be used throughout the project. This provides clear conventions for where code lives.
 
 **Acceptance Criteria:**
+
 - [ ] `/app` - Next.js App Router pages
 - [ ] `/components` - Reusable UI components
 - [ ] `/components/ui` - Primitive UI components
@@ -214,6 +226,7 @@ Establish the folder structure that will be used throughout the project. This pr
 Set up path aliases for cleaner imports. This prevents deeply nested relative imports and makes refactoring easier.
 
 **Acceptance Criteria:**
+
 - [ ] `@/` alias points to project root
 - [ ] `@/components` alias works
 - [ ] `@/lib` alias works
@@ -221,6 +234,7 @@ Set up path aliases for cleaner imports. This prevents deeply nested relative im
 - [ ] IDE autocomplete works with aliases
 
 **Test Cases:**
+
 ```
 GIVEN a component importing from "@/lib/utils"
 WHEN the file is compiled
@@ -239,6 +253,7 @@ THEN the import resolves correctly
 Create a GitHub Actions workflow that runs on every push and PR. The pipeline must run linting, type checking, and tests.
 
 **Acceptance Criteria:**
+
 - [ ] `.github/workflows/ci.yml` created
 - [ ] Pipeline triggers on push to main and PRs
 - [ ] Runs `npm ci` for clean installs
@@ -261,6 +276,7 @@ Create a GitHub Actions workflow that runs on every push and PR. The pipeline mu
 Add the brand color palette to Tailwind configuration. Colors should match the visual identity: soft greens, off-whites, warm neutrals. No loud contrast.
 
 **Acceptance Criteria:**
+
 - [ ] Primary green color scale defined (50-900)
 - [ ] Neutral/warm white scale defined
 - [ ] Background colors defined
@@ -269,6 +285,7 @@ Add the brand color palette to Tailwind configuration. Colors should match the v
 - [ ] No default Tailwind colors leak into design
 
 **Color Specifications:**
+
 ```
 Primary (Soft Green): For accents, links, CTAs
 - Light: #E8F5E9
@@ -294,6 +311,7 @@ Neutral (Warm):
 Set up the typography system with fonts that feel "human and organic" per brand guidelines. Use serif or soft sans-serif combinations. Ensure excellent readability.
 
 **Acceptance Criteria:**
+
 - [ ] Primary font selected and loaded (likely serif for headings)
 - [ ] Secondary font selected (soft sans-serif for body)
 - [ ] Font files optimized and self-hosted or via Google Fonts
@@ -302,6 +320,7 @@ Set up the typography system with fonts that feel "human and organic" per brand 
 - [ ] Tailwind typography configured
 
 **Test Cases:**
+
 ```
 GIVEN the homepage loads
 WHEN I inspect the body text
@@ -324,6 +343,7 @@ THEN they use the heading font with correct sizes
 Configure Tailwind's spacing scale to create consistent, harmonious spacing throughout the site. The design should have "strong use of white space."
 
 **Acceptance Criteria:**
+
 - [ ] Spacing scale defined (4, 8, 16, 24, 32, 48, 64, 96, 128)
 - [ ] Section padding standardized
 - [ ] Component internal spacing consistent
@@ -341,6 +361,7 @@ Configure Tailwind's spacing scale to create consistent, harmonious spacing thro
 Build the primary Button component following TDD. This will be used for all CTAs including newsletter signup and navigation.
 
 **Acceptance Criteria:**
+
 - [ ] Button component created at `/components/ui/Button.tsx`
 - [ ] Variants: `primary`, `secondary`, `ghost`
 - [ ] Sizes: `sm`, `md`, `lg`
@@ -349,6 +370,7 @@ Build the primary Button component following TDD. This will be used for all CTAs
 - [ ] TypeScript props interface defined
 
 **Test Cases:**
+
 ```
 GIVEN a Button with variant="primary"
 WHEN it renders
@@ -375,6 +397,7 @@ THEN the focus ring is visible
 Build a Link component that wraps Next.js Link with consistent styling. Must handle both internal and external links appropriately.
 
 **Acceptance Criteria:**
+
 - [ ] Link component created at `/components/ui/Link.tsx`
 - [ ] Internal links use Next.js Link
 - [ ] External links open in new tab with `rel="noopener noreferrer"`
@@ -383,6 +406,7 @@ Build a Link component that wraps Next.js Link with consistent styling. Must han
 - [ ] Accessible
 
 **Test Cases:**
+
 ```
 GIVEN a Link with href="/about"
 WHEN it renders
@@ -405,6 +429,7 @@ THEN it has target="_blank" and rel="noopener noreferrer"
 Build Text and Heading components for consistent typography usage. These enforce the type scale and prevent one-off styling.
 
 **Acceptance Criteria:**
+
 - [ ] Heading component with levels 1-6
 - [ ] Text component with size variants
 - [ ] Semantic HTML tags used (h1, h2, p, span)
@@ -412,6 +437,7 @@ Build Text and Heading components for consistent typography usage. These enforce
 - [ ] Components accept className for overrides
 
 **Test Cases:**
+
 ```
 GIVEN a Heading with level={1}
 WHEN it renders
@@ -434,6 +460,7 @@ THEN it has the large font size class
 Build a styled Input component for forms (newsletter, contact). Must be accessible and handle validation states.
 
 **Acceptance Criteria:**
+
 - [ ] Input component at `/components/ui/Input.tsx`
 - [ ] Label association (via id or wrapping)
 - [ ] Error state styling
@@ -442,6 +469,7 @@ Build a styled Input component for forms (newsletter, contact). Must be accessib
 - [ ] TypeScript props for all HTML input attributes
 
 **Test Cases:**
+
 ```
 GIVEN an Input with error="Email is required"
 WHEN it renders
@@ -465,6 +493,7 @@ THEN the label is associated with the input (accessible)
 Build a Container component that provides consistent max-width and horizontal padding. Used to constrain content width across all pages.
 
 **Acceptance Criteria:**
+
 - [ ] Container component at `/components/ui/Container.tsx`
 - [ ] Max-width appropriate for reading (prose ~65ch for text)
 - [ ] Wider variant for full layouts
@@ -472,6 +501,7 @@ Build a Container component that provides consistent max-width and horizontal pa
 - [ ] Centers content
 
 **Test Cases:**
+
 ```
 GIVEN a Container with variant="prose"
 WHEN it renders
@@ -494,6 +524,7 @@ THEN it has appropriate horizontal padding
 Build a minimal Card component for displaying books and blog posts. Keep it simple—no heavy shadows or borders per brand guidelines.
 
 **Acceptance Criteria:**
+
 - [ ] Card component at `/components/ui/Card.tsx`
 - [ ] Subtle styling (minimal border or shadow)
 - [ ] Padding consistent with spacing scale
@@ -512,6 +543,7 @@ Build a minimal Card component for displaying books and blog posts. Keep it simp
 Build a dev-only page (`/dev/design-system`) that displays all components and their variants. This serves as living documentation.
 
 **Acceptance Criteria:**
+
 - [ ] Page only accessible in development
 - [ ] Shows all colors from palette
 - [ ] Shows typography scale
@@ -532,6 +564,7 @@ Build a dev-only page (`/dev/design-system`) that displays all components and th
 Build the root layout (`/app/layout.tsx`) that wraps all pages. Must include proper HTML structure, metadata, and font loading.
 
 **Acceptance Criteria:**
+
 - [ ] Root layout created
 - [ ] HTML lang attribute set
 - [ ] Fonts loaded via next/font
@@ -540,6 +573,7 @@ Build the root layout (`/app/layout.tsx`) that wraps all pages. Must include pro
 - [ ] Viewport meta tag correct
 
 **Test Cases:**
+
 ```
 GIVEN any page renders
 WHEN I inspect the HTML
@@ -559,6 +593,7 @@ AND fonts are loaded without layout shift
 Build the site header with logo and navigation links. Keep it minimal per brand guidelines. Mobile responsiveness is critical.
 
 **Acceptance Criteria:**
+
 - [ ] Header component at `/components/Header.tsx`
 - [ ] Logo displayed (mark logo on mobile, can be full on desktop)
 - [ ] Navigation links: Home, About, Books, Blog, Newsletter, Contact
@@ -567,6 +602,7 @@ Build the site header with logo and navigation links. Keep it minimal per brand 
 - [ ] Accessible navigation (nav element, aria labels)
 
 **Test Cases:**
+
 ```
 GIVEN the header renders on desktop
 WHEN I look at navigation
@@ -593,6 +629,7 @@ THEN they hear appropriate aria labels
 Build the mobile navigation experience. Should feel calm and intentional—no jarring animations. Consider a slide-in drawer or simple dropdown.
 
 **Acceptance Criteria:**
+
 - [ ] Mobile menu component created
 - [ ] Opens/closes smoothly
 - [ ] All navigation links accessible
@@ -602,6 +639,7 @@ Build the mobile navigation experience. Should feel calm and intentional—no ja
 - [ ] Escape key closes menu
 
 **Test Cases:**
+
 ```
 GIVEN the mobile menu is open
 WHEN I click a navigation link
@@ -625,6 +663,7 @@ THEN the menu closes
 Build the site footer with logo lockup, essential links, and copyright. Keep minimal—this is not a mega-footer.
 
 **Acceptance Criteria:**
+
 - [ ] Footer component at `/components/Footer.tsx`
 - [ ] Logo lockup displayed
 - [ ] Essential links (About, Contact, Newsletter)
@@ -633,6 +672,7 @@ Build the site footer with logo lockup, essential links, and copyright. Keep min
 - [ ] Consistent with brand (calm, minimal)
 
 **Test Cases:**
+
 ```
 GIVEN the footer renders
 WHEN I look at the copyright
@@ -655,6 +695,7 @@ THEN it uses a footer element
 Build a PageLayout component that provides consistent structure for all pages: proper spacing, max-width, and page title handling.
 
 **Acceptance Criteria:**
+
 - [ ] PageLayout component created
 - [ ] Accepts title prop for page heading
 - [ ] Consistent vertical padding
@@ -673,6 +714,7 @@ Build a PageLayout component that provides consistent structure for all pages: p
 Create the route files for all pages with placeholder content. This establishes the information architecture.
 
 **Acceptance Criteria:**
+
 - [ ] `/app/page.tsx` - Home
 - [ ] `/app/about/page.tsx` - About
 - [ ] `/app/books/page.tsx` - Books
@@ -683,6 +725,7 @@ Create the route files for all pages with placeholder content. This establishes 
 - [ ] Each page renders without error
 
 **Test Cases:**
+
 ```
 GIVEN I navigate to /about
 WHEN the page loads
@@ -705,6 +748,7 @@ THEN I see a 404 page
 Build a custom 404 page that matches the brand. Should be helpful and calm, not jarring.
 
 **Acceptance Criteria:**
+
 - [ ] `/app/not-found.tsx` created
 - [ ] Friendly message
 - [ ] Link back to home
@@ -725,6 +769,7 @@ Build a custom 404 page that matches the brand. Should be helpful and calm, not 
 Build the hero section for the home page. This is the first impression—must communicate the brand in under 30 seconds. Include logo, tagline, and brief brand explanation.
 
 **Acceptance Criteria:**
+
 - [ ] Hero component at `/components/home/Hero.tsx`
 - [ ] Logo prominently displayed
 - [ ] Short tagline (2-4 words) visible immediately
@@ -734,6 +779,7 @@ Build the hero section for the home page. This is the first impression—must co
 - [ ] Feels "calm and intentional"
 
 **Test Cases:**
+
 ```
 GIVEN the home page loads
 WHEN I view the hero section
@@ -756,6 +802,7 @@ THEN there are no more than 3 sentences
 Build the primary CTA section for newsletter signup on the home page. This is the primary conversion goal.
 
 **Acceptance Criteria:**
+
 - [ ] NewsletterCTA component created
 - [ ] Clear value proposition (one sentence)
 - [ ] Email input field
@@ -765,6 +812,7 @@ Build the primary CTA section for newsletter signup on the home page. This is th
 - [ ] No hype or marketing language
 
 **Test Cases:**
+
 ```
 GIVEN the newsletter CTA
 WHEN I read the copy
@@ -791,6 +839,7 @@ THEN an error message displays
 Build the secondary CTA section that directs users to Blog and Books. Keep minimal—just clear paths forward.
 
 **Acceptance Criteria:**
+
 - [ ] Section with links to Blog and Books
 - [ ] Clear, simple labels
 - [ ] Consistent styling with brand
@@ -809,6 +858,7 @@ Build the secondary CTA section that directs users to Blog and Books. Keep minim
 Combine all home page components into the final page. Ensure proper spacing, flow, and that it remains single-scroll or near single-scroll.
 
 **Acceptance Criteria:**
+
 - [ ] Hero section renders
 - [ ] Newsletter CTA renders
 - [ ] Secondary CTAs render
@@ -817,6 +867,7 @@ Combine all home page components into the final page. Ensure proper spacing, flo
 - [ ] Responsive on all devices
 
 **Test Cases:**
+
 ```
 GIVEN the home page on desktop
 WHEN I view without scrolling
@@ -839,6 +890,7 @@ THEN all sections are accessible and readable
 Add proper metadata for the home page including title, description, and Open Graph tags.
 
 **Acceptance Criteria:**
+
 - [ ] Page title set
 - [ ] Meta description set (under 160 characters)
 - [ ] Open Graph title and description
@@ -857,6 +909,7 @@ Add proper metadata for the home page including title, description, and Open Gra
 Write comprehensive tests for the home page to ensure all components render correctly and interactions work.
 
 **Test Cases:**
+
 ```
 GIVEN the home page
 WHEN it loads
@@ -888,6 +941,7 @@ THEN all content is accessible
 Build the About page content component. Content explains why Easy Plant Life exists and what it is NOT. Tone is personal but not biographical.
 
 **Acceptance Criteria:**
+
 - [ ] About content component created
 - [ ] Explains "why Easy Plant Life exists"
 - [ ] Clearly states what it is NOT
@@ -896,6 +950,7 @@ Build the About page content component. Content explains why Easy Plant Life exi
 - [ ] Not preachy or activist
 
 **Content Sections:**
+
 1. Why Easy Plant Life exists
 2. What we believe
 3. What we're not (explicitly)
@@ -912,6 +967,7 @@ Build the About page content component. Content explains why Easy Plant Life exi
 Combine components into the final About page with proper layout and spacing.
 
 **Acceptance Criteria:**
+
 - [ ] Page uses PageLayout component
 - [ ] Content flows naturally
 - [ ] Appropriate heading hierarchy
@@ -930,6 +986,7 @@ Combine components into the final About page with proper layout and spacing.
 Add proper metadata for the About page.
 
 **Acceptance Criteria:**
+
 - [ ] Page title: "About | Easy Plant Life"
 - [ ] Meta description set
 - [ ] Open Graph tags
@@ -946,6 +1003,7 @@ Add proper metadata for the About page.
 Write tests to ensure About page renders correctly.
 
 **Test Cases:**
+
 ```
 GIVEN the about page
 WHEN it loads
@@ -968,6 +1026,7 @@ AND the "what we're not" section is present
 Create the data structure for books and add initial book content. Books are static content for MVP.
 
 **Acceptance Criteria:**
+
 - [ ] Book TypeScript interface defined
 - [ ] Book data stored in `/content/books.ts`
 - [ ] Each book has: title, description, cover image, status, purchase links
@@ -975,13 +1034,14 @@ Create the data structure for books and add initial book content. Books are stat
 - [ ] At least one book entry (can be placeholder)
 
 **Data Structure:**
+
 ```typescript
 interface Book {
   id: string;
   title: string;
   description: string;
   coverImage: string;
-  status: 'available' | 'coming-soon';
+  status: "available" | "coming-soon";
   purchaseLinks: {
     label: string;
     url: string;
@@ -1001,6 +1061,7 @@ interface Book {
 Build a card component specifically for displaying books. Shows cover, title, description, status, and purchase links.
 
 **Acceptance Criteria:**
+
 - [ ] BookCard component at `/components/books/BookCard.tsx`
 - [ ] Displays cover image
 - [ ] Displays title and short description
@@ -1009,6 +1070,7 @@ Build a card component specifically for displaying books. Shows cover, title, de
 - [ ] External links have proper attributes
 
 **Test Cases:**
+
 ```
 GIVEN a book with status "available"
 WHEN the card renders
@@ -1032,6 +1094,7 @@ AND no purchase links are displayed
 Build a component that displays all books. Layout should be clean and scannable.
 
 **Acceptance Criteria:**
+
 - [ ] BooksList component created
 - [ ] Renders all books from data source
 - [ ] Responsive layout (single column mobile, may expand desktop)
@@ -1049,6 +1112,7 @@ Build a component that displays all books. Layout should be clean and scannable.
 Combine components into the final Books page.
 
 **Acceptance Criteria:**
+
 - [ ] Page uses PageLayout
 - [ ] Page title/intro explaining the books section
 - [ ] Books list renders
@@ -1066,6 +1130,7 @@ Combine components into the final Books page.
 Write tests for books page and components.
 
 **Test Cases:**
+
 ```
 GIVEN the books page
 WHEN it loads
@@ -1090,6 +1155,7 @@ THEN they have target="_blank" and rel="noopener noreferrer"
 Research how to fetch posts from Medium. Options include RSS feed, Medium API (if available), or manual curation. Document the chosen approach.
 
 **Acceptance Criteria:**
+
 - [ ] Research Medium RSS feed structure
 - [ ] Determine if API access is available/needed
 - [ ] Document the chosen integration method
@@ -1110,6 +1176,7 @@ Research how to fetch posts from Medium. Options include RSS feed, Medium API (i
 Build a service to fetch blog posts from Medium. This handles all Medium API/RSS communication.
 
 **Acceptance Criteria:**
+
 - [ ] Service at `/lib/api/medium.ts`
 - [ ] Fetches post list from Medium
 - [ ] Parses required fields: title, excerpt, URL, date
@@ -1118,6 +1185,7 @@ Build a service to fetch blog posts from Medium. This handles all Medium API/RSS
 - [ ] TypeScript types for Medium post data
 
 **Test Cases:**
+
 ```
 GIVEN the Medium service
 WHEN fetching posts succeeds
@@ -1140,6 +1208,7 @@ THEN it throws a descriptive error
 Create the TypeScript interface for blog posts as displayed on the site.
 
 **Acceptance Criteria:**
+
 - [ ] BlogPost interface defined
 - [ ] Fields: title, excerpt, url, publishedDate
 - [ ] Optional fields: thumbnail, readTime
@@ -1157,6 +1226,7 @@ Create the TypeScript interface for blog posts as displayed on the site.
 Build a card component for displaying blog post previews. Links out to Medium.
 
 **Acceptance Criteria:**
+
 - [ ] BlogPostCard component created
 - [ ] Displays title prominently
 - [ ] Shows excerpt (truncated if needed)
@@ -1165,6 +1235,7 @@ Build a card component for displaying blog post previews. Links out to Medium.
 - [ ] External link indicators present
 
 **Test Cases:**
+
 ```
 GIVEN a blog post card
 WHEN it renders
@@ -1184,6 +1255,7 @@ AND the link opens in a new tab
 Build a component that displays a list of blog posts.
 
 **Acceptance Criteria:**
+
 - [ ] BlogPostsList component created
 - [ ] Accepts posts array as prop
 - [ ] Handles empty state gracefully
@@ -1191,6 +1263,7 @@ Build a component that displays a list of blog posts.
 - [ ] Error state handled
 
 **Test Cases:**
+
 ```
 GIVEN an empty posts array
 WHEN the list renders
@@ -1213,6 +1286,7 @@ THEN a loading indicator displays
 Combine components into the final Blog page. Implement data fetching.
 
 **Acceptance Criteria:**
+
 - [ ] Page uses PageLayout
 - [ ] Fetches posts on load (SSR or SSG)
 - [ ] Displays posts list
@@ -1232,6 +1306,7 @@ Combine components into the final Blog page. Implement data fetching.
 Write comprehensive tests for blog functionality.
 
 **Test Cases:**
+
 ```
 GIVEN the blog page with posts
 WHEN it loads
@@ -1260,6 +1335,7 @@ THEN they open Medium in a new tab
 Set up Resend account, create API key, and configure for newsletter functionality.
 
 **Acceptance Criteria:**
+
 - [ ] Resend account created
 - [ ] API key generated and stored in environment
 - [ ] Domain verified in Resend (if using custom domain)
@@ -1278,6 +1354,7 @@ Set up Resend account, create API key, and configure for newsletter functionalit
 Build a service layer for interacting with Resend API. Abstracts email functionality.
 
 **Acceptance Criteria:**
+
 - [ ] Email service at `/lib/api/email.ts`
 - [ ] Function to add contact to newsletter audience
 - [ ] Function to send transactional email (for contact form)
@@ -1285,6 +1362,7 @@ Build a service layer for interacting with Resend API. Abstracts email functiona
 - [ ] TypeScript types for all parameters/returns
 
 **Test Cases:**
+
 ```
 GIVEN a valid email
 WHEN addToNewsletter is called
@@ -1307,6 +1385,7 @@ THEN it throws an appropriate error
 Build the API route that handles newsletter signup submissions.
 
 **Acceptance Criteria:**
+
 - [ ] API route at `/app/api/newsletter/route.ts`
 - [ ] Accepts POST with email in body
 - [ ] Validates email format
@@ -1315,6 +1394,7 @@ Build the API route that handles newsletter signup submissions.
 - [ ] Rate limiting considered
 
 **Test Cases:**
+
 ```
 GIVEN a valid email POST request
 WHEN the API is called
@@ -1341,6 +1421,7 @@ THEN it returns 200 (idempotent, no error to user)
 Build the newsletter form component with proper validation and state handling.
 
 **Acceptance Criteria:**
+
 - [ ] NewsletterForm component created
 - [ ] Email input with validation
 - [ ] Submit button with loading state
@@ -1350,6 +1431,7 @@ Build the newsletter form component with proper validation and state handling.
 - [ ] No marketing hype in copy
 
 **Test Cases:**
+
 ```
 GIVEN an empty form
 WHEN I click submit
@@ -1378,6 +1460,7 @@ AND form can be resubmitted
 Build the dedicated newsletter signup page with form and value proposition.
 
 **Acceptance Criteria:**
+
 - [ ] Page uses PageLayout
 - [ ] One-sentence promise/value proposition
 - [ ] Newsletter form prominent
@@ -1397,6 +1480,7 @@ Build the dedicated newsletter signup page with form and value proposition.
 Wire up the newsletter form on the home page to actually submit to the API.
 
 **Acceptance Criteria:**
+
 - [ ] Home page form submits to newsletter API
 - [ ] Success/error states work correctly
 - [ ] Form resets appropriately after submission
@@ -1414,6 +1498,7 @@ Wire up the newsletter form on the home page to actually submit to the API.
 Add proper metadata for the newsletter page.
 
 **Acceptance Criteria:**
+
 - [ ] Page title: "Newsletter | Easy Plant Life"
 - [ ] Meta description emphasizing value
 - [ ] Open Graph tags
@@ -1430,6 +1515,7 @@ Add proper metadata for the newsletter page.
 Write tests covering the entire newsletter flow.
 
 **Test Cases:**
+
 ```
 GIVEN the newsletter API
 WHEN called with valid email
@@ -1458,6 +1544,7 @@ THEN it functions identically to dedicated page
 Build the API route that handles contact form submissions and sends email via Resend.
 
 **Acceptance Criteria:**
+
 - [ ] API route at `/app/api/contact/route.ts`
 - [ ] Accepts POST with name, email, message
 - [ ] Validates all required fields
@@ -1466,6 +1553,7 @@ Build the API route that handles contact form submissions and sends email via Re
 - [ ] Basic spam protection (honeypot field)
 
 **Test Cases:**
+
 ```
 GIVEN a valid contact form submission
 WHEN the API is called
@@ -1489,6 +1577,7 @@ THEN 400 response with validation errors
 Build the contact form with proper validation and state management.
 
 **Acceptance Criteria:**
+
 - [ ] ContactForm component created
 - [ ] Fields: name, email, message
 - [ ] Honeypot field for spam prevention (hidden)
@@ -1497,6 +1586,7 @@ Build the contact form with proper validation and state management.
 - [ ] Accessible
 
 **Test Cases:**
+
 ```
 GIVEN an empty form
 WHEN I submit
@@ -1524,6 +1614,7 @@ THEN it silently "succeeds" without sending
 Build the contact page with form and minimal additional content.
 
 **Acceptance Criteria:**
+
 - [ ] Page uses PageLayout
 - [ ] Contact form displayed
 - [ ] Optional: direct email address displayed
@@ -1543,6 +1634,7 @@ Build the contact page with form and minimal additional content.
 Add proper metadata for the contact page.
 
 **Acceptance Criteria:**
+
 - [ ] Page title: "Contact | Easy Plant Life"
 - [ ] Meta description
 - [ ] Open Graph tags
@@ -1559,6 +1651,7 @@ Add proper metadata for the contact page.
 Write tests for contact form and page.
 
 **Test Cases:**
+
 ```
 GIVEN the contact page
 WHEN it loads
@@ -1587,6 +1680,7 @@ THEN no email is sent but user sees "success"
 Integrate GA4 for basic traffic analytics. Keep it minimal—no invasive profiling.
 
 **Acceptance Criteria:**
+
 - [ ] GA4 measurement ID configured
 - [ ] Analytics script loads on all pages
 - [ ] Page views tracked automatically
@@ -1594,6 +1688,7 @@ Integrate GA4 for basic traffic analytics. Keep it minimal—no invasive profili
 - [ ] Analytics only loads in production
 
 **Test Cases:**
+
 ```
 GIVEN production environment
 WHEN any page loads
@@ -1616,12 +1711,14 @@ THEN GA4 script is NOT present
 Add tracking for meaningful user interactions as specified in MasterDocument.
 
 **Events to Track:**
+
 - Newsletter form view
 - Newsletter submission (success/failure)
 - Contact form submission
 - Outbound clicks (Medium articles, book purchases)
 
 **Acceptance Criteria:**
+
 - [ ] Event tracking utility created
 - [ ] Newsletter form view event fires
 - [ ] Newsletter submit event fires with outcome
@@ -1630,6 +1727,7 @@ Add tracking for meaningful user interactions as specified in MasterDocument.
 - [ ] Events include minimal necessary data
 
 **Test Cases:**
+
 ```
 GIVEN the newsletter form
 WHEN it becomes visible
@@ -1652,6 +1750,7 @@ THEN an outbound_click event is sent with destination
 Set up default metadata that applies to all pages unless overridden.
 
 **Acceptance Criteria:**
+
 - [ ] Default title template: "Page | Easy Plant Life"
 - [ ] Default description set
 - [ ] Default Open Graph image
@@ -1671,6 +1770,7 @@ Set up default metadata that applies to all pages unless overridden.
 Create a sitemap.xml for search engine crawling.
 
 **Acceptance Criteria:**
+
 - [ ] Sitemap generated at `/sitemap.xml`
 - [ ] Includes all public pages
 - [ ] Uses Next.js built-in sitemap generation
@@ -1688,6 +1788,7 @@ Create a sitemap.xml for search engine crawling.
 Create robots.txt with appropriate crawler directives.
 
 **Acceptance Criteria:**
+
 - [ ] robots.txt at `/robots.txt`
 - [ ] Allows all crawlers
 - [ ] Points to sitemap
@@ -1705,6 +1806,7 @@ Create robots.txt with appropriate crawler directives.
 Add basic structured data for better search results.
 
 **Acceptance Criteria:**
+
 - [ ] Organization schema on home page
 - [ ] WebSite schema with search action (if applicable)
 - [ ] Book schema on books page (for each book)
@@ -1724,6 +1826,7 @@ Add basic structured data for better search results.
 Audit the entire site for accessibility issues and fix any problems.
 
 **Acceptance Criteria:**
+
 - [ ] Run automated accessibility tests (axe, lighthouse)
 - [ ] Fix all critical/serious issues
 - [ ] Keyboard navigation works throughout
@@ -1733,6 +1836,7 @@ Audit the entire site for accessibility issues and fix any problems.
 - [ ] Forms are properly labeled
 
 **Test Cases:**
+
 ```
 GIVEN any page
 WHEN running axe accessibility audit
@@ -1755,6 +1859,7 @@ THEN all interactive elements are reachable
 Audit and optimize performance for fast loading and good Core Web Vitals.
 
 **Acceptance Criteria:**
+
 - [ ] Lighthouse performance score > 90
 - [ ] Images optimized (next/image, WebP)
 - [ ] Fonts optimized (subset, preload)
@@ -1763,6 +1868,7 @@ Audit and optimize performance for fast loading and good Core Web Vitals.
 - [ ] CSS purged of unused styles
 
 **Test Cases:**
+
 ```
 GIVEN any page
 WHEN running Lighthouse
@@ -1785,6 +1891,7 @@ THEN Largest Contentful Paint < 2.5s
 Verify the site works correctly across major browsers and devices.
 
 **Acceptance Criteria:**
+
 - [ ] Chrome (latest) tested
 - [ ] Firefox (latest) tested
 - [ ] Safari (latest) tested
@@ -1805,6 +1912,7 @@ Verify the site works correctly across major browsers and devices.
 Review all site content for accuracy, tone, and brand alignment.
 
 **Acceptance Criteria:**
+
 - [ ] All placeholder text replaced
 - [ ] Tone matches brand guidelines (calm, not preachy)
 - [ ] No typos or grammatical errors
@@ -1824,6 +1932,7 @@ Review all site content for accuracy, tone, and brand alignment.
 Verify all launch requirements are met.
 
 **Checklist:**
+
 - [ ] Domain configured and DNS propagated
 - [ ] SSL certificate active
 - [ ] Environment variables set in production
@@ -1866,29 +1975,29 @@ M11 (Polish & Launch) requires all other milestones complete
 
 ## Label Definitions
 
-| Label | Description |
-|-------|-------------|
+| Label               | Description                     |
+| ------------------- | ------------------------------- |
 | `priority:critical` | Must be done, blocks other work |
-| `priority:high` | Important, should be done soon |
-| `priority:medium` | Should be done, can wait |
-| `priority:low` | Nice to have |
-| `setup` | Project setup/configuration |
-| `foundation` | Core infrastructure |
-| `design-system` | Design system work |
-| `component` | Reusable component |
-| `page` | Page assembly |
-| `api` | Backend API work |
-| `testing` | Test writing |
-| `seo` | Search engine optimization |
-| `analytics` | Analytics implementation |
-| `qa` | Quality assurance |
-| `accessibility` | Accessibility work |
-| `performance` | Performance optimization |
+| `priority:high`     | Important, should be done soon  |
+| `priority:medium`   | Should be done, can wait        |
+| `priority:low`      | Nice to have                    |
+| `setup`             | Project setup/configuration     |
+| `foundation`        | Core infrastructure             |
+| `design-system`     | Design system work              |
+| `component`         | Reusable component              |
+| `page`              | Page assembly                   |
+| `api`               | Backend API work                |
+| `testing`           | Test writing                    |
+| `seo`               | Search engine optimization      |
+| `analytics`         | Analytics implementation        |
+| `qa`                | Quality assurance               |
+| `accessibility`     | Accessibility work              |
+| `performance`       | Performance optimization        |
 
 ---
 
 ## Revision History
 
-| Version | Date | Author | Notes |
-|---------|------|--------|-------|
-| 1.0 | 2026-01-30 | Claude (via Chad Le Grand methodology) | Initial specification |
+| Version | Date       | Author                                 | Notes                 |
+| ------- | ---------- | -------------------------------------- | --------------------- |
+| 1.0     | 2026-01-30 | Claude (via Chad Le Grand methodology) | Initial specification |

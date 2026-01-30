@@ -183,20 +183,24 @@ Default configuration (automatically detected or uses these defaults):
 ### Common Issues and Solutions
 
 **GitHub CLI not authenticated**
+
 - Run `gh auth login` and follow the prompts
 - Verify with `gh auth status`
 
 **Permission denied - cannot merge**
+
 - Ensure you have write/merge permissions to the repository
 - Check repository settings for branch protection rules
 
 **CI checks are failing**
+
 - Review which checks failed: `gh pr checks <pr-number> --repo <repo>`
 - Do NOT merge with failing checks
 - Fix issues on the PR branch and push changes
 - Wait for CI to pass before attempting merge again
 
 **Merge conflicts detected**
+
 - Checkout the PR branch: `gh pr checkout <pr-number>`
 - Merge base branch: `git merge origin/<base-branch>`
 - Resolve conflicts manually in affected files
@@ -205,10 +209,12 @@ Default configuration (automatically detected or uses these defaults):
 - Wait for CI to pass, then retry merge
 
 **Issue not auto-closing after merge**
+
 - Ensure PR description contains "Closes #<issue-number>" or "Resolves #<issue-number>"
 - If missing, manually close: `gh issue close <issue-number> --repo <repo>`
 
 **Branch not deleted after merge**
+
 - Remote branch: `gh api repos/<repo>/git/refs/heads/<branch-name> -X DELETE`
 - Local branch: `git branch -D <branch-name>` (force delete if needed)
 
