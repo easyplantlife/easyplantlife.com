@@ -4,8 +4,10 @@ import { useState, type HTMLAttributes, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-export interface NewsletterCTAProps
-  extends Omit<HTMLAttributes<HTMLElement>, "onSubmit"> {
+export interface NewsletterCTAProps extends Omit<
+  HTMLAttributes<HTMLElement>,
+  "onSubmit"
+> {
   /** Additional CSS classes */
   className?: string;
   /** Callback when form is submitted with valid email */
