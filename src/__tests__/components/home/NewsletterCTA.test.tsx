@@ -509,7 +509,9 @@ describe("handleNewsletterSubmit", () => {
       json: async () => ({ success: true }),
     });
 
-    await expect(handleNewsletterSubmit("test@example.com")).resolves.toBeUndefined();
+    await expect(
+      handleNewsletterSubmit("test@example.com")
+    ).resolves.toBeUndefined();
   });
 
   it("throws an error when API returns non-ok response", async () => {

@@ -26,7 +26,19 @@ import Home from "@/app/page";
  * THEN all content is accessible
  */
 
+// Mock fetch for newsletter API calls
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 describe("Home Page Integration Tests", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+    // Default to successful API response
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+  });
   describe("GIVEN the home page WHEN it loads", () => {
     /**
      * THEN the logo is visible
