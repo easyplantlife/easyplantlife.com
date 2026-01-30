@@ -1,7 +1,9 @@
 import { forwardRef, useId, type InputHTMLAttributes } from "react";
 
-export interface InputProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+export interface InputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "size"
+> {
   /** Label text for the input */
   label?: string;
   /** Error message to display below the input */
