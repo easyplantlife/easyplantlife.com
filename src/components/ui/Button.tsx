@@ -34,8 +34,7 @@ const variantStyles: Record<ButtonVariant, string> = {
     "bg-primary text-text-inverse hover:bg-primary-dark active:bg-primary-700",
   secondary:
     "bg-transparent border border-primary text-primary hover:bg-primary-50 active:bg-primary-100",
-  ghost:
-    "bg-transparent text-text hover:bg-neutral-100 active:bg-neutral-200",
+  ghost: "bg-transparent text-text hover:bg-neutral-100 active:bg-neutral-200",
 };
 
 /**
