@@ -62,7 +62,9 @@ describe("AboutContent Component", () => {
 
     it("has a heading for the beliefs section", () => {
       render(<AboutContent />);
-      const heading = screen.getByRole("heading", { name: /believe|philosophy/i });
+      const heading = screen.getByRole("heading", {
+        name: /believe|philosophy/i,
+      });
       expect(heading).toBeInTheDocument();
     });
 
@@ -118,7 +120,13 @@ describe("AboutContent Component", () => {
       const content = screen.getByTestId("about-content");
       const text = content.textContent?.toLowerCase() || "";
       // Should not contain activist/aggressive words
-      const activistWords = ["fight", "battle", "warrior", "revolution", "crusade"];
+      const activistWords = [
+        "fight",
+        "battle",
+        "warrior",
+        "revolution",
+        "crusade",
+      ];
       activistWords.forEach((word) => {
         expect(text).not.toContain(word);
       });
@@ -129,7 +137,13 @@ describe("AboutContent Component", () => {
       const content = screen.getByTestId("about-content");
       const text = content.textContent?.toLowerCase() || "";
       // Should not contain marketing hype
-      const hypeWords = ["amazing", "incredible", "revolutionary", "game-changing", "best ever"];
+      const hypeWords = [
+        "amazing",
+        "incredible",
+        "revolutionary",
+        "game-changing",
+        "best ever",
+      ];
       hypeWords.forEach((word) => {
         expect(text).not.toContain(word);
       });
@@ -168,7 +182,9 @@ describe("AboutContent Component", () => {
 
     it("uses brand typography for body text", () => {
       render(<AboutContent />);
-      const paragraphs = screen.getByTestId("about-content").querySelectorAll("p");
+      const paragraphs = screen
+        .getByTestId("about-content")
+        .querySelectorAll("p");
       paragraphs.forEach((p) => {
         expect(p).toHaveClass("font-body");
       });
@@ -186,7 +202,9 @@ describe("AboutContent Component", () => {
     it("does not render cards", () => {
       render(<AboutContent />);
       const content = screen.getByTestId("about-content");
-      const cards = content.querySelectorAll('[class*="card"], [data-testid*="card"]');
+      const cards = content.querySelectorAll(
+        '[class*="card"], [data-testid*="card"]'
+      );
       expect(cards).toHaveLength(0);
     });
 

@@ -59,8 +59,8 @@ export function AboutContent({ className = "", ...props }: AboutContentProps) {
         </p>
         <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
           Simplicity is a feature. If something adds complexity without adding
-          clarity, it probably doesn't belong here. We choose calm over urgency,
-          honest information over hype.
+          clarity, it probably doesn&apos;t belong here. We choose calm over
+          urgency, honest information over hype.
         </p>
         <p className="font-body text-lg text-text-secondary leading-relaxed">
           Long-term sustainability beats short-term perfection. Every time.
@@ -70,22 +70,22 @@ export function AboutContent({ className = "", ...props }: AboutContentProps) {
       {/* Section 3: What We're Not */}
       <section data-testid="about-not-section" className="mb-12">
         <h2 className="font-heading text-3xl md:text-4xl text-text mb-6">
-          What We're Not
+          What We&apos;re Not
         </h2>
         <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We're not here to tell you what to do. There's no judgment for
-          imperfect choices, no lectures about doing more, and no pressure to
-          become a different person.
+          We&apos;re not here to tell you what to do. There&apos;s no judgment
+          for imperfect choices, no lectures about doing more, and no pressure
+          to become a different person.
         </p>
         <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We don't do wellness influencer energy. We don't sell perfection or
-          pretend any of this is complicated. We're not interested in making you
-          feel bad about where you are right now.
+          We don&apos;t do wellness influencer energy. We don&apos;t sell
+          perfection or pretend any of this is complicated. We&apos;re not
+          interested in making you feel bad about where you are right now.
         </p>
         <p className="font-body text-lg text-text-secondary leading-relaxed">
           Easy Plant Life is not a lifestyle brand that expects you to buy in
-          completely. Take what works for you. Leave the rest. That's the whole
-          point.
+          completely. Take what works for you. Leave the rest. That&apos;s the
+          whole point.
         </p>
       </section>
     </article>
