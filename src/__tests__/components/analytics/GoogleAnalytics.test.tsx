@@ -22,7 +22,8 @@
 
 import { render } from "@testing-library/react";
 
-// Mock next/script
+/* eslint-disable @next/next/no-sync-scripts */
+// Mock next/script - uses native script elements to verify rendering behavior
 jest.mock("next/script", () => {
   const MockScript = ({
     id,
@@ -62,6 +63,7 @@ jest.mock("next/script", () => {
   MockScript.displayName = "MockScript";
   return MockScript;
 });
+/* eslint-enable @next/next/no-sync-scripts */
 
 // Import after mocking
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
@@ -113,7 +115,9 @@ describe("GoogleAnalytics Component (M10-01)", () => {
       const gtagScript = container.querySelector(
         'script[src*="googletagmanager.com/gtag"]'
       );
-      expect(gtagScript?.getAttribute("data-strategy")).toBe("afterInteractive");
+      expect(gtagScript?.getAttribute("data-strategy")).toBe(
+        "afterInteractive"
+      );
     });
 
     it("initializes gtag with page_view tracking", () => {

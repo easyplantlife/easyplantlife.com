@@ -41,9 +41,7 @@ jest.mock("next/font/google", () => {
 
 // Mock GoogleAnalytics component
 jest.mock("@/components/analytics/GoogleAnalytics", () => {
-  const MockGoogleAnalytics = () => (
-    <div data-testid="google-analytics-mock" />
-  );
+  const MockGoogleAnalytics = () => <div data-testid="google-analytics-mock" />;
   MockGoogleAnalytics.displayName = "MockGoogleAnalytics";
   return MockGoogleAnalytics;
 });
