@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
+import { handleNewsletterSubmit } from "@/components/home/NewsletterCTA";
 
 /**
  * NewsletterCTA Component Tests
@@ -14,9 +15,22 @@ import { NewsletterCTA } from "@/components/home/NewsletterCTA";
  * - Success state after submission
  * - Error state for failures
  * - No hype or marketing language
+ *
+ * Additional tests for issue #53 (M8-06):
+ * - Home page form submits to newsletter API
+ * - Success/error states work correctly
+ * - Form resets appropriately after submission
+ * - Same behavior as dedicated newsletter page
  */
 
+// Mock fetch for API calls
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 describe("NewsletterCTA Component", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
   describe("Rendering", () => {
     it("renders as a section element with appropriate landmark", () => {
       render(<NewsletterCTA />);
@@ -454,6 +468,203 @@ describe("NewsletterCTA Component", () => {
       hypeWords.forEach((word) => {
         expect(text).not.toContain(word);
       });
+    });
+  });
+});
+
+/**
+ * handleNewsletterSubmit Function Tests
+ *
+ * Tests for the newsletter API submission handler used by the home page CTA.
+ * Based on acceptance criteria from issue #53 (M8-06):
+ * - Home page form submits to newsletter API
+ * - Success/error states work correctly
+ * - Same behavior as dedicated newsletter page
+ */
+describe("handleNewsletterSubmit", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it("calls the newsletter API with the email", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    await handleNewsletterSubmit("test@example.com");
+
+    expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: "test@example.com" }),
+    });
+  });
+
+  it("resolves successfully when API returns ok response", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    await expect(handleNewsletterSubmit("test@example.com")).resolves.toBeUndefined();
+  });
+
+  it("throws an error when API returns non-ok response", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: "Invalid email format" }),
+    });
+
+    await expect(handleNewsletterSubmit("test@example.com")).rejects.toThrow(
+      "Invalid email format"
+    );
+  });
+
+  it("throws generic error when API error has no message", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+
+    await expect(handleNewsletterSubmit("test@example.com")).rejects.toThrow(
+      "Failed to subscribe"
+    );
+  });
+});
+
+/**
+ * NewsletterCTA API Integration Tests
+ *
+ * Tests for the NewsletterCTA component with the API handler.
+ * Based on acceptance criteria from issue #53 (M8-06):
+ * - Home page form submits to newsletter API
+ * - Success/error states work correctly
+ * - Form resets appropriately after submission
+ * - Same behavior as dedicated newsletter page
+ */
+describe("NewsletterCTA with API Integration", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
+
+  it("submits to API when using handleNewsletterSubmit", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const user = userEvent.setup();
+    render(<NewsletterCTA onSubmit={handleNewsletterSubmit} />);
+
+    const input = screen.getByRole("textbox", { name: /email/i });
+    const button = screen.getByRole("button", { name: /subscribe/i });
+
+    await user.type(input, "user@example.com");
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: "user@example.com" }),
+      });
+    });
+  });
+
+  it("shows success state after successful API submission", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const user = userEvent.setup();
+    render(<NewsletterCTA onSubmit={handleNewsletterSubmit} />);
+
+    const input = screen.getByRole("textbox", { name: /email/i });
+    const button = screen.getByRole("button", { name: /subscribe/i });
+
+    await user.type(input, "user@example.com");
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
+    });
+  });
+
+  it("shows error state when API fails", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: "Server error" }),
+    });
+
+    const user = userEvent.setup();
+    render(<NewsletterCTA onSubmit={handleNewsletterSubmit} />);
+
+    const input = screen.getByRole("textbox", { name: /email/i });
+    const button = screen.getByRole("button", { name: /subscribe/i });
+
+    await user.type(input, "user@example.com");
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
+    });
+  });
+
+  it("form remains visible after error for retry", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: "Server error" }),
+    });
+
+    const user = userEvent.setup();
+    render(<NewsletterCTA onSubmit={handleNewsletterSubmit} />);
+
+    const input = screen.getByRole("textbox", { name: /email/i });
+    const button = screen.getByRole("button", { name: /subscribe/i });
+
+    await user.type(input, "user@example.com");
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(screen.getByRole("form")).toBeInTheDocument();
+    });
+  });
+
+  it("defaults to API handler when no onSubmit prop is provided", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+
+    const user = userEvent.setup();
+    // Note: No onSubmit prop provided - should use default API handler
+    render(<NewsletterCTA />);
+
+    const input = screen.getByRole("textbox", { name: /email/i });
+    const button = screen.getByRole("button", { name: /subscribe/i });
+
+    await user.type(input, "default@example.com");
+    await user.click(button);
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: "default@example.com" }),
+      });
+    });
+
+    // Verify success state is shown
+    await waitFor(() => {
+      expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
     });
   });
 });

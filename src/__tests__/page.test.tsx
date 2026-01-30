@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
 
 /**
@@ -12,9 +13,20 @@ import Home from "@/app/page";
  * - Page is single-scroll or near single-scroll
  * - No unnecessary sections
  * - Responsive on all devices
+ *
+ * Additional tests for issue #53 (M8-06):
+ * - Home page newsletter form submits to API
+ * - Success/error states work correctly
  */
 
+// Mock fetch for API calls
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 describe("Home Page", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
   describe("Page Structure", () => {
     it("renders a main element as the page container", () => {
       render(<Home />);
@@ -224,6 +236,102 @@ describe("Home Page", () => {
       // Hero content should be constrained with max-width
       const contentContainer = hero.querySelector('[class*="max-w-"]');
       expect(contentContainer).not.toBeNull();
+    });
+  });
+
+  describe("Newsletter API Integration (M8-06)", () => {
+    /**
+     * GIVEN the home page newsletter form
+     * WHEN I submit a valid email
+     * THEN it should call the newsletter API
+     */
+    it("newsletter form submits to the API", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const user = userEvent.setup();
+      render(<Home />);
+
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", { name: /subscribe/i });
+
+      await user.type(input, "home@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: "home@example.com" }),
+        });
+      });
+    });
+
+    it("shows success message after successful submission", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const user = userEvent.setup();
+      render(<Home />);
+
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", { name: /subscribe/i });
+
+      await user.type(input, "home@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
+      });
+    });
+
+    it("shows error message when API fails", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: "Server error" }),
+      });
+
+      const user = userEvent.setup();
+      render(<Home />);
+
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", { name: /subscribe/i });
+
+      await user.type(input, "home@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
+      });
+    });
+
+    it("form behavior matches dedicated newsletter page", async () => {
+      // Same behavior as dedicated newsletter page - form resets to success state after submission
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      });
+
+      const user = userEvent.setup();
+      render(<Home />);
+
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", { name: /subscribe/i });
+
+      await user.type(input, "home@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        // Form should be replaced with success message (same as newsletter page)
+        expect(screen.queryByRole("form")).not.toBeInTheDocument();
+        expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
+      });
     });
   });
 });
