@@ -126,13 +126,19 @@ describe("Root Layout (M3-01)", () => {
     it("exports metadata with title", () => {
       expect(metadata).toBeDefined();
       expect((metadata as Metadata).title).toBeDefined();
-      expect((metadata as Metadata).title).toBe("Easy Plant Life");
+      // Title is now a template object with default and template properties
+      const title = (metadata as Metadata).title as {
+        default?: string;
+        template?: string;
+      };
+      expect(title.default).toBe("Easy Plant Life");
+      expect(title.template).toBe("%s | Easy Plant Life");
     });
 
     it("exports metadata with description", () => {
       expect((metadata as Metadata).description).toBeDefined();
-      expect((metadata as Metadata).description).toBe(
-        "A calm approach to living with plants"
+      expect((metadata as Metadata).description).toContain(
+        "calm approach to plant-based living"
       );
     });
   });
