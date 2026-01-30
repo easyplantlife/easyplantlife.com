@@ -4,6 +4,27 @@ import { useState, type HTMLAttributes, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
+/**
+ * Handles newsletter form submission by calling the API.
+ * Exported for testing and for use as the default onSubmit handler.
+ *
+ * @param email - The email address to subscribe
+ */
+export async function handleNewsletterSubmit(email: string): Promise<void> {
+  const response = await fetch("/api/newsletter", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Failed to subscribe");
+  }
+}
+
 export interface NewsletterCTAProps extends Omit<
   HTMLAttributes<HTMLElement>,
   "onSubmit"
@@ -80,9 +101,9 @@ export function NewsletterCTA({
     setStatus("loading");
 
     try {
-      if (onSubmit) {
-        await onSubmit(email);
-      }
+      // Use provided onSubmit handler or default to API handler
+      const submitHandler = onSubmit ?? handleNewsletterSubmit;
+      await submitHandler(email);
       setStatus("success");
     } catch {
       setStatus("error");
