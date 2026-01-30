@@ -99,13 +99,17 @@ describe("NewsletterCTA Component", () => {
   describe("Submit Button", () => {
     it("renders a submit button", () => {
       render(<NewsletterCTA />);
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
       expect(button).toBeInTheDocument();
     });
 
     it("submit button has type submit", () => {
       render(<NewsletterCTA />);
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
       expect(button).toHaveAttribute("type", "submit");
     });
   });
@@ -132,7 +136,9 @@ describe("NewsletterCTA Component", () => {
       const handleSubmit = jest.fn();
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -147,7 +153,9 @@ describe("NewsletterCTA Component", () => {
       const handleSubmit = jest.fn().mockResolvedValue(undefined);
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -162,7 +170,9 @@ describe("NewsletterCTA Component", () => {
       const handleSubmit = jest.fn().mockResolvedValue(undefined);
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -178,7 +188,9 @@ describe("NewsletterCTA Component", () => {
       const handleSubmit = jest.fn().mockResolvedValue(undefined);
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -192,10 +204,14 @@ describe("NewsletterCTA Component", () => {
   describe("Error State", () => {
     it("displays error message when submission fails", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -207,10 +223,14 @@ describe("NewsletterCTA Component", () => {
 
     it("error message has role alert for accessibility", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -222,10 +242,14 @@ describe("NewsletterCTA Component", () => {
 
     it("form remains visible after error for retry", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -237,10 +261,14 @@ describe("NewsletterCTA Component", () => {
 
     it("error clears when user starts typing again", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockRejectedValue(new Error("Submission failed"));
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -260,7 +288,9 @@ describe("NewsletterCTA Component", () => {
       const user = userEvent.setup();
       render(<NewsletterCTA />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       // Use an email that passes browser validation but fails our regex
       // (browser accepts some formats our validation rejects)
@@ -277,7 +307,9 @@ describe("NewsletterCTA Component", () => {
       const handleSubmit = jest.fn();
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       // Use an email that passes browser validation but we want to ensure
       // our validator catches edge cases
@@ -297,7 +329,9 @@ describe("NewsletterCTA Component", () => {
       );
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -316,7 +350,9 @@ describe("NewsletterCTA Component", () => {
       );
       render(<NewsletterCTA onSubmit={handleSubmit} />);
       const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe|sign up|join/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
 
       await user.type(input, "test@example.com");
       await user.click(button);
@@ -375,7 +411,9 @@ describe("NewsletterCTA Component", () => {
       expect(screen.getByRole("textbox", { name: /email/i })).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole("button", { name: /subscribe|sign up|join/i })).toHaveFocus();
+      expect(
+        screen.getByRole("button", { name: /subscribe|sign up|join/i })
+      ).toHaveFocus();
     });
   });
 

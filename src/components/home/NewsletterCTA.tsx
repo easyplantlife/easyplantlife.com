@@ -4,7 +4,8 @@ import { useState, type HTMLAttributes, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-export interface NewsletterCTAProps extends HTMLAttributes<HTMLElement> {
+export interface NewsletterCTAProps
+  extends Omit<HTMLAttributes<HTMLElement>, "onSubmit"> {
   /** Additional CSS classes */
   className?: string;
   /** Callback when form is submitted with valid email */
@@ -43,7 +44,9 @@ export function NewsletterCTA({
   ...props
 }: NewsletterCTAProps) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const baseStyles = [
@@ -151,7 +154,9 @@ export function NewsletterCTA({
               onChange={handleEmailChange}
               required
               disabled={isLoading}
-              aria-describedby={errorMessage ? "newsletter-error-message" : undefined}
+              aria-describedby={
+                errorMessage ? "newsletter-error-message" : undefined
+              }
             />
           </div>
           <Button
