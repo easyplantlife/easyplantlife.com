@@ -25,7 +25,10 @@ export interface SecondaryCTAsProps extends HTMLAttributes<HTMLElement> {
  * <SecondaryCTAs className="mt-8" />
  * ```
  */
-export function SecondaryCTAs({ className = "", ...props }: SecondaryCTAsProps) {
+export function SecondaryCTAs({
+  className = "",
+  ...props
+}: SecondaryCTAsProps) {
   const baseStyles = [
     // Background - subtle, consistent with brand
     "bg-background",
