@@ -46,7 +46,6 @@ jest.mock("next/link", () => {
 });
 
 describe("404 Not Found Page (M3-07)", () => {
-
   describe("Rendering", () => {
     it("renders without error", async () => {
       const NotFoundPage = (await import("@/app/not-found")).default;
