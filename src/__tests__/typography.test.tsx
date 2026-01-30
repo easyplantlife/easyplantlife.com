@@ -78,12 +78,20 @@ describe("Typography Scale", () => {
   it("defines heading font family in Tailwind config", async () => {
     const config = await import("../../tailwind.config");
     expect(config.default.theme?.fontFamily).toBeDefined();
-    expect(config.default.theme?.fontFamily?.heading).toBeDefined();
+    const fontFamily = config.default.theme?.fontFamily as Record<
+      string,
+      unknown
+    >;
+    expect(fontFamily?.heading).toBeDefined();
   });
 
   it("defines body font family in Tailwind config", async () => {
     const config = await import("../../tailwind.config");
-    expect(config.default.theme?.fontFamily?.body).toBeDefined();
+    const fontFamily = config.default.theme?.fontFamily as Record<
+      string,
+      unknown
+    >;
+    expect(fontFamily?.body).toBeDefined();
   });
 
   it("defines font size scale in Tailwind config", async () => {
@@ -93,7 +101,10 @@ describe("Typography Scale", () => {
 
   it("defines line height values optimized for readability", async () => {
     const config = await import("../../tailwind.config");
-    const lineHeight = config.default.theme?.lineHeight;
+    const lineHeight = config.default.theme?.lineHeight as Record<
+      string,
+      unknown
+    >;
     expect(lineHeight).toBeDefined();
     // Body text should have generous line height (1.6-1.8)
     expect(lineHeight?.relaxed || lineHeight?.body).toBeDefined();
