@@ -82,7 +82,7 @@ describe("GoogleAnalytics Component (M10-01)", () => {
 
   describe("Production Environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "production";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "production";
       process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = "G-TEST123456";
     });
 
@@ -151,7 +151,7 @@ describe("GoogleAnalytics Component (M10-01)", () => {
 
   describe("Development Environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "development";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "development";
       process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = "G-TEST123456";
     });
 
@@ -171,7 +171,7 @@ describe("GoogleAnalytics Component (M10-01)", () => {
 
   describe("Missing Configuration", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "production";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "production";
       delete process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
     });
 
@@ -191,7 +191,7 @@ describe("GoogleAnalytics Component (M10-01)", () => {
 
   describe("Empty Measurement ID", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "production";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "production";
       process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = "";
     });
 
@@ -205,7 +205,7 @@ describe("GoogleAnalytics Component (M10-01)", () => {
 
   describe("Test Environment", () => {
     beforeEach(() => {
-      process.env.NODE_ENV = "test";
+      (process.env as { NODE_ENV: string }).NODE_ENV = "test";
       process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = "G-TEST123456";
     });
 
