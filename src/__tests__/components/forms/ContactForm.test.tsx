@@ -1,6 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "@/components/forms/ContactForm";
+import * as analytics from "@/lib/analytics/events";
+
+// Mock the analytics module
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackContactSubmit: jest.fn(),
+}));
 
 /**
  * ContactForm Component Tests
@@ -983,6 +990,106 @@ describe("ContactForm Component", () => {
           expect(text).not.toContain(word);
         });
       });
+    });
+  });
+
+  describe("Analytics Tracking (M10-02)", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("tracks form view when component mounts", () => {
+      render(<ContactForm />);
+
+      expect(analytics.trackFormView).toHaveBeenCalledWith("contact");
+    });
+
+    it("tracks successful contact submission", async () => {
+      const user = userEvent.setup();
+      const handleSubmit = jest.fn().mockResolvedValue(undefined);
+      render(<ContactForm onSubmit={handleSubmit} />);
+
+      await user.type(
+        screen.getByRole("textbox", { name: /name/i }),
+        "John Doe"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /email/i }),
+        "john@example.com"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /message/i }),
+        "Hello!"
+      );
+      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+
+      await waitFor(() => {
+        expect(analytics.trackContactSubmit).toHaveBeenCalledWith("success");
+      });
+    });
+
+    it("tracks failed contact submission", async () => {
+      const user = userEvent.setup();
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
+      render(<ContactForm onSubmit={handleSubmit} />);
+
+      await user.type(
+        screen.getByRole("textbox", { name: /name/i }),
+        "John Doe"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /email/i }),
+        "john@example.com"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /message/i }),
+        "Hello!"
+      );
+      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+
+      await waitFor(() => {
+        expect(analytics.trackContactSubmit).toHaveBeenCalledWith("error");
+      });
+    });
+
+    it("does not track submit when honeypot is filled", async () => {
+      const user = userEvent.setup();
+      const handleSubmit = jest.fn();
+      render(<ContactForm onSubmit={handleSubmit} />);
+
+      const honeypot = screen.getByTestId("contact-honeypot");
+
+      await user.type(
+        screen.getByRole("textbox", { name: /name/i }),
+        "John Doe"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /email/i }),
+        "john@example.com"
+      );
+      await user.type(
+        screen.getByRole("textbox", { name: /message/i }),
+        "Hello!"
+      );
+      await user.type(honeypot, "spam-bot-value");
+      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+
+      await waitFor(() => {
+        // Success state shown but no tracking event fired
+        expect(screen.getByTestId("contact-success")).toBeInTheDocument();
+      });
+      expect(analytics.trackContactSubmit).not.toHaveBeenCalled();
+    });
+
+    it("only tracks form view once per mount", () => {
+      const { rerender } = render(<ContactForm />);
+
+      // Force a rerender
+      rerender(<ContactForm className="updated" />);
+
+      expect(analytics.trackFormView).toHaveBeenCalledTimes(1);
     });
   });
 });
