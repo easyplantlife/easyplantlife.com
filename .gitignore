@@ -33,6 +33,7 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+*.pem
 
 # Claude Code dev loop logs
 .claude/.logs/
