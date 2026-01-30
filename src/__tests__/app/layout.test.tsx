@@ -39,6 +39,15 @@ jest.mock("next/font/google", () => {
   };
 });
 
+// Mock GoogleAnalytics component
+jest.mock("@/components/analytics/GoogleAnalytics", () => {
+  const MockGoogleAnalytics = () => (
+    <div data-testid="google-analytics-mock" />
+  );
+  MockGoogleAnalytics.displayName = "MockGoogleAnalytics";
+  return MockGoogleAnalytics;
+});
+
 // Import after mocking
 import RootLayout, { metadata } from "@/app/layout";
 
@@ -159,6 +168,19 @@ describe("Root Layout (M3-01)", () => {
           initialScale: 1,
         })
       );
+    });
+  });
+
+  describe("Analytics Integration", () => {
+    it("includes GoogleAnalytics component for tracking", () => {
+      const { getByTestId } = render(
+        <RootLayout>
+          <div>Test content</div>
+        </RootLayout>
+      );
+
+      // Verify GoogleAnalytics is rendered in the layout
+      expect(getByTestId("google-analytics-mock")).toBeInTheDocument();
     });
   });
 });

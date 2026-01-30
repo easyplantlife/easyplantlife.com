@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Lora, Source_Sans_3 } from "next/font/google";
+import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import "./globals.css";
 
 const headingFont = Lora({
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${headingFont.variable} ${bodyFont.variable} antialiased`}
       >
+        <GoogleAnalytics />
         {children}
       </body>
     </html>
