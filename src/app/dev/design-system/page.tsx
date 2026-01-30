@@ -58,7 +58,9 @@ function ColorSwatch({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <div className={`h-16 w-full rounded-md border border-neutral-200 ${className}`} />
+      <div
+        className={`h-16 w-full rounded-md border border-neutral-200 ${className}`}
+      />
       <Text size="sm" className="font-medium">
         {name}
       </Text>
@@ -138,15 +140,51 @@ export default function DesignSystemPage() {
         <Subsection title="Primary">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-5 md:grid-cols-10">
             <ColorSwatch name="50" value="#F1F8E9" className="bg-primary-50" />
-            <ColorSwatch name="100" value="#E8F5E9" className="bg-primary-100" />
-            <ColorSwatch name="200" value="#C8E6C9" className="bg-primary-200" />
-            <ColorSwatch name="300" value="#A5D6A7" className="bg-primary-300" />
-            <ColorSwatch name="400" value="#81C784" className="bg-primary-400" />
-            <ColorSwatch name="500" value="#66BB6A" className="bg-primary-500" />
-            <ColorSwatch name="600" value="#4CAF50" className="bg-primary-600" />
-            <ColorSwatch name="700" value="#43A047" className="bg-primary-700" />
-            <ColorSwatch name="800" value="#388E3C" className="bg-primary-800" />
-            <ColorSwatch name="900" value="#2E7D32" className="bg-primary-900" />
+            <ColorSwatch
+              name="100"
+              value="#E8F5E9"
+              className="bg-primary-100"
+            />
+            <ColorSwatch
+              name="200"
+              value="#C8E6C9"
+              className="bg-primary-200"
+            />
+            <ColorSwatch
+              name="300"
+              value="#A5D6A7"
+              className="bg-primary-300"
+            />
+            <ColorSwatch
+              name="400"
+              value="#81C784"
+              className="bg-primary-400"
+            />
+            <ColorSwatch
+              name="500"
+              value="#66BB6A"
+              className="bg-primary-500"
+            />
+            <ColorSwatch
+              name="600"
+              value="#4CAF50"
+              className="bg-primary-600"
+            />
+            <ColorSwatch
+              name="700"
+              value="#43A047"
+              className="bg-primary-700"
+            />
+            <ColorSwatch
+              name="800"
+              value="#388E3C"
+              className="bg-primary-800"
+            />
+            <ColorSwatch
+              name="900"
+              value="#2E7D32"
+              className="bg-primary-900"
+            />
           </div>
           <CodeBlock
             code='<div className="bg-primary-400">Primary color</div>'
@@ -157,15 +195,51 @@ export default function DesignSystemPage() {
         <Subsection title="Neutral">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-5 md:grid-cols-10">
             <ColorSwatch name="50" value="#FDFCFB" className="bg-neutral-50" />
-            <ColorSwatch name="100" value="#F5F5F0" className="bg-neutral-100" />
-            <ColorSwatch name="200" value="#E8E6E1" className="bg-neutral-200" />
-            <ColorSwatch name="300" value="#D5D3CE" className="bg-neutral-300" />
-            <ColorSwatch name="400" value="#A8A5A0" className="bg-neutral-400" />
-            <ColorSwatch name="500" value="#7A7875" className="bg-neutral-500" />
-            <ColorSwatch name="600" value="#5C5A58" className="bg-neutral-600" />
-            <ColorSwatch name="700" value="#3E3D3B" className="bg-neutral-700" />
-            <ColorSwatch name="800" value="#2D2D2D" className="bg-neutral-800" />
-            <ColorSwatch name="900" value="#1A1A1A" className="bg-neutral-900" />
+            <ColorSwatch
+              name="100"
+              value="#F5F5F0"
+              className="bg-neutral-100"
+            />
+            <ColorSwatch
+              name="200"
+              value="#E8E6E1"
+              className="bg-neutral-200"
+            />
+            <ColorSwatch
+              name="300"
+              value="#D5D3CE"
+              className="bg-neutral-300"
+            />
+            <ColorSwatch
+              name="400"
+              value="#A8A5A0"
+              className="bg-neutral-400"
+            />
+            <ColorSwatch
+              name="500"
+              value="#7A7875"
+              className="bg-neutral-500"
+            />
+            <ColorSwatch
+              name="600"
+              value="#5C5A58"
+              className="bg-neutral-600"
+            />
+            <ColorSwatch
+              name="700"
+              value="#3E3D3B"
+              className="bg-neutral-700"
+            />
+            <ColorSwatch
+              name="800"
+              value="#2D2D2D"
+              className="bg-neutral-800"
+            />
+            <ColorSwatch
+              name="900"
+              value="#1A1A1A"
+              className="bg-neutral-900"
+            />
           </div>
           <CodeBlock
             code='<div className="bg-neutral-100">Neutral background</div>'
@@ -175,7 +249,11 @@ export default function DesignSystemPage() {
 
         <Subsection title="Background">
           <div className="grid grid-cols-3 gap-4">
-            <ColorSwatch name="Default" value="#FDFCFB" className="bg-background" />
+            <ColorSwatch
+              name="Default"
+              value="#FDFCFB"
+              className="bg-background"
+            />
             <ColorSwatch
               name="Secondary"
               value="#F5F5F0"
@@ -272,7 +350,9 @@ export default function DesignSystemPage() {
               <Text size="sm">text-sm - 14px / 0.875rem - Helper text</Text>
             </div>
             <div className="border-b border-neutral-200 pb-2">
-              <Text size="base">text-base - 16px / 1rem - Body text (default)</Text>
+              <Text size="base">
+                text-base - 16px / 1rem - Body text (default)
+              </Text>
             </div>
             <div className="border-b border-neutral-200 pb-2">
               <Text size="lg">text-lg - 18px / 1.125rem - Lead paragraphs</Text>
@@ -293,9 +373,7 @@ export default function DesignSystemPage() {
         <Subsection title="Font Families">
           <div className="flex flex-col gap-4">
             <div className="rounded-md border border-neutral-200 p-4">
-              <p className="font-heading text-2xl">
-                Lora (Serif) - Headings
-              </p>
+              <p className="font-heading text-2xl">Lora (Serif) - Headings</p>
               <Text size="sm" color="secondary">
                 font-heading, font-serif
               </Text>
@@ -559,7 +637,8 @@ export default function DesignSystemPage() {
       {/* Spacing Section */}
       <Section title="Spacing">
         <Text className="mb-4">
-          The spacing scale emphasizes generous white space for a calm aesthetic.
+          The spacing scale emphasizes generous white space for a calm
+          aesthetic.
         </Text>
 
         <div className="mb-6 grid gap-2">

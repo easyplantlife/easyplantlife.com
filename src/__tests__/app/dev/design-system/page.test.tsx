@@ -2,28 +2,9 @@
  * @jest-environment jsdom
  */
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import DesignSystemPage from "@/app/dev/design-system/page";
 
-// Mock clipboard API at module level
-const mockWriteText = jest.fn(() => Promise.resolve());
-
-// Override navigator.clipboard before tests run
-beforeAll(() => {
-  Object.defineProperty(global.navigator, "clipboard", {
-    value: {
-      writeText: mockWriteText,
-      readText: jest.fn(),
-    },
-    configurable: true,
-  });
-});
-
 describe("Design System Reference Page", () => {
-  beforeEach(() => {
-    mockWriteText.mockClear();
-  });
-
   describe("Development Access", () => {
     it("renders the page in development mode", () => {
       // Development mode is the default for Jest
@@ -82,12 +63,24 @@ describe("Design System Reference Page", () => {
     it("shows heading examples from h1 to h6", () => {
       render(<DesignSystemPage />);
       // All heading levels should be displayed as examples
-      expect(screen.getAllByRole("heading", { level: 1 }).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByRole("heading", { level: 2 }).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByRole("heading", { level: 3 }).length).toBeGreaterThan(0);
-      expect(screen.getAllByRole("heading", { level: 4 }).length).toBeGreaterThan(0);
-      expect(screen.getAllByRole("heading", { level: 5 }).length).toBeGreaterThan(0);
-      expect(screen.getAllByRole("heading", { level: 6 }).length).toBeGreaterThan(0);
+      expect(
+        screen.getAllByRole("heading", { level: 1 }).length
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByRole("heading", { level: 2 }).length
+      ).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByRole("heading", { level: 3 }).length
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByRole("heading", { level: 4 }).length
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByRole("heading", { level: 5 }).length
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getAllByRole("heading", { level: 6 }).length
+      ).toBeGreaterThan(0);
     });
 
     it("shows text size examples", () => {
@@ -95,7 +88,9 @@ describe("Design System Reference Page", () => {
       // Should show text size scale examples (some may appear multiple times)
       expect(screen.getAllByText(/text-xs/i).length).toBeGreaterThanOrEqual(1);
       expect(screen.getAllByText(/text-sm/i).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(/text-base/i).length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText(/text-base/i).length).toBeGreaterThanOrEqual(
+        1
+      );
       expect(screen.getAllByText(/text-lg/i).length).toBeGreaterThanOrEqual(1);
     });
   });
