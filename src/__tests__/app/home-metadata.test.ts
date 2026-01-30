@@ -81,7 +81,8 @@ describe("Home Page SEO Metadata", () => {
     });
 
     it("has Open Graph type set to website", () => {
-      expect(metadata.openGraph?.type).toBe("website");
+      const og = metadata.openGraph as { type?: string } | undefined;
+      expect(og?.type).toBe("website");
     });
 
     it("has Open Graph site name", () => {
@@ -116,11 +117,10 @@ describe("Home Page SEO Metadata", () => {
     });
 
     it("has Twitter card type", () => {
-      expect(metadata.twitter?.card).toBeDefined();
+      const twitter = metadata.twitter as { card?: string } | undefined;
+      expect(twitter?.card).toBeDefined();
       // Should be summary or summary_large_image
-      expect(["summary", "summary_large_image"]).toContain(
-        metadata.twitter?.card
-      );
+      expect(["summary", "summary_large_image"]).toContain(twitter?.card);
     });
 
     it("has Twitter title", () => {
