@@ -19,8 +19,10 @@ export interface ContactFormData {
   message: string;
 }
 
-export interface ContactFormProps
-  extends Omit<HTMLAttributes<HTMLFormElement>, "onSubmit"> {
+export interface ContactFormProps extends Omit<
+  HTMLAttributes<HTMLFormElement>,
+  "onSubmit"
+> {
   /** Additional CSS classes */
   className?: string;
   /** Callback when form is submitted with valid data */
@@ -233,9 +235,7 @@ export function ContactForm({
         aria-hidden="true"
         className="absolute left-[-9999px] top-[-9999px] opacity-0 h-0 w-0 overflow-hidden"
       >
-        <label htmlFor={`${formId}-website`}>
-          Website (leave blank)
-        </label>
+        <label htmlFor={`${formId}-website`}>Website (leave blank)</label>
         <input
           id={`${formId}-website`}
           data-testid="contact-honeypot"
