@@ -172,17 +172,13 @@ describe("BookCard Component", () => {
 
   describe("Props and Customization", () => {
     it("accepts and applies custom className", () => {
-      render(
-        <BookCard book={mockAvailableBook} className="custom-class" />
-      );
+      render(<BookCard book={mockAvailableBook} className="custom-class" />);
       const card = screen.getByRole("article");
       expect(card).toHaveClass("custom-class");
     });
 
     it("passes through HTML attributes", () => {
-      render(
-        <BookCard book={mockAvailableBook} data-testid="book-card" />
-      );
+      render(<BookCard book={mockAvailableBook} data-testid="book-card" />);
       expect(screen.getByTestId("book-card")).toBeInTheDocument();
     });
   });
