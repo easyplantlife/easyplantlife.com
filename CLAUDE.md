@@ -46,7 +46,21 @@ npm test -- path/to/test.ts  # Run single test file
 ## Key Documents
 
 - `MasterDocument.md` - Brand guidelines, visual identity, page requirements
-- `SPECS.md` - TDD-ready task specifications with acceptance criteria
+- `SPECS.md` - TDD-ready task specifications with acceptance criteria (71 tasks across 11 milestones)
+
+## Automation
+
+```bash
+# Claude Code slash commands
+/build                    # Pick next issue, implement with TDD, create PR
+/merge                    # Review and merge current branch's PR
+
+# Continuous development loop
+./scripts/dev-loop.sh              # Run build → merge in continuous loop
+./scripts/dev-loop.sh --build      # Run only build phase
+./scripts/dev-loop.sh --merge      # Run only merge phase
+./scripts/dev-loop.sh --once       # Single cycle then exit
+```
 
 ## Development Approach
 
