@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { PageLayout } from "@/components/PageLayout";
+import { AboutContent } from "@/components/about";
 
 export const metadata: Metadata = {
   title: "About | Easy Plant Life",
@@ -6,17 +8,24 @@ export const metadata: Metadata = {
     "Learn about Easy Plant Life and our calm approach to living with plants.",
 };
 
+/**
+ * About Page
+ *
+ * Explains the Easy Plant Life brand philosophy through three sections:
+ * 1. Why Easy Plant Life exists
+ * 2. What we believe
+ * 3. What we're not
+ *
+ * Design principles:
+ * - Calm, honest, non-authoritative tone
+ * - Simple single-column layout for readability
+ * - Generous white space between sections
+ * - No complex grid layouts or cards
+ */
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-background">
-      <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        <h1 className="font-heading text-4xl font-semibold text-text sm:text-5xl">
-          About
-        </h1>
-        <p className="mt-6 text-lg text-text-secondary">
-          A calm approach to living with plants.
-        </p>
-      </div>
-    </main>
+    <PageLayout title="About">
+      <AboutContent />
+    </PageLayout>
   );
 }
