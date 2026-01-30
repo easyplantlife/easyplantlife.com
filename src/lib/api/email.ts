@@ -135,7 +135,9 @@ export async function addToNewsletter(
 
     const message =
       error instanceof Error ? error.message : "Unknown error occurred";
-    throw new EmailServiceError(`Failed to add contact to newsletter: ${message}`);
+    throw new EmailServiceError(
+      `Failed to add contact to newsletter: ${message}`
+    );
   }
 }
 
@@ -174,29 +176,26 @@ export async function sendEmail(
   }
 
   try {
-    const emailData: {
-      from: string;
-      to: string;
-      subject: string;
-      html?: string;
-      text?: string;
-      replyTo?: string;
-    } = {
+    // Build base email options
+    const baseOptions = {
       from: params.from || DEFAULT_FROM_EMAIL,
       to: params.to,
       subject: params.subject,
+      ...(params.replyTo && { replyTo: params.replyTo }),
     };
 
-    if (params.html) {
-      emailData.html = params.html;
-    }
-
-    if (params.text) {
-      emailData.text = params.text;
-    }
-
-    if (params.replyTo) {
-      emailData.replyTo = params.replyTo;
+    // Build the email data with at least one content type (html or text)
+    // Resend requires at least one of: react, html, or text
+    let emailData;
+    if (params.html && params.text) {
+      emailData = { ...baseOptions, html: params.html, text: params.text };
+    } else if (params.html) {
+      emailData = { ...baseOptions, html: params.html };
+    } else if (params.text) {
+      emailData = { ...baseOptions, text: params.text };
+    } else {
+      // Default to empty text if neither is provided
+      emailData = { ...baseOptions, text: "" };
     }
 
     const { data, error } = await client.emails.send(emailData);
