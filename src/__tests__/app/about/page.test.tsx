@@ -5,15 +5,58 @@ import AboutPage from "@/app/about/page";
  * About Page Tests
  *
  * Tests for the complete About page assembly following TDD approach.
- * Based on acceptance criteria from issue #33 (M5-02):
+ * Based on acceptance criteria from:
+ *
+ * Issue #33 (M5-02):
  * - Page uses PageLayout component
  * - Content flows naturally
  * - Appropriate heading hierarchy
  * - Readable line lengths (prose width)
  * - Responsive
+ *
+ * Issue #35 (M5-04):
+ * - Page title "About" is visible
+ * - "why" section is present
+ * - "what we're not" section is present
  */
 
 describe("About Page", () => {
+  /**
+   * Acceptance Criteria Tests (Issue #35 - M5-04)
+   *
+   * GIVEN the about page
+   * WHEN it loads
+   * THEN the page title "About" is visible
+   * AND the "why" section is present
+   * AND the "what we're not" section is present
+   */
+  describe("Acceptance Criteria (M5-04)", () => {
+    it("displays the page title 'About' when the page loads", () => {
+      render(<AboutPage />);
+      const heading = screen.getByRole("heading", { level: 1 });
+      expect(heading).toBeInTheDocument();
+      expect(heading).toHaveTextContent(/about/i);
+    });
+
+    it("displays the 'why' section when the page loads", () => {
+      render(<AboutPage />);
+      const whySection = screen.getByTestId("about-why-section");
+      expect(whySection).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /why easy plant life exists/i })
+      ).toBeInTheDocument();
+    });
+
+    it("displays the 'what we're not' section when the page loads", () => {
+      render(<AboutPage />);
+      const notSection = screen.getByTestId("about-not-section");
+      expect(notSection).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /what we're not/i })
+      ).toBeInTheDocument();
+    });
+  });
+
   describe("Page Structure", () => {
     it("renders a main element as the page container (via PageLayout)", () => {
       render(<AboutPage />);
