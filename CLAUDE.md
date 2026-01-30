@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Easy Plant Life is a calm, brand-first landing website (not a web app). Primary purpose:
+
 - Communicate brand philosophy clearly
 - Distribute written content (blog via Medium, books)
 - Capture newsletter signups via Resend

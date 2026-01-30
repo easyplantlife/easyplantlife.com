@@ -6,10 +6,10 @@
 
 This is **not a web app** and **not a product dashboard**. It is a **landing-style website** whose primary purpose is to:
 
-* Clearly communicate the brand philosophy
-* Establish trust and credibility
-* Distribute written content (blog + books)
-* Capture interest via a newsletter
+- Clearly communicate the brand philosophy
+- Establish trust and credibility
+- Distribute written content (blog + books)
+- Capture interest via a newsletter
 
 The site should feel more like an **author / lifestyle brand** than a startup.
 
@@ -21,28 +21,28 @@ MVP and beta scope are intentionally minimal.
 
 ### Primary Goals
 
-* Communicate what “Easy Plant Life” stands for in under 30 seconds
-* Feel calm, credible, and intentional
-* Provide a clear place to read long-form thoughts (blog)
-* Provide a clear place to discover books
-* Capture newsletter signups
+- Communicate what “Easy Plant Life” stands for in under 30 seconds
+- Feel calm, credible, and intentional
+- Provide a clear place to read long-form thoughts (blog)
+- Provide a clear place to discover books
+- Capture newsletter signups
 
 ### Explicit Non-Goals
 
-* No complex user accounts
-* No dashboards
-* No recipe database
-* No personalization
-* No growth-hack funnels
+- No complex user accounts
+- No dashboards
+- No recipe database
+- No personalization
+- No growth-hack funnels
 
 ---
 
 ## 3. Target Audience
 
-* People interested in vegan living but overwhelmed by complexity
-* Long-term vegans tired of perfectionism and performative wellness
-* Busy people who want clarity, not content overload
-* Readers who appreciate thoughtful, simple writing
+- People interested in vegan living but overwhelmed by complexity
+- Long-term vegans tired of perfectionism and performative wellness
+- Busy people who want clarity, not content overload
+- Readers who appreciate thoughtful, simple writing
 
 The tone should **never** feel preachy, activist, or influencer-driven.
 
@@ -56,17 +56,17 @@ The tone should **never** feel preachy, activist, or influencer-driven.
 
 ### Brand Values
 
-* Simplicity over optimization
-* Sustainability over perfection
-* Calm over urgency
-* Practical over ideological
+- Simplicity over optimization
+- Sustainability over perfection
+- Calm over urgency
+- Practical over ideological
 
 ### Brand Personality
 
-* Grounded
-* Minimal
-* Thoughtful
-* Quiet confidence
+- Grounded
+- Minimal
+- Thoughtful
+- Quiet confidence
 
 ---
 
@@ -74,28 +74,28 @@ The tone should **never** feel preachy, activist, or influencer-driven.
 
 ### Overall Aesthetic
 
-* Editorial, lifestyle, calm
-* Minimal UI
-* Strong use of white space
+- Editorial, lifestyle, calm
+- Minimal UI
+- Strong use of white space
 
 ### Color Palette
 
-* Soft greens (primary accent)
-* Off-whites / warm neutrals
-* No loud contrast
-* No gradients unless extremely subtle
+- Soft greens (primary accent)
+- Off-whites / warm neutrals
+- No loud contrast
+- No gradients unless extremely subtle
 
 ### Typography
 
-* Highly readable
-* Human, organic feel
-* No sharp "tech" fonts
-* Prefer serif or soft sans-serif combinations
+- Highly readable
+- Human, organic feel
+- No sharp "tech" fonts
+- Prefer serif or soft sans-serif combinations
 
 ### Logo Usage
 
-* **Lockup logo**: homepage hero, footer
-* **Mark logo (green heart + leaf)**: favicon, mobile header, social previews
+- **Lockup logo**: homepage hero, footer
+- **Mark logo (green heart + leaf)**: favicon, mobile header, social previews
 
 The logo should feel natural and timeless, not trendy.
 
@@ -109,17 +109,17 @@ The logo should feel natural and timeless, not trendy.
 
 **Content:**
 
-* Logo
-* Short tagline (2–4 words)
-* Brief brand explanation (2–3 sentences max)
-* Primary CTA: Newsletter signup
-* Secondary CTA: Blog or Books
+- Logo
+- Short tagline (2–4 words)
+- Brief brand explanation (2–3 sentences max)
+- Primary CTA: Newsletter signup
+- Secondary CTA: Blog or Books
 
 **Notes:**
 
-* Single-scroll or near single-scroll
-* No feature lists
-* No cards, no grids unless justified
+- Single-scroll or near single-scroll
+- No feature lists
+- No cards, no grids unless justified
 
 ---
 
@@ -129,14 +129,14 @@ The logo should feel natural and timeless, not trendy.
 
 **Content:**
 
-* Why Easy Plant Life exists
-* What it is *not*
-* Emphasis on realism and sustainability
+- Why Easy Plant Life exists
+- What it is _not_
+- Emphasis on realism and sustainability
 
 **Tone:**
 
-* Personal but not biographical
-* Calm, honest, non-authoritative
+- Personal but not biographical
+- Calm, honest, non-authoritative
 
 ---
 
@@ -146,15 +146,15 @@ The logo should feel natural and timeless, not trendy.
 
 **Content:**
 
-* Book covers
-* Short descriptions
-* Status: available / coming soon
-* External purchase links
+- Book covers
+- Short descriptions
+- Status: available / coming soon
+- External purchase links
 
 **Notes:**
 
-* Static content for MVP
-* Signals credibility and seriousness
+- Static content for MVP
+- Signals credibility and seriousness
 
 ---
 
@@ -166,17 +166,16 @@ The logo should feel natural and timeless, not trendy.
 
 **On-site behavior:**
 
-* Display a list of recent posts
-* Each item shows:
-
-  * Title
-  * Short excerpt
-  * Link to read on Medium
+- Display a list of recent posts
+- Each item shows:
+  - Title
+  - Short excerpt
+  - Link to read on Medium
 
 **Important:**
 
-* The website does not host the full articles
-* Medium remains canonical
+- The website does not host the full articles
+- Medium remains canonical
 
 Integration approach can evolve, but MVP prioritizes reliability over sophistication.
 
@@ -188,15 +187,15 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 **Content:**
 
-* One-sentence promise
-* Email input
-* Clear confirmation states
+- One-sentence promise
+- Email input
+- Clear confirmation states
 
 **Tone:**
 
-* No hype
-* No frequency pressure
-* No marketing language
+- No hype
+- No frequency pressure
+- No marketing language
 
 ---
 
@@ -206,8 +205,8 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 **Content:**
 
-* Minimal form or email address
-* No social links required
+- Minimal form or email address
+- No social links required
 
 ---
 
@@ -215,31 +214,30 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 ### Frontend
 
-* **Next.js** (App Router)
-* **Tailwind CSS**
-* Static-first approach
+- **Next.js** (App Router)
+- **Tailwind CSS**
+- Static-first approach
 
 ### Backend
 
-* **Next.js API Routes**
-* No database in MVP
+- **Next.js API Routes**
+- No database in MVP
 
 ### Email
 
-* **Resend**
-
-  * Contact form delivery
-  * Newsletter audience management
+- **Resend**
+  - Contact form delivery
+  - Newsletter audience management
 
 ### Blog Platform
 
-* **Medium** (external)
-* Website displays excerpts/snippets only
+- **Medium** (external)
+- Website displays excerpts/snippets only
 
 ### Analytics
 
-* **Google Analytics (GA4)**
-* Event-based tracking (no invasive user profiling)
+- **Google Analytics (GA4)**
+- Event-based tracking (no invasive user profiling)
 
 ---
 
@@ -247,13 +245,13 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 ### Required (MVP)
 
-* Resend (email + newsletter)
-* Google Analytics (traffic + events)
+- Resend (email + newsletter)
+- Google Analytics (traffic + events)
 
 ### Optional / Later
 
-* Cookie consent (EU compliance)
-* Lightweight analytics alternative (Plausible / Umami)
+- Cookie consent (EU compliance)
+- Lightweight analytics alternative (Plausible / Umami)
 
 ---
 
@@ -261,11 +259,11 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 Track only meaningful interactions:
 
-* Page views
-* Newsletter form views
-* Newsletter submissions (success/failure)
-* Contact submissions
-* Outbound clicks (Medium, book purchases)
+- Page views
+- Newsletter form views
+- Newsletter submissions (success/failure)
+- Contact submissions
+- Outbound clicks (Medium, book purchases)
 
 No session replay.
 No behavioral profiling.
@@ -274,10 +272,10 @@ No behavioral profiling.
 
 ## 10. Development Approach
 
-* **TDD-first**
-* Clear separation between content and layout
-* Minimal state management
-* Accessibility respected by default
+- **TDD-first**
+- Clear separation between content and layout
+- Minimal state management
+- Accessibility respected by default
 
 The site should be easy to maintain, easy to evolve, and hard to break.
 
@@ -285,11 +283,11 @@ The site should be easy to maintain, easy to evolve, and hard to break.
 
 ## 11. Success Criteria (MVP)
 
-* Brand message is understood immediately
-* Site feels calm and intentional
-* Newsletter signup works reliably
-* Blog and book links are clear
-* No unnecessary complexity
+- Brand message is understood immediately
+- Site feels calm and intentional
+- Newsletter signup works reliably
+- Blog and book links are clear
+- No unnecessary complexity
 
 ---
 
