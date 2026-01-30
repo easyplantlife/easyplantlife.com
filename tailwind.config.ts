@@ -1,11 +1,96 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * Easy Plant Life - Brand Color System
+ *
+ * This color palette reflects the brand's visual identity:
+ * - Soft greens for accents and interactions
+ * - Warm neutrals for backgrounds and text
+ * - No loud contrast, calm and minimal aesthetic
+ *
+ * Colors are defined at the theme level (not extend) to prevent
+ * default Tailwind colors from leaking into the design system.
+ */
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  theme: {
+    colors: {
+      /**
+       * Primary - Soft Green
+       * For accents, links, CTAs, and interactive elements.
+       * Evokes nature, calm, and plant life without being overwhelming.
+       */
+      primary: {
+        50: "#F1F8E9", // Lightest - subtle backgrounds
+        100: "#E8F5E9", // Light - hover backgrounds
+        200: "#C8E6C9", // Light accent
+        300: "#A5D6A7", // Medium light
+        400: "#81C784", // Default - main brand green
+        500: "#66BB6A", // Medium
+        600: "#4CAF50", // Dark - hover states, emphasis
+        700: "#43A047", // Darker
+        800: "#388E3C", // Very dark
+        900: "#2E7D32", // Darkest
+        DEFAULT: "#81C784",
+        light: "#E8F5E9",
+        dark: "#4CAF50",
+      },
+
+      /**
+       * Neutral - Warm Tones
+       * For backgrounds, text, borders, and general UI.
+       * Warm off-whites and grays create a cozy, approachable feel.
+       */
+      neutral: {
+        50: "#FDFCFB", // Warm white - main background
+        100: "#F5F5F0", // Light - secondary backgrounds
+        200: "#E8E6E1", // Medium - borders, dividers
+        300: "#D5D3CE", // Medium gray
+        400: "#A8A5A0", // Gray
+        500: "#7A7875", // Medium dark
+        600: "#5C5A58", // Dark gray
+        700: "#3E3D3B", // Very dark
+        800: "#2D2D2D", // Near black - main text
+        900: "#1A1A1A", // Darkest
+        DEFAULT: "#F5F5F0",
+        white: "#FDFCFB",
+        light: "#F5F5F0",
+        medium: "#E8E6E1",
+        dark: "#2D2D2D",
+      },
+
+      /**
+       * Background colors
+       * Semantic aliases for common background use cases.
+       */
+      background: {
+        DEFAULT: "#FDFCFB", // Warm white
+        secondary: "#F5F5F0", // Light neutral
+        accent: "#E8F5E9", // Light green tint
+      },
+
+      /**
+       * Text colors
+       * Semantic aliases for typography.
+       */
+      text: {
+        DEFAULT: "#2D2D2D", // Main body text
+        secondary: "#5C5A58", // Secondary/muted text
+        accent: "#4CAF50", // Links and emphasis
+        inverse: "#FDFCFB", // Text on dark backgrounds
+      },
+
+      // Essential utility colors
+      transparent: "transparent",
+      current: "currentColor",
+      white: "#FFFFFF",
+      black: "#000000",
+    },
+  },
 };
 
 export default config;
