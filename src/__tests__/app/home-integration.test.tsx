@@ -34,7 +34,10 @@ describe("Home Page Integration Tests", () => {
     it("displays the Easy Plant Life logo/brand name", () => {
       render(<Home />);
 
-      const logo = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      const logo = screen.getByRole("heading", {
+        level: 1,
+        name: /easy plant life/i,
+      });
       expect(logo).toBeVisible();
     });
 
@@ -96,7 +99,9 @@ describe("Home Page Integration Tests", () => {
       expect(screen.getByTestId("hero-tagline")).toBeVisible();
 
       // Newsletter form
-      expect(screen.getByRole("form", { name: /newsletter/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("form", { name: /newsletter/i })
+      ).toBeInTheDocument();
 
       // Navigation links
       expect(screen.getByRole("link", { name: /blog/i })).toBeInTheDocument();
@@ -117,11 +122,15 @@ describe("Home Page Integration Tests", () => {
       const newsletterSection = screen.getByTestId("newsletter-cta");
 
       // Enter a valid email
-      const emailInput = within(newsletterSection).getByRole("textbox", { name: /email/i });
+      const emailInput = within(newsletterSection).getByRole("textbox", {
+        name: /email/i,
+      });
       await user.type(emailInput, "test@example.com");
 
       // Submit the form
-      const submitButton = within(newsletterSection).getByRole("button", { name: /subscribe/i });
+      const submitButton = within(newsletterSection).getByRole("button", {
+        name: /subscribe/i,
+      });
       await user.click(submitButton);
 
       // Wait for success state
@@ -158,7 +167,9 @@ describe("Home Page Integration Tests", () => {
       });
 
       // 5. Form is hidden after success
-      expect(screen.queryByRole("form", { name: /newsletter/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("form", { name: /newsletter/i })
+      ).not.toBeInTheDocument();
     });
 
     /**
@@ -214,7 +225,9 @@ describe("Home Page Integration Tests", () => {
 
       // Newsletter content should be constrained
       const newsletterSection = screen.getByTestId("newsletter-cta");
-      expect(newsletterSection.querySelector('[class*="max-w-"]')).not.toBeNull();
+      expect(
+        newsletterSection.querySelector('[class*="max-w-"]')
+      ).not.toBeNull();
     });
 
     it("uses mobile-first responsive padding", () => {
@@ -312,14 +325,16 @@ describe("Home Page Integration Tests", () => {
       const secondary = screen.getByTestId("secondary-ctas");
 
       // Hero before Newsletter
-      expect(hero.compareDocumentPosition(newsletter) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
-      );
+      expect(
+        hero.compareDocumentPosition(newsletter) &
+          Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 
       // Newsletter before Secondary
-      expect(newsletter.compareDocumentPosition(secondary) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
-      );
+      expect(
+        newsletter.compareDocumentPosition(secondary) &
+          Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
     it("has exactly three main sections", () => {
@@ -373,7 +388,14 @@ describe("Home Page Integration Tests", () => {
       const text = proposition.textContent?.toLowerCase() || "";
 
       // No hype words
-      const hypeWords = ["free", "exclusive", "amazing", "incredible", "best", "revolutionary"];
+      const hypeWords = [
+        "free",
+        "exclusive",
+        "amazing",
+        "incredible",
+        "best",
+        "revolutionary",
+      ];
       hypeWords.forEach((word) => {
         expect(text).not.toContain(word);
       });
