@@ -109,8 +109,8 @@ describe("BlogPostsList Component", () => {
       // Check for aria-live or status role for screen reader announcement
       const loadingElement = screen.getByText(/loading/i);
       expect(
-        loadingElement.closest('[aria-live]') ||
-          loadingElement.closest('[role="status"]')
+        loadingElement.closest("[aria-live]") ||
+          loadingElement.closest("[role='status']")
       ).toBeInTheDocument();
     });
   });
@@ -122,9 +122,7 @@ describe("BlogPostsList Component", () => {
     });
 
     it("does not render posts when error occurs", () => {
-      render(
-        <BlogPostsList posts={mockPosts} error="Failed to load posts" />
-      );
+      render(<BlogPostsList posts={mockPosts} error="Failed to load posts" />);
       expect(
         screen.queryByText("Finding Peace Through Plant Care")
       ).not.toBeInTheDocument();
@@ -146,9 +144,7 @@ describe("BlogPostsList Component", () => {
     });
 
     it("passes through HTML attributes", () => {
-      render(
-        <BlogPostsList posts={mockPosts} data-testid="blog-posts-list" />
-      );
+      render(<BlogPostsList posts={mockPosts} data-testid="blog-posts-list" />);
       expect(screen.getByTestId("blog-posts-list")).toBeInTheDocument();
     });
   });
