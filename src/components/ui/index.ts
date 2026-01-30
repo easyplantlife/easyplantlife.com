@@ -1,3 +1,3 @@
 // Re-export all primitive UI components
-// Add UI component exports here as they are created
-export {};
+export { Button } from "./Button";
+export type { ButtonProps, ButtonVariant, ButtonSize } from "./Button";
