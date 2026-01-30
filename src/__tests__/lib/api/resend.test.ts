@@ -73,14 +73,18 @@ describe("Resend Configuration", () => {
       delete process.env.RESEND_API_KEY;
       const result = validateResendConfig();
       expect(result.valid).toBe(false);
-      expect(result.error).toBe("RESEND_API_KEY environment variable is not set");
+      expect(result.error).toBe(
+        "RESEND_API_KEY environment variable is not set"
+      );
     });
 
     it("should return invalid when API key is empty", () => {
       process.env.RESEND_API_KEY = "";
       const result = validateResendConfig();
       expect(result.valid).toBe(false);
-      expect(result.error).toBe("RESEND_API_KEY environment variable is not set");
+      expect(result.error).toBe(
+        "RESEND_API_KEY environment variable is not set"
+      );
     });
 
     it("should return valid for live API keys starting with re_", () => {
