@@ -21,69 +21,67 @@ export const contentType = "image/png";
  */
 export default async function Image() {
   return new ImageResponse(
-    (
+    <div
+      style={{
+        background: "#FAFAF8",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "serif",
+      }}
+    >
+      {/* Decorative leaf/heart shape - brand mark */}
       <div
         style={{
-          background: "#FAFAF8",
-          width: "100%",
-          height: "100%",
+          width: 120,
+          height: 120,
+          borderRadius: "50% 50% 50% 0",
+          background: "linear-gradient(135deg, #7BA05B 0%, #5C8A3E 100%)",
+          marginBottom: 40,
+          transform: "rotate(-45deg)",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily: "serif",
         }}
       >
-        {/* Decorative leaf/heart shape - brand mark */}
         <div
           style={{
-            width: 120,
-            height: 120,
+            width: 60,
+            height: 60,
             borderRadius: "50% 50% 50% 0",
-            background: "linear-gradient(135deg, #7BA05B 0%, #5C8A3E 100%)",
-            marginBottom: 40,
-            transform: "rotate(-45deg)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            background: "#FAFAF8",
+            opacity: 0.3,
           }}
-        >
-          <div
-            style={{
-              width: 60,
-              height: 60,
-              borderRadius: "50% 50% 50% 0",
-              background: "#FAFAF8",
-              opacity: 0.3,
-            }}
-          />
-        </div>
-
-        {/* Brand name */}
-        <div
-          style={{
-            fontSize: 72,
-            fontWeight: 600,
-            color: "#2D3A24",
-            marginBottom: 16,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          Easy Plant Life
-        </div>
-
-        {/* Tagline */}
-        <div
-          style={{
-            fontSize: 32,
-            color: "#5C6B52",
-            letterSpacing: "0.02em",
-          }}
-        >
-          A calm approach to plant-based living
-        </div>
+        />
       </div>
-    ),
+
+      {/* Brand name */}
+      <div
+        style={{
+          fontSize: 72,
+          fontWeight: 600,
+          color: "#2D3A24",
+          marginBottom: 16,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        Easy Plant Life
+      </div>
+
+      {/* Tagline */}
+      <div
+        style={{
+          fontSize: 32,
+          color: "#5C6B52",
+          letterSpacing: "0.02em",
+        }}
+      >
+        A calm approach to plant-based living
+      </div>
+    </div>,
     {
       ...size,
     }
