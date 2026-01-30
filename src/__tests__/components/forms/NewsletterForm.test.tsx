@@ -328,9 +328,7 @@ describe("NewsletterForm Component", () => {
 
       await waitFor(() => {
         const success = screen.getByTestId("newsletter-success");
-        expect(success.textContent).toMatch(
-          /thank you|subscribed|success/i
-        );
+        expect(success.textContent).toMatch(/thank you|subscribed|success/i);
       });
     });
 

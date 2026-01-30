@@ -4,8 +4,10 @@ import { useState, type HTMLAttributes, type FormEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
-export interface NewsletterFormProps
-  extends Omit<HTMLAttributes<HTMLFormElement>, "onSubmit"> {
+export interface NewsletterFormProps extends Omit<
+  HTMLAttributes<HTMLFormElement>,
+  "onSubmit"
+> {
   /** Additional CSS classes */
   className?: string;
   /** Callback when form is submitted with valid email */
@@ -126,7 +128,9 @@ export function NewsletterForm({
           onChange={handleEmailChange}
           required
           disabled={isLoading}
-          aria-describedby={errorMessage ? "newsletter-error-message" : undefined}
+          aria-describedby={
+            errorMessage ? "newsletter-error-message" : undefined
+          }
         />
       </div>
       <Button
