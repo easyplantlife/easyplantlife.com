@@ -92,10 +92,11 @@ describe("Books Page JSON-LD", () => {
     );
 
     bookSchemas.forEach((schema) => {
-      const author = (schema as { author?: { "@type"?: string; name?: string } })
-        ?.author;
-      expect(author?.["@type"]).toBe("Organization");
-      expect(author?.name).toBe("Easy Plant Life");
+      const typedSchema = schema as {
+        author?: { "@type"?: string; name?: string };
+      };
+      expect(typedSchema?.author?.["@type"]).toBe("Organization");
+      expect(typedSchema?.author?.name).toBe("Easy Plant Life");
     });
   });
 

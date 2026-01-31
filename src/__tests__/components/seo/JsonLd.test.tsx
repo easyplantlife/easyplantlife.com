@@ -135,9 +135,7 @@ describe("JSON-LD Structured Data Components", () => {
       description: "A test book description for testing purposes.",
       coverImage: "/images/books/test-book.jpg",
       status: "available",
-      purchaseLinks: [
-        { label: "Amazon", url: "https://amazon.com/test-book" },
-      ],
+      purchaseLinks: [{ label: "Amazon", url: "https://amazon.com/test-book" }],
     };
 
     const mockComingSoonBook: Book = {
