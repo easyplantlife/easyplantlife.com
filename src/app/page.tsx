@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero, NewsletterCTA, SecondaryCTAs } from "@/components/home";
+import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 
 /**
  * Home Page SEO Metadata
@@ -58,6 +59,10 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="bg-background">
+      {/* JSON-LD Structured Data for SEO */}
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
+
       {/* Hero Section - First impression and brand message */}
       <Hero />
 
