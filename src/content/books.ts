@@ -42,11 +42,11 @@ export interface Book {
  */
 export const books: Book[] = [
   {
-    id: "easy-plant-life-guide",
-    title: "The Easy Plant Life Guide",
+    id: "easy-plant-life-the-everyday-vegan-playbook",
+    title: "The Everyday Vegan Playbook",
     description:
-      "A gentle introduction to bringing plants into your home. No pressure, no complicated care schedules—just simple, honest advice for living with plants.",
-    coverImage: "/images/books/easy-plant-life-guide.svg",
+      "Not a cookbook or a manifesto. A calm guide to building simple default meals and systems so vegan eating fits naturally into busy, imperfect days—without constant planning, recipes, or willpower.",
+    coverImage: "/images/books/easy-plant-life-the-everyday-vegan-playbook.png",
     status: "coming-soon",
     purchaseLinks: [],
   },
