@@ -46,7 +46,7 @@ export const books: Book[] = [
     title: "The Easy Plant Life Guide",
     description:
       "A gentle introduction to bringing plants into your home. No pressure, no complicated care schedules—just simple, honest advice for living with plants.",
-    coverImage: "/images/books/easy-plant-life-guide.jpg",
+    coverImage: "/images/books/easy-plant-life-guide.svg",
     status: "coming-soon",
     purchaseLinks: [],
   },
