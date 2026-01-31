@@ -32,26 +32,29 @@ export function SecondaryCTAs({
     <section
       aria-label="Secondary navigation"
       data-testid="secondary-ctas"
-      className={`bg-white py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
+      className={`bg-background py-12 md:py-14 lg:py-16 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
       {...props}
     >
       <div className="max-w-4xl mx-auto">
         {/* Section heading */}
-        <h2 className="font-heading text-2xl md:text-3xl text-primary-800 text-center mb-4">
+        <h2 className="font-heading text-2xl md:text-3xl text-primary-800 text-center mb-3">
           Go Further
         </h2>
-        <p className="text-neutral-500 text-center mb-12">
-          Use what helps. Ignore what does not.
+        <p className="text-neutral-600 text-center mb-2 max-w-xl mx-auto">
+          Use what helps. Ignore what does not. More depth lives in the blog and in longer-form guides.
+        </p>
+        <p className="text-neutral-500 text-center text-sm mb-10">
+          Short reads and calm books for a plant-based life.
         </p>
 
         {/* Cards container */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-2 gap-5 md:gap-6">
           {/* Blog Card */}
           <NextLink
             href="/blog"
-            className="group block rounded-xl border border-primary-200 bg-primary-100/80 p-8 transition-all duration-200 hover:border-primary-300 hover:bg-primary-200/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="group block rounded-xl border border-primary-200 bg-primary-100/80 p-6 md:p-7 transition-all duration-200 hover:border-primary-300 hover:bg-primary-200/60 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 text-left"
           >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-200/80 text-primary-800">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-200/80 text-primary-800">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -70,17 +73,17 @@ export function SecondaryCTAs({
             <h3 className="font-heading text-xl text-primary-800 mb-2">
               Blog
             </h3>
-            <p className="text-neutral-600 text-sm">
-              Short thoughts. Practical ideas. No fluff.
+            <p className="text-neutral-600 text-sm leading-relaxed">
+              Short thoughts and practical ideas on plant-based living—no fluff. Honest writing about simplicity, sustainability, and what actually works day to day.
             </p>
           </NextLink>
 
           {/* Books Card */}
           <NextLink
             href="/books"
-            className="group block rounded-xl border border-primary-200 bg-primary-100/60 p-8 transition-all duration-200 hover:border-primary-300 hover:bg-primary-200/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+            className="group block rounded-xl border border-primary-200 bg-primary-100/60 p-6 md:p-7 transition-all duration-200 hover:border-primary-300 hover:bg-primary-200/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 text-left"
           >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-200/80 text-primary-800">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-200/80 text-primary-800">
               <svg
                 className="h-5 w-5"
                 fill="none"
@@ -99,8 +102,8 @@ export function SecondaryCTAs({
             <h3 className="font-heading text-xl text-primary-800 mb-2">
               Books
             </h3>
-            <p className="text-neutral-600 text-sm">
-              Calm guides for living simply with plants.
+            <p className="text-neutral-600 text-sm leading-relaxed">
+              Calm guides for living simply with plants. Longer-form work you can read at your own pace—focused on practical steps and a sustainable approach, not perfection.
             </p>
           </NextLink>
         </div>

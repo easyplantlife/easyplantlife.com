@@ -74,12 +74,12 @@ export function NewsletterCTA({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const baseStyles = [
-    // Soft green tint background
-    "bg-primary-100/70",
-    // Generous vertical padding for white space
-    "py-16",
-    "md:py-20",
-    "lg:py-24",
+    // Warm off-white background for visual variety (not flat white)
+    "bg-neutral-100",
+    // Balanced vertical padding
+    "py-12",
+    "md:py-14",
+    "lg:py-16",
     // Horizontal padding
     "px-4",
     "md:px-6",
@@ -174,7 +174,10 @@ export function NewsletterCTA({
         >
           Occasional thoughts on easy plant-based living.
         </p>
-        <p className="font-body text-base text-neutral-500 mb-8">
+        <p className="font-body text-base text-neutral-600 mb-2 max-w-lg mx-auto">
+          Short notes on simplicity, sustainability, and practical choices—no hype, no frequency pressure. Just useful ideas when they are ready.
+        </p>
+        <p className="font-body text-sm text-neutral-500 mb-8">
           No pressure. Unsubscribe anytime.
         </p>
 

@@ -31,8 +31,8 @@ export function Footer() {
 
   return (
     <footer className="border-t border-neutral-200 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col items-center gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex flex-col items-center gap-6">
           {/* Logo */}
           <NextLink
             href="/"
@@ -49,6 +49,11 @@ export function Footer() {
               aria-hidden="true"
             />
           </NextLink>
+
+          {/* Tagline */}
+          <p className="text-neutral-600 text-center text-sm max-w-md">
+            A calm approach to plant-based living. Simple, sustainable, no perfection required.
+          </p>
 
           {/* Navigation */}
           <nav

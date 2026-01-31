@@ -28,14 +28,14 @@ export function Hero({ className = "", ...props }: HeroProps) {
     <section
       aria-label="Hero section"
       data-testid="hero-section"
-      className={`bg-gradient-to-b from-primary-100 to-white py-24 md:py-32 lg:py-40 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
+      className={`bg-gradient-to-b from-primary-100 to-neutral-100 py-14 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
       {...props}
     >
       {/* Content */}
       <div className="text-center">
         <div className="max-w-3xl mx-auto">
           {/* Logo - h1 for semantic structure and accessibility */}
-          <h1 className="mb-8 flex justify-center font-heading">
+          <h1 className="mb-6 flex justify-center font-heading">
             <span className="sr-only">Easy Plant Life</span>
             <Image
               src="/images/lockup-logo.png"
@@ -50,22 +50,23 @@ export function Hero({ className = "", ...props }: HeroProps) {
           {/* Tagline - 2-4 words */}
           <p
             data-testid="hero-tagline"
-            className="font-heading text-2xl md:text-3xl lg:text-4xl text-primary-800 mb-8 font-medium"
+            className="font-heading text-2xl md:text-3xl lg:text-4xl text-primary-800 mb-6 font-medium"
           >
             Vegan living made simple.
           </p>
 
-          {/* Brand Explanation - max 3 sentences */}
+          {/* Brand Explanation - expanded for clarity and content */}
           <div
             data-testid="hero-explanation"
             className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-3"
           >
             <p>Living vegan does not need to feel like a project.</p>
             <p>No perfection or rules—just easy choices that fit your real life.</p>
+            <p>Here you will find calm guidance: practical ideas, honest writing, and simple steps toward a plant-based life that feels sustainable instead of overwhelming.</p>
           </div>
 
           {/* Decorative divider */}
-          <div className="mt-14 flex justify-center items-center gap-4">
+          <div className="mt-10 flex justify-center items-center gap-4">
             <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary-300" />
             <Image
               src="/images/mark-logo.png"
