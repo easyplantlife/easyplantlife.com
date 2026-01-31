@@ -144,8 +144,7 @@ describe("Keyboard Navigation - Link Component", () => {
     expect(screen.getByRole("link", { name: "About" })).toHaveFocus();
   });
 
-  it("should be activatable with Enter key", async () => {
-    const user = userEvent.setup();
+  it("should be activatable with Enter key", () => {
     render(<Link href="/about">About</Link>);
 
     const link = screen.getByRole("link", { name: "About" });
@@ -209,7 +208,9 @@ describe("Keyboard Navigation - MobileNav Component", () => {
     menuButton.focus();
     await user.keyboard("{Enter}");
 
-    expect(screen.getByRole("navigation", { name: "Mobile navigation" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Mobile navigation" })
+    ).toBeInTheDocument();
   });
 
   it("should close menu with Escape key", async () => {
@@ -220,12 +221,16 @@ describe("Keyboard Navigation - MobileNav Component", () => {
     const menuButton = screen.getByRole("button", { name: "Menu" });
     await user.click(menuButton);
 
-    expect(screen.getByRole("navigation", { name: "Mobile navigation" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "Mobile navigation" })
+    ).toBeInTheDocument();
 
     // Press Escape
     await user.keyboard("{Escape}");
 
-    expect(screen.queryByRole("navigation", { name: "Mobile navigation" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("navigation", { name: "Mobile navigation" })
+    ).not.toBeInTheDocument();
   });
 
   it("should trap focus within the menu when open", async () => {

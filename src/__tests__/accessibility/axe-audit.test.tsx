@@ -150,7 +150,9 @@ describe("Accessibility Audit - UI Components", () => {
     });
 
     it("should have no accessibility violations (h2)", async () => {
-      const { container } = render(<Heading level={2}>Section Heading</Heading>);
+      const { container } = render(
+        <Heading level={2}>Section Heading</Heading>
+      );
       const results = await axe(container);
       expect(results).toHaveNoViolations();
     });
@@ -268,9 +270,7 @@ describe("Accessibility Audit - Books Page Components", () => {
     description: "Test description",
     coverImage: "/test-cover.jpg",
     status: "available" as const,
-    purchaseLinks: [
-      { label: "Buy on Amazon", url: "https://amazon.com/test" },
-    ],
+    purchaseLinks: [{ label: "Buy on Amazon", url: "https://amazon.com/test" }],
   };
 
   describe("BookCard Component", () => {

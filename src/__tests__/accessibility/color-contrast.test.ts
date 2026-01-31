@@ -189,10 +189,7 @@ describe("Color Contrast - WCAG 2.1 AA Compliance", () => {
 describe("Color Contrast - Specific Component Checks", () => {
   it("Button primary variant has sufficient text contrast", () => {
     // Primary button: white text on green background
-    const ratio = getContrastRatio(
-      colors.text.inverse,
-      colors.primary.DEFAULT
-    );
+    const ratio = getContrastRatio(colors.text.inverse, colors.primary.DEFAULT);
     // Should meet at least large text requirements (buttons are typically bold)
     expect(ratio).toBeGreaterThanOrEqual(WCAG_AA_LARGE_TEXT);
   });
