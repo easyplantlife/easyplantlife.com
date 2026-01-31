@@ -84,6 +84,15 @@ describe("Site Performance (M11-02)", () => {
       }
     });
 
+    it("next.config.ts allows Medium image domains for optimization", () => {
+      const configPath = path.join(process.cwd(), "next.config.ts");
+      const configContent = fs.readFileSync(configPath, "utf-8");
+
+      // Should configure remote patterns for Medium images
+      expect(configContent).toContain("remotePatterns");
+      expect(configContent).toContain("miro.medium.com");
+    });
+
     it("images in public folder use optimized formats", () => {
       const publicImagesDir = path.join(process.cwd(), "public", "images");
 
