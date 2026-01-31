@@ -32,61 +32,63 @@ export function AboutContent({ className = "", ...props }: AboutContentProps) {
     >
       {/* Section 1: Why Easy Plant Life Exists */}
       <section data-testid="about-why-section" className="mb-12">
-        <h2 className="font-heading text-3xl md:text-4xl text-text mb-6">
+        <h2 className="font-heading text-3xl md:text-4xl text-neutral-800 mb-8">
           Why Easy Plant Life Exists
         </h2>
-        <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We started Easy Plant Life because we noticed something: plant-based
-          living had become complicated. Somewhere along the way, what began as
-          a simple choice turned into a project filled with rules, pressure, and
-          endless optimization.
-        </p>
-        <p className="font-body text-lg text-text-secondary leading-relaxed">
-          We wanted a space that felt different. A place where choosing plants
-          over other options could just be... easy. No perfection required.
-        </p>
+        <div className="font-body text-lg text-neutral-600 leading-relaxed space-y-4">
+          <p>Living vegan should not feel like a project.</p>
+          <p>
+            Somewhere along the way, what began as a simple choice turned into
+            something complicated. Rules to follow. Recipes to perfect. Pressure
+            to optimize.
+          </p>
+          <p>We wanted something different.</p>
+          <p>
+            A place where plant-based living could just be easy. Where good
+            enough is enough. Where you do not need to prove anything to anyone.
+          </p>
+        </div>
       </section>
 
       {/* Section 2: What We Believe */}
       <section data-testid="about-beliefs-section" className="mb-12">
-        <h2 className="font-heading text-3xl md:text-4xl text-text mb-6">
+        <h2 className="font-heading text-3xl md:text-4xl text-neutral-800 mb-8">
           What We Believe
         </h2>
-        <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We believe in practical choices that fit real life. Sustainable habits
-          that you can maintain over time matter more than perfect days followed
-          by burnout.
-        </p>
-        <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          Simplicity is a feature. If something adds complexity without adding
-          clarity, it probably doesn&apos;t belong here. We choose calm over
-          urgency, honest information over hype.
-        </p>
-        <p className="font-body text-lg text-text-secondary leading-relaxed">
-          Long-term sustainability beats short-term perfection. Every time.
-        </p>
+        <div className="font-body text-lg text-neutral-600 leading-relaxed space-y-4">
+          <p>Easy matters because ease is what allows habits to survive real life.</p>
+          <p>Most days are average. Some days are rushed. Some days are tiring.</p>
+          <p>
+            A way of eating that depends on everything going right will eventually
+            feel like too much.
+          </p>
+          <p>Simplicity over optimization.</p>
+          <p>Sustainability over perfection.</p>
+          <p>Calm over urgency.</p>
+          <p>
+            If something adds complexity without increasing clarity, it does not
+            belong here.
+          </p>
+        </div>
       </section>
 
       {/* Section 3: What We're Not */}
       <section data-testid="about-not-section" className="mb-12">
-        <h2 className="font-heading text-3xl md:text-4xl text-text mb-6">
+        <h2 className="font-heading text-3xl md:text-4xl text-neutral-800 mb-8">
           What We&apos;re Not
         </h2>
-        <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We&apos;re not here to tell you what to do. There&apos;s no judgment
-          for imperfect choices, no lectures about doing more, and no pressure
-          to become a different person.
-        </p>
-        <p className="font-body text-lg text-text-secondary leading-relaxed mb-4">
-          We don&apos;t do wellness influencer energy. We don&apos;t sell
-          perfection or pretend any of this is complicated. We&apos;re not
-          interested in making you feel bad about where you are right now.
-        </p>
-        <p className="font-body text-lg text-text-secondary leading-relaxed">
-          Easy Plant Life is not a lifestyle brand that expects you to buy in
-          completely. Take what works for you. Leave the rest. That&apos;s the
-          whole point.
-        </p>
+        <div className="font-body text-lg text-neutral-600 leading-relaxed space-y-4">
+          <p>We are not here to tell you what to do.</p>
+          <p>
+            No judgment for imperfect choices. No lectures about doing more. No
+            pressure to become a different person.
+          </p>
+          <p>We do not do wellness influencer energy.</p>
+          <p>We do not sell perfection.</p>
+          <p>We are not interested in making you feel bad about where you are.</p>
+          <p>Use what helps. Ignore what does not.</p>
+          <p>That is the whole point.</p>
+        </div>
       </section>
     </article>
   );

@@ -37,9 +37,12 @@ export function SecondaryCTAs({
     >
       <div className="max-w-4xl mx-auto">
         {/* Section heading */}
-        <h2 className="font-heading text-2xl md:text-3xl text-neutral-800 text-center mb-10">
-          Explore More
+        <h2 className="font-heading text-2xl md:text-3xl text-neutral-800 text-center mb-4">
+          Go Further
         </h2>
+        <p className="text-neutral-500 text-center mb-10">
+          Use what helps. Ignore what does not.
+        </p>
 
         {/* Cards container */}
         <div className="grid md:grid-cols-2 gap-6 md:gap-8">
@@ -55,7 +58,7 @@ export function SecondaryCTAs({
                 Blog
               </h3>
               <p className="text-neutral-600 text-sm">
-                Thoughtful articles on plant-based living
+                Short thoughts. Practical ideas. No fluff.
               </p>
             </div>
           </NextLink>
@@ -72,7 +75,7 @@ export function SecondaryCTAs({
                 Books
               </h3>
               <p className="text-neutral-600 text-sm">
-                In-depth guides for your journey
+                Calm guides for living simply with plants.
               </p>
             </div>
           </NextLink>

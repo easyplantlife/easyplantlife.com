@@ -14,11 +14,10 @@ export default function NotFound() {
     <main className="py-12 md:py-16 text-center">
       <Container>
         <Heading level={1} className="text-4xl mb-6">
-          This page has wandered off
+          Page not found
         </Heading>
         <Text size="lg" color="secondary" className="mb-8 max-w-md mx-auto">
-          It looks like the page you were looking for has moved or never
-          existed. Let&apos;s get you back on track.
+          This page does not exist. No worries.
         </Text>
         <Link href="/">Return home</Link>
       </Container>

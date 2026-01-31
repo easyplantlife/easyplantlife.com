@@ -157,13 +157,14 @@ export function NewsletterCTA({
       {...props}
     >
       <div className="max-w-xl mx-auto">
-        {/* Value Proposition - one sentence, no hype */}
-        <p
+        {/* Value Proposition - calm, no hype */}
+        <div
           data-testid="newsletter-value-proposition"
-          className="font-body text-lg md:text-xl text-text mb-8"
+          className="font-body text-lg md:text-xl text-neutral-700 mb-8 space-y-2"
         >
-          Receive occasional thoughts on living simply with plants.
-        </p>
+          <p>Occasional thoughts on easy plant-based living.</p>
+          <p className="text-neutral-500 text-base">No pressure. No spam. Unsubscribe anytime.</p>
+        </div>
 
         {/* Newsletter Form */}
         <form

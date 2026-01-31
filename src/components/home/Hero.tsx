@@ -59,18 +59,18 @@ export function Hero({ className = "", ...props }: HeroProps) {
             data-testid="hero-tagline"
             className="font-heading text-2xl md:text-3xl lg:text-4xl text-primary-800 mb-8 font-medium"
           >
-            Living simply, naturally.
+            Vegan living made simple.
           </p>
 
           {/* Brand Explanation - max 3 sentences */}
-          <p
+          <div
             data-testid="hero-explanation"
-            className="font-body text-lg md:text-xl text-neutral-700 leading-relaxed max-w-2xl mx-auto"
+            className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-2"
           >
-            Easy Plant Life is about embracing a plant-based lifestyle without the
-            pressure to be perfect. We believe in sustainable choices, not rigid
-            rules.
-          </p>
+            <p>Living vegan should not feel like a project.</p>
+            <p>No perfection required. No rules to follow.</p>
+            <p>Just easy choices that fit your real life.</p>
+          </div>
 
           {/* Decorative leaf divider */}
           <div className="mt-12 flex justify-center items-center gap-4">
