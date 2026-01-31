@@ -2,6 +2,7 @@
 
 import {
   useState,
+  useEffect,
   useId,
   type HTMLAttributes,
   type FormEvent,
@@ -9,6 +10,7 @@ import {
 } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { trackFormView, trackContactSubmit } from "@/lib/analytics/events";
 
 /**
  * Form data shape for contact form submission
@@ -75,11 +77,16 @@ export function ContactForm({
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Track form view on mount
+  useEffect(() => {
+    trackFormView("contact");
+  }, []);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    // Check honeypot - if filled, silently "succeed" without sending
+    // Check honeypot - if filled, silently "succeed" without sending or tracking
     if (honeypot.trim()) {
       setStatus("success");
       return;
@@ -121,9 +128,11 @@ export function ContactForm({
         });
       }
       setStatus("success");
+      trackContactSubmit("success");
     } catch {
       setStatus("error");
       setErrorMessage("Something went wrong. Please try again.");
+      trackContactSubmit("error");
     }
   };
 

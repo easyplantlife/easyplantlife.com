@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Link } from "@/components/ui/Link";
+import * as analytics from "@/lib/analytics/events";
+
+// Mock the analytics module
+jest.mock("@/lib/analytics/events", () => ({
+  trackOutboundClick: jest.fn(),
+}));
 
 /**
  * Link Component Tests
@@ -191,6 +197,92 @@ describe("Link Component", () => {
       const link = screen.getByRole("link");
       expect(link).toHaveAttribute("title", "About page");
       expect(link).toHaveAttribute("id", "about-link");
+    });
+  });
+
+  describe("Analytics Tracking (M10-02)", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("tracks outbound click when external link is clicked", async () => {
+      const user = userEvent.setup();
+      render(
+        <Link href="https://medium.com/@easyplantlife/article">
+          Read on Medium
+        </Link>
+      );
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://medium.com/@easyplantlife/article",
+        "Read on Medium"
+      );
+    });
+
+    it("tracks outbound click for https links", async () => {
+      const user = userEvent.setup();
+      render(<Link href="https://amazon.com/dp/123456">Buy Now</Link>);
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://amazon.com/dp/123456",
+        "Buy Now"
+      );
+    });
+
+    it("tracks outbound click for http links", async () => {
+      const user = userEvent.setup();
+      render(<Link href="http://example.com">Example</Link>);
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "http://example.com",
+        "Example"
+      );
+    });
+
+    it("does not track internal link clicks", async () => {
+      const user = userEvent.setup();
+      render(<Link href="/about">About Us</Link>);
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).not.toHaveBeenCalled();
+    });
+
+    it("does not track hash link clicks", async () => {
+      const user = userEvent.setup();
+      render(<Link href="#section">Jump to section</Link>);
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).not.toHaveBeenCalled();
+    });
+
+    it("handles links with complex child elements", async () => {
+      const user = userEvent.setup();
+      render(
+        <Link href="https://medium.com/article">
+          <span>Read</span> <strong>on Medium</strong>
+        </Link>
+      );
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://medium.com/article",
+        "Read on Medium"
+      );
     });
   });
 });

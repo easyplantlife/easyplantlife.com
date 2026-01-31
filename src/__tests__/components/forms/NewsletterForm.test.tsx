@@ -1,6 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NewsletterForm } from "@/components/forms/NewsletterForm";
+import * as analytics from "@/lib/analytics/events";
+
+// Mock the analytics module
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackNewsletterSubmit: jest.fn(),
+}));
 
 /**
  * NewsletterForm Component Tests
@@ -638,6 +645,63 @@ describe("NewsletterForm Component", () => {
           expect(text).not.toContain(word);
         });
       });
+    });
+  });
+
+  describe("Analytics Tracking (M10-02)", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("tracks form view when component mounts", () => {
+      render(<NewsletterForm />);
+
+      expect(analytics.trackFormView).toHaveBeenCalledWith("newsletter");
+    });
+
+    it("tracks successful newsletter submission", async () => {
+      const user = userEvent.setup();
+      const handleSubmit = jest.fn().mockResolvedValue(undefined);
+      render(<NewsletterForm onSubmit={handleSubmit} />);
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
+
+      await user.type(input, "test@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(analytics.trackNewsletterSubmit).toHaveBeenCalledWith("success");
+      });
+    });
+
+    it("tracks failed newsletter submission", async () => {
+      const user = userEvent.setup();
+      const handleSubmit = jest
+        .fn()
+        .mockRejectedValue(new Error("Submission failed"));
+      render(<NewsletterForm onSubmit={handleSubmit} />);
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", {
+        name: /subscribe|sign up|join/i,
+      });
+
+      await user.type(input, "test@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(analytics.trackNewsletterSubmit).toHaveBeenCalledWith("error");
+      });
+    });
+
+    it("only tracks form view once per mount", () => {
+      const { rerender } = render(<NewsletterForm />);
+
+      // Force a rerender
+      rerender(<NewsletterForm className="updated" />);
+
+      expect(analytics.trackFormView).toHaveBeenCalledTimes(1);
     });
   });
 });

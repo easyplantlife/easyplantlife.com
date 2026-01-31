@@ -1,5 +1,10 @@
-import { forwardRef, type AnchorHTMLAttributes } from "react";
+import React, {
+  forwardRef,
+  type AnchorHTMLAttributes,
+  type MouseEvent,
+} from "react";
 import NextLink from "next/link";
+import { trackOutboundClick } from "@/lib/analytics/events";
 
 export interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   /** The URL the link points to */
@@ -34,8 +39,23 @@ function isExternalLink(href: string): boolean {
  * <Link href="/contact" className="text-lg">Contact</Link>
  * ```
  */
+/**
+ * Extracts text content from React children for analytics tracking
+ */
+function getTextContent(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (typeof node === "number") return String(node);
+  if (Array.isArray(node)) {
+    return node.map(getTextContent).join(" ").replace(/\s+/g, " ").trim();
+  }
+  if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+    return getTextContent(node.props.children);
+  }
+  return "";
+}
+
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
-  { href, children, className = "", ...props },
+  { href, children, className = "", onClick, ...props },
   ref
 ) {
   const baseStyles = [
@@ -55,6 +75,17 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
 
   const combinedClassName = `${baseStyles} ${className}`.trim();
 
+  const handleExternalClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    // Track outbound click with link text
+    const linkText = getTextContent(children).trim();
+    trackOutboundClick(href, linkText || undefined);
+
+    // Call original onClick handler if provided
+    if (onClick) {
+      onClick(e);
+    }
+  };
+
   if (isExternalLink(href)) {
     return (
       <a
@@ -63,6 +94,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
         target="_blank"
         rel="noopener noreferrer"
         className={combinedClassName}
+        onClick={handleExternalClick}
         {...props}
       >
         {children}
@@ -71,7 +103,13 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   }
 
   return (
-    <NextLink ref={ref} href={href} className={combinedClassName} {...props}>
+    <NextLink
+      ref={ref}
+      href={href}
+      className={combinedClassName}
+      onClick={onClick}
+      {...props}
+    >
       {children}
     </NextLink>
   );
