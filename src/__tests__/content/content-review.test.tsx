@@ -262,7 +262,14 @@ describe("Content Quality: Internal Links", () => {
   it("Header navigation links use valid internal paths", () => {
     render(<Header />);
     const links = screen.getAllByRole("link");
-    const validPaths = ["/", "/about", "/books", "/blog", "/newsletter", "/contact"];
+    const validPaths = [
+      "/",
+      "/about",
+      "/books",
+      "/blog",
+      "/newsletter",
+      "/contact",
+    ];
 
     links.forEach((link) => {
       const href = link.getAttribute("href");
@@ -275,7 +282,14 @@ describe("Content Quality: Internal Links", () => {
   it("Footer navigation links use valid internal paths", () => {
     render(<Footer />);
     const links = screen.getAllByRole("link");
-    const validPaths = ["/", "/about", "/books", "/blog", "/newsletter", "/contact"];
+    const validPaths = [
+      "/",
+      "/about",
+      "/books",
+      "/blog",
+      "/newsletter",
+      "/contact",
+    ];
 
     links.forEach((link) => {
       const href = link.getAttribute("href");
@@ -288,7 +302,14 @@ describe("Content Quality: Internal Links", () => {
   it("SecondaryCTAs links use valid internal paths", () => {
     render(<SecondaryCTAs />);
     const links = screen.getAllByRole("link");
-    const validPaths = ["/", "/about", "/books", "/blog", "/newsletter", "/contact"];
+    const validPaths = [
+      "/",
+      "/about",
+      "/books",
+      "/blog",
+      "/newsletter",
+      "/contact",
+    ];
 
     links.forEach((link) => {
       const href = link.getAttribute("href");
@@ -349,10 +370,14 @@ describe("Content Quality: Form Labels and Accessibility", () => {
 
   it("Forms have submit buttons with clear text", () => {
     render(<NewsletterContent />);
-    expect(screen.getByRole("button", { name: /subscribe/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /subscribe/i })
+    ).toBeInTheDocument();
 
     const { unmount } = render(<ContactContent />);
-    expect(screen.getByRole("button", { name: /send message/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /send message/i })
+    ).toBeInTheDocument();
     unmount();
   });
 });
@@ -372,7 +397,8 @@ describe("Content Quality: Page Sections Have Proper Structure", () => {
 
     // Explanation (max 3 sentences)
     const explanation = screen.getByTestId("hero-explanation");
-    const sentences = explanation.textContent?.split(/[.!?]+/).filter(Boolean) || [];
+    const sentences =
+      explanation.textContent?.split(/[.!?]+/).filter(Boolean) || [];
     expect(sentences.length).toBeLessThanOrEqual(3);
   });
 
