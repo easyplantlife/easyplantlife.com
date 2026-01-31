@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageLayout } from "@/components/PageLayout";
 import { BooksList } from "@/components/books/BooksList";
+import { BookJsonLd } from "@/components/seo/JsonLd";
 import { books } from "@/content/books";
 
 export const metadata: Metadata = {
@@ -23,6 +24,11 @@ export const metadata: Metadata = {
 export default function BooksPage() {
   return (
     <PageLayout title="Books">
+      {/* JSON-LD Structured Data for each book */}
+      {books.map((book) => (
+        <BookJsonLd key={book.id} book={book} />
+      ))}
+
       <p
         data-testid="books-intro"
         className="mb-12 text-lg text-text-secondary"
