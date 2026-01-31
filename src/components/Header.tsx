@@ -1,6 +1,7 @@
 "use client";
 
 import NextLink from "next/link";
+import Image from "next/image";
 import { MobileNav } from "./MobileNav";
 
 /**
@@ -25,6 +26,7 @@ const navLinks: NavLink[] = [
  *
  * Site header with logo and navigation for Easy Plant Life.
  * Features responsive design with mobile menu and desktop navigation.
+ * Uses mark logo on mobile and lockup logo on desktop.
  *
  * @example
  * ```tsx
@@ -33,20 +35,32 @@ const navLinks: NavLink[] = [
  */
 export function Header() {
   return (
-    <header className="bg-background border-b border-neutral-200">
+    <header className="bg-white/80 backdrop-blur-sm border-b border-primary-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <NextLink
             href="/"
             className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
           >
-            <span
-              aria-label="Easy Plant Life home"
-              className="font-heading text-xl font-semibold text-text"
-            >
-              Easy Plant Life
-            </span>
+            {/* Mark logo for mobile */}
+            <Image
+              src="/images/mark-logo.png"
+              alt="Easy Plant Life"
+              width={48}
+              height={48}
+              className="md:hidden"
+              priority
+            />
+            {/* Lockup logo for desktop */}
+            <Image
+              src="/images/lockup-logo.png"
+              alt="Easy Plant Life"
+              width={180}
+              height={60}
+              className="hidden md:block"
+              priority
+            />
           </NextLink>
 
           {/* Desktop Navigation */}
@@ -58,7 +72,7 @@ export function Header() {
               <NextLink
                 key={link.href}
                 href={link.href}
-                className="text-text hover:text-primary-dark transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
+                className="text-neutral-700 font-medium hover:text-primary-600 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary-500 hover:after:w-full after:transition-all after:duration-300"
               >
                 {link.name}
               </NextLink>

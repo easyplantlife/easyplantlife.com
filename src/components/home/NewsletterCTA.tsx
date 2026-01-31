@@ -73,8 +73,8 @@ export function NewsletterCTA({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const baseStyles = [
-    // Background - subtle differentiation
-    "bg-neutral-50",
+    // Background with gradient
+    "bg-gradient-to-br from-white via-primary-50 to-accent-50",
     // Generous vertical padding for white space
     "py-16",
     "md:py-20",
@@ -134,10 +134,13 @@ export function NewsletterCTA({
         <div className="max-w-xl mx-auto">
           <div
             data-testid="newsletter-success"
-            className="text-primary font-body text-lg"
+            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-primary-200"
           >
-            <p className="mb-2 font-medium">Thank you for subscribing.</p>
-            <p className="text-text-secondary">
+            <div className="text-5xl mb-4">🌱</div>
+            <p className="mb-2 font-heading text-xl text-primary-700 font-medium">
+              Thank you for subscribing!
+            </p>
+            <p className="text-neutral-600">
               We will be in touch with thoughtful updates.
             </p>
           </div>

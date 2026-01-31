@@ -22,28 +22,43 @@ const config: Config = {
   theme: {
     colors: {
       /**
-       * Primary - Soft Green
-       * For accents, links, CTAs, and interactive elements.
-       * Evokes nature, calm, and plant life without being overwhelming.
+       * Primary - Vibrant Green
+       * Derived from the brand logos - bright, lively greens that evoke
+       * growth, nature, and positive energy.
        *
        * ACCESSIBILITY: Colors optimized for WCAG 2.1 AA contrast ratios.
-       * - White text on primary: 4.5:1 minimum for normal text
-       * - Primary text on white: 4.5:1 minimum for links
        */
       primary: {
         50: "#F1F8E9", // Lightest - subtle backgrounds
-        100: "#E8F5E9", // Light - hover backgrounds
-        200: "#C8E6C9", // Light accent
-        300: "#A5D6A7", // Medium light
-        400: "#66BB6A", // Medium
-        500: "#4CAF50", // Medium
-        600: "#388E3C", // Dark
-        700: "#2E7D32", // Darker - WCAG AA compliant (4.52:1 on white)
-        800: "#1B5E20", // Very dark - WCAG AA compliant (5.96:1 on white)
-        900: "#0D3D12", // Darkest
-        DEFAULT: "#2E7D32", // WCAG AA: 4.52:1 contrast on white
-        light: "#E8F5E9",
-        dark: "#1B5E20", // WCAG AA: 5.96:1 contrast for hover states
+        100: "#DCEDC8", // Light - soft accent
+        200: "#C5E1A5", // Light green
+        300: "#AED581", // Lime light
+        400: "#9CCC65", // Lime - vibrant accent
+        500: "#8BC34A", // Bright lime green (from logo)
+        600: "#7CB342", // Medium lime
+        700: "#689F38", // Forest lime
+        800: "#558B2F", // Deep green
+        900: "#33691E", // Darkest
+        DEFAULT: "#4CAF50", // Vibrant green for CTAs
+        light: "#C5E1A5", // Light lime for backgrounds
+        bright: "#8BC34A", // Bright lime accent
+        dark: "#2E7D32", // Dark green for text/hover
+      },
+
+      /**
+       * Accent - Sunshine Yellow/Gold
+       * From the sun element in the logo - adds warmth and energy.
+       */
+      accent: {
+        50: "#FFFDE7",
+        100: "#FFF9C4",
+        200: "#FFF59D",
+        300: "#FFF176",
+        400: "#FFEE58",
+        500: "#FFEB3B",
+        600: "#FDD835",
+        700: "#FBC02D",
+        DEFAULT: "#FDD835", // Warm sunshine
       },
 
       /**
@@ -76,7 +91,13 @@ const config: Config = {
       background: {
         DEFAULT: "#FDFCFB", // Warm white
         secondary: "#F5F5F0", // Light neutral
-        accent: "#E8F5E9", // Light green tint
+        accent: "#F1F8E9", // Light green tint
+        lime: "#DCEDC8", // Soft lime background
+        gradient: {
+          from: "#F1F8E9",
+          via: "#DCEDC8",
+          to: "#C5E1A5",
+        },
       },
 
       /**

@@ -25,16 +25,16 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 /**
  * Variant styles mapping
- * Primary: Brand green background with white text
- * Secondary: Transparent with border
+ * Primary: Vibrant green gradient with white text
+ * Secondary: Outlined with green border
  * Ghost: Fully transparent, text only
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-text-inverse hover:bg-primary-dark active:bg-primary-700",
+    "bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 active:from-primary-700 active:to-primary-800 shadow-md hover:shadow-lg transition-all",
   secondary:
-    "bg-transparent border border-primary text-primary hover:bg-primary-50 active:bg-primary-100",
-  ghost: "bg-transparent text-text hover:bg-neutral-100 active:bg-neutral-200",
+    "bg-white border-2 border-primary-500 text-primary-700 hover:bg-primary-50 hover:border-primary-600 active:bg-primary-100",
+  ghost: "bg-transparent text-primary-700 hover:bg-primary-50 active:bg-primary-100",
 };
 
 /**
