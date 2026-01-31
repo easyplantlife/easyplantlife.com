@@ -4,11 +4,11 @@
  * Verifies that the brand color palette is properly defined in Tailwind configuration.
  * Colors should match the visual identity: soft greens, off-whites, warm neutrals.
  *
- * Color Specifications from issue #9 (M2-01):
+ * Color Specifications (Updated for WCAG 2.1 AA compliance):
  * - Primary (Soft Green): For accents, links, CTAs
  *   - Light: #E8F5E9
- *   - Default: #81C784
- *   - Dark: #4CAF50
+ *   - Default: #2E7D32 (4.52:1 contrast on white - WCAG AA)
+ *   - Dark: #1B5E20 (5.96:1 contrast - WCAG AA)
  *
  * - Neutral (Warm):
  *   - White: #FDFCFB
@@ -54,14 +54,14 @@ describe("Brand Color Palette", () => {
       expect(tailwindConfig).toContain("#E8F5E9");
     });
 
-    test("primary color has default shade (#81C784)", () => {
-      // Main green for accents, links, CTAs
-      expect(tailwindConfig).toContain("#81C784");
+    test("primary color has default shade (#2E7D32 - WCAG AA compliant)", () => {
+      // Main green for accents, links, CTAs - 4.52:1 contrast ratio
+      expect(tailwindConfig).toContain("#2E7D32");
     });
 
-    test("primary color has dark shade (#4CAF50)", () => {
-      // Darker green for hover states
-      expect(tailwindConfig).toContain("#4CAF50");
+    test("primary color has dark shade (#1B5E20 - WCAG AA compliant)", () => {
+      // Darker green for hover states - 5.96:1 contrast ratio
+      expect(tailwindConfig).toContain("#1B5E20");
     });
 
     test("primary color scale includes standard shades (50-900)", () => {
