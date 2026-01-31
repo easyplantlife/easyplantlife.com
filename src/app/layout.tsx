@@ -57,11 +57,15 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
-  // Note: favicon.ico exists as static file, apple-icon.tsx is auto-discovered
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon",
+    icon: [
+      { url: "/favicons/favicon.ico", sizes: "any" },
+      { url: "/favicons/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicons/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/favicons/apple-touch-icon.png",
   },
+  manifest: "/favicons/site.webmanifest",
 };
 
 export const viewport: Viewport = {
