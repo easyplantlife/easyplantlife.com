@@ -58,31 +58,28 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   ref
 ) {
   const baseStyles = [
-    // Modern card styling with subtle shadow
+    // Minimal card styling per brand guidelines
     "border",
-    "border-primary-100",
-    // More rounded corners
-    "rounded-2xl",
+    "border-neutral-200",
+    // Rounded corners
+    "rounded-lg",
     // Padding consistent with spacing scale
     "p-6",
-    // White background with subtle gradient
-    "bg-gradient-to-br from-white to-primary-50/30",
-    // Subtle shadow
-    "shadow-sm",
+    // Clean background
+    "bg-background",
   ].join(" ");
 
   const clickableStyles = href
     ? [
-        // Hover state with elevated shadow and scale
-        "hover:shadow-lg",
-        "hover:border-primary-300",
-        "hover:scale-[1.02]",
+        // Hover state
+        "hover:shadow-md",
+        "hover:border-primary",
         // Smooth transition
-        "transition-all duration-300",
+        "transition-colors duration-200",
         // Focus styles for accessibility
         "focus-visible:outline-none",
         "focus-visible:ring-2",
-        "focus-visible:ring-primary-500",
+        "focus-visible:ring-primary",
         "focus-visible:ring-offset-2",
         // Block display for proper sizing
         "block",

@@ -46,10 +46,7 @@ describe("Home Page Integration Tests", () => {
     it("displays the Easy Plant Life logo/brand name", () => {
       render(<Home />);
 
-      const logo = screen.getByRole("heading", {
-        level: 1,
-        name: /easy plant life/i,
-      });
+      const logo = screen.getByRole("img", { name: /easy plant life/i });
       expect(logo).toBeVisible();
     });
 
@@ -105,7 +102,7 @@ describe("Home Page Integration Tests", () => {
       render(<Home />);
 
       // Logo
-      expect(screen.getByText("Easy Plant Life")).toBeVisible();
+      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
 
       // Tagline
       expect(screen.getByTestId("hero-tagline")).toBeVisible();
@@ -287,10 +284,9 @@ describe("Home Page Integration Tests", () => {
     it("has proper heading hierarchy", () => {
       render(<Home />);
 
-      // Should have exactly one h1
-      const h1Elements = screen.getAllByRole("heading", { level: 1 });
-      expect(h1Elements).toHaveLength(1);
-      expect(h1Elements[0]).toHaveTextContent("Easy Plant Life");
+      // Should have exactly one h1 with brand name
+      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      expect(h1).toBeInTheDocument();
     });
 
     it("all sections have aria-labels for screen readers", () => {
@@ -381,8 +377,8 @@ describe("Home Page Integration Tests", () => {
     it("displays all essential brand elements above the fold conceptually", () => {
       render(<Home />);
 
-      // Brand name
-      expect(screen.getByText("Easy Plant Life")).toBeVisible();
+      // Brand name/logo
+      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
 
       // Tagline
       const tagline = screen.getByTestId("hero-tagline");

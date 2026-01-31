@@ -48,16 +48,22 @@ jest.mock("next/link", () => {
   };
 });
 
-// Mock next/image
+// Mock next/image - filter out Next.js-specific props
 jest.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage(props: {
     src: string;
     alt: string;
+    priority?: boolean;
+    fill?: boolean;
     [key: string]: unknown;
   }) {
+    // Filter out Next.js-specific props that aren't valid HTML attributes
+    const { priority, fill, ...htmlProps } = props;
+    void priority;
+    void fill;
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img {...props} />;
+    return <img {...htmlProps} />;
   },
 }));
 

@@ -52,16 +52,22 @@ jest.mock("next/link", () => {
   };
 });
 
-// Mock next/image
+// Mock next/image - filter out Next.js-specific props
 jest.mock("next/image", () => ({
   __esModule: true,
   default: function MockImage(props: {
     src: string;
     alt: string;
+    priority?: boolean;
+    fill?: boolean;
     [key: string]: unknown;
   }) {
+    // Filter out Next.js-specific props that aren't valid HTML attributes
+    const { priority, fill, ...htmlProps } = props;
+    void priority;
+    void fill;
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img {...props} />;
+    return <img {...htmlProps} />;
   },
 }));
 
@@ -89,7 +95,7 @@ describe("Layout Correctness - Semantic HTML Structure", () => {
 
     it("logo is a link with proper text", () => {
       render(<Header />);
-      const logoLink = screen.getByText("Easy Plant Life").closest("a");
+      const logoLink = screen.getByRole("link", { name: /easy plant life/i });
       expect(logoLink).toBeInTheDocument();
       expect(logoLink).toHaveAttribute("href", "/");
     });
@@ -458,8 +464,10 @@ describe("Layout Correctness - Visual Hierarchy", () => {
   it("Hero has visual prominence with larger text", () => {
     render(<Hero />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    // H1 should have larger text size classes
-    expect(h1.className).toMatch(/text-(4xl|5xl|6xl)/);
+    // H1 wraps the logo; logo image has responsive width for visual prominence
+    expect(h1).toBeInTheDocument();
+    const logo = screen.getByRole("img", { name: /easy plant life/i });
+    expect(logo.className).toMatch(/w-64|md:w-80|lg:w-96/);
   });
 });
 

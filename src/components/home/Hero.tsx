@@ -28,31 +28,24 @@ export function Hero({ className = "", ...props }: HeroProps) {
     <section
       aria-label="Hero section"
       data-testid="hero-section"
-      className={`relative overflow-hidden ${className}`.trim()}
+      className={`bg-gradient-to-b from-primary-100 to-white py-24 md:py-32 lg:py-40 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
       {...props}
     >
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-primary-100 to-primary-200 opacity-60" />
-
-      {/* Decorative Elements */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-primary-300 rounded-full opacity-20 blur-3xl" />
-      <div className="absolute bottom-20 right-10 w-48 h-48 bg-accent-300 rounded-full opacity-20 blur-3xl" />
-      <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-primary-400 rounded-full opacity-10 blur-2xl" />
-
       {/* Content */}
-      <div className="relative py-24 md:py-32 lg:py-40 px-4 md:px-6 lg:px-8 text-center">
-        <div className="max-w-4xl mx-auto">
-          {/* Logo */}
-          <div className="mb-8 flex justify-center">
+      <div className="text-center">
+        <div className="max-w-3xl mx-auto">
+          {/* Logo - h1 for semantic structure and accessibility */}
+          <h1 className="mb-8 flex justify-center font-heading">
+            <span className="sr-only">Easy Plant Life</span>
             <Image
               src="/images/lockup-logo.png"
               alt="Easy Plant Life"
               width={400}
               height={150}
-              className="w-64 md:w-80 lg:w-96 h-auto drop-shadow-lg"
+              className="w-64 md:w-80 lg:w-96 h-auto"
               priority
             />
-          </div>
+          </h1>
 
           {/* Tagline - 2-4 words */}
           <p
@@ -65,25 +58,24 @@ export function Hero({ className = "", ...props }: HeroProps) {
           {/* Brand Explanation - max 3 sentences */}
           <div
             data-testid="hero-explanation"
-            className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-2"
+            className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-3"
           >
-            <p>Living vegan should not feel like a project.</p>
-            <p>No perfection required. No rules to follow.</p>
-            <p>Just easy choices that fit your real life.</p>
+            <p>Living vegan does not need to feel like a project.</p>
+            <p>No perfection or rules—just easy choices that fit your real life.</p>
           </div>
 
-          {/* Decorative leaf divider */}
-          <div className="mt-12 flex justify-center items-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary-400" />
+          {/* Decorative divider */}
+          <div className="mt-14 flex justify-center items-center gap-4">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary-300" />
             <Image
               src="/images/mark-logo.png"
               alt=""
-              width={32}
-              height={32}
-              className="opacity-60"
+              width={28}
+              height={28}
+              className="opacity-70"
               aria-hidden="true"
             />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary-400" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary-300" />
           </div>
         </div>
       </div>

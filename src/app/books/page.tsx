@@ -29,14 +29,17 @@ export default function BooksPage() {
         <BookJsonLd key={book.id} book={book} />
       ))}
 
-      <p
+      {/* Intro with soft colour */}
+      <div
         data-testid="books-intro"
-        className="mb-12 text-lg text-text-secondary"
+        className="mb-12 rounded-2xl border border-primary-200 bg-primary-100/80 px-6 py-8 md:px-8 md:py-10"
       >
-        Simple, honest guides for living with plants. No complicated care
-        schedules, no pressure—just calm advice for bringing nature into your
-        space.
-      </p>
+        <p className="text-lg leading-relaxed text-neutral-700 md:text-xl">
+          Simple, honest guides for living with plants. No complicated care
+          schedules, no pressure—just calm advice for bringing nature into your
+          space.
+        </p>
+      </div>
       <BooksList books={books} data-testid="books-list" />
     </PageLayout>
   );

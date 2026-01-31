@@ -60,10 +60,10 @@ export function NewsletterContent({
       {/* Value proposition - calm, no hype */}
       <div className="max-w-2xl space-y-4">
         <Text size="lg" className="text-neutral-700">
-          Occasional thoughts on easy plant-based living.
+          Thoughtful notes on easy plant-based living.
         </Text>
         <Text size="base" className="text-neutral-500">
-          We only send when we have something worth sharing. No pressure. No spam.
+          We only send when we have something worth sharing.
         </Text>
       </div>
 

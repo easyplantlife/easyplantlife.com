@@ -35,31 +35,35 @@ const navLinks: NavLink[] = [
  */
 export function Header() {
   return (
-    <header className="bg-white/80 backdrop-blur-sm border-b border-primary-100 sticky top-0 z-50">
+    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <NextLink
             href="/"
+            aria-label="Easy Plant Life"
             className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
           >
+            <span className="sr-only">Easy Plant Life</span>
             {/* Mark logo for mobile */}
             <Image
               src="/images/mark-logo.png"
-              alt="Easy Plant Life"
+              alt=""
               width={48}
               height={48}
               className="md:hidden"
               priority
+              aria-hidden="true"
             />
             {/* Lockup logo for desktop */}
             <Image
               src="/images/lockup-logo.png"
-              alt="Easy Plant Life"
+              alt=""
               width={180}
               height={60}
               className="hidden md:block"
               priority
+              aria-hidden="true"
             />
           </NextLink>
 

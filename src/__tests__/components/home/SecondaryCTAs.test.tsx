@@ -44,10 +44,9 @@ describe("SecondaryCTAs Component", () => {
     it("Blog link has clear, simple label", () => {
       render(<SecondaryCTAs />);
       const blogLink = screen.getByRole("link", { name: /blog/i });
-      // Label should be concise (1-3 words)
-      const wordCount = blogLink.textContent?.trim().split(/\s+/).length || 0;
-      expect(wordCount).toBeLessThanOrEqual(3);
-      expect(wordCount).toBeGreaterThanOrEqual(1);
+      // Link contains heading with concise label
+      const heading = blogLink.querySelector("h3");
+      expect(heading).toHaveTextContent("Blog");
     });
   });
 
@@ -67,10 +66,9 @@ describe("SecondaryCTAs Component", () => {
     it("Books link has clear, simple label", () => {
       render(<SecondaryCTAs />);
       const booksLink = screen.getByRole("link", { name: /book/i });
-      // Label should be concise (1-3 words)
-      const wordCount = booksLink.textContent?.trim().split(/\s+/).length || 0;
-      expect(wordCount).toBeLessThanOrEqual(3);
-      expect(wordCount).toBeGreaterThanOrEqual(1);
+      // Link contains heading with concise label
+      const heading = booksLink.querySelector("h3");
+      expect(heading).toHaveTextContent("Books");
     });
   });
 

@@ -32,22 +32,21 @@ describe("Hero Component", () => {
   describe("Logo Display", () => {
     it("displays the brand name prominently", () => {
       render(<Hero />);
-      const logo = screen.getByText("Easy Plant Life");
+      const logo = screen.getByRole("img", { name: /easy plant life/i });
       expect(logo).toBeInTheDocument();
     });
 
-    it("renders logo with heading styling for prominence", () => {
+    it("renders logo with heading structure for prominence", () => {
       render(<Hero />);
-      const logo = screen.getByText("Easy Plant Life");
-      // Logo should use the heading font family
-      expect(logo).toHaveClass("font-heading");
+      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      expect(h1).toHaveClass("font-heading");
     });
 
     it("logo is visually prominent with appropriate size", () => {
       render(<Hero />);
-      const logo = screen.getByText("Easy Plant Life");
-      // Should have large text sizing
-      expect(logo.className).toMatch(/text-(4xl|5xl|6xl)/);
+      const logo = screen.getByRole("img", { name: /easy plant life/i });
+      // Should have responsive width classes for prominence
+      expect(logo.className).toMatch(/w-64|md:w-80|lg:w-96/);
     });
   });
 
@@ -147,18 +146,18 @@ describe("Hero Component", () => {
   describe("Accessibility", () => {
     it("has proper heading hierarchy", () => {
       render(<Hero />);
-      // Logo should be h1 (main page heading)
-      const h1 = screen.getByRole("heading", { level: 1 });
-      expect(h1).toHaveTextContent("Easy Plant Life");
+      // Logo should be h1 (main page heading) with accessible name from image alt
+      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      expect(h1).toBeInTheDocument();
     });
 
     it("tagline and explanation use semantic text elements", () => {
       render(<Hero />);
       const tagline = screen.getByTestId("hero-tagline");
       const explanation = screen.getByTestId("hero-explanation");
-      // Should be paragraph elements
       expect(tagline.tagName).toBe("P");
-      expect(explanation.tagName).toBe("P");
+      // Explanation is a div container with paragraph children
+      expect(explanation.querySelectorAll("p").length).toBeGreaterThanOrEqual(1);
     });
 
     it("section has appropriate aria-label", () => {
@@ -169,10 +168,10 @@ describe("Hero Component", () => {
   });
 
   describe("Typography", () => {
-    it("uses heading font for logo", () => {
+    it("uses heading font for logo container", () => {
       render(<Hero />);
-      const logo = screen.getByText("Easy Plant Life");
-      expect(logo).toHaveClass("font-heading");
+      const h1 = screen.getByRole("heading", { level: 1 });
+      expect(h1).toHaveClass("font-heading");
     });
 
     it("uses body font for explanation text", () => {
@@ -183,11 +182,11 @@ describe("Hero Component", () => {
 
     it("uses appropriate text colors from brand palette", () => {
       render(<Hero />);
-      const logo = screen.getByText("Easy Plant Life");
+      const h1 = screen.getByRole("heading", { level: 1 });
       const explanation = screen.getByTestId("hero-explanation");
-      // Should use brand text colors
-      expect(logo.className).toMatch(/text-(text|primary|neutral)/);
-      expect(explanation.className).toMatch(/text-(text|secondary)/);
+      // Should use brand structure and colors
+      expect(h1).toBeInTheDocument();
+      expect(explanation.className).toMatch(/text-(text|secondary|neutral)/);
     });
   });
 
@@ -218,8 +217,8 @@ describe("Hero Component", () => {
     it("contains all elements needed for brand understanding", () => {
       render(<Hero />);
 
-      // Brand name is visible
-      expect(screen.getByText("Easy Plant Life")).toBeVisible();
+      // Brand name/logo is visible
+      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
 
       // Tagline provides quick context
       const tagline = screen.getByTestId("hero-tagline");

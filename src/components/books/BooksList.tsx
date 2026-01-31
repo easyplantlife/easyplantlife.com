@@ -27,7 +27,7 @@ export interface BooksListProps extends HTMLAttributes<HTMLDivElement> {
  */
 export function BooksList({ books, className = "", ...props }: BooksListProps) {
   return (
-    <div className={`grid gap-8 sm:gap-12 ${className}`} {...props}>
+    <div className={`grid grid-cols-1 gap-10 sm:gap-14 ${className}`} {...props}>
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}

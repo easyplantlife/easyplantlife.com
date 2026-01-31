@@ -14,7 +14,7 @@ export default function NotFound() {
     <main className="py-12 md:py-16 text-center">
       <Container>
         <Heading level={1} className="text-4xl mb-6">
-          Page not found
+          Oops, nothing here
         </Heading>
         <Text size="lg" color="secondary" className="mb-8 max-w-md mx-auto">
           This page does not exist. No worries.

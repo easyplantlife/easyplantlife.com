@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type HTMLAttributes, type FormEvent } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -73,8 +74,8 @@ export function NewsletterCTA({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const baseStyles = [
-    // Background with gradient
-    "bg-gradient-to-br from-white via-primary-50 to-accent-50",
+    // Soft green tint background
+    "bg-primary-100/70",
     // Generous vertical padding for white space
     "py-16",
     "md:py-20",
@@ -134,10 +135,19 @@ export function NewsletterCTA({
         <div className="max-w-xl mx-auto">
           <div
             data-testid="newsletter-success"
-            className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg border border-primary-200"
+            className="rounded-xl p-8 border border-primary-100 bg-white shadow-sm"
           >
-            <div className="text-5xl mb-4">🌱</div>
-            <p className="mb-2 font-heading text-xl text-primary-700 font-medium">
+            <div className="mb-4 flex justify-center">
+              <Image
+                src="/images/mark-logo.png"
+                alt=""
+                width={40}
+                height={40}
+                className="opacity-80"
+                aria-hidden="true"
+              />
+            </div>
+            <p className="mb-2 font-heading text-xl text-neutral-800 font-medium">
               Thank you for subscribing!
             </p>
             <p className="text-neutral-600">
@@ -158,13 +168,15 @@ export function NewsletterCTA({
     >
       <div className="max-w-xl mx-auto">
         {/* Value Proposition - calm, no hype */}
-        <div
+        <p
           data-testid="newsletter-value-proposition"
-          className="font-body text-lg md:text-xl text-neutral-700 mb-8 space-y-2"
+          className="font-body text-lg md:text-xl text-neutral-700 mb-2"
         >
-          <p>Occasional thoughts on easy plant-based living.</p>
-          <p className="text-neutral-500 text-base">No pressure. No spam. Unsubscribe anytime.</p>
-        </div>
+          Occasional thoughts on easy plant-based living.
+        </p>
+        <p className="font-body text-base text-neutral-500 mb-8">
+          No pressure. Unsubscribe anytime.
+        </p>
 
         {/* Newsletter Form */}
         <form

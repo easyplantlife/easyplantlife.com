@@ -30,23 +30,23 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-gradient-to-t from-primary-100 to-white border-t border-primary-200">
-      {/* Decorative top border */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-300 via-primary-500 to-primary-300" />
-
+    <footer className="border-t border-neutral-200 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col items-center gap-8">
           {/* Logo */}
           <NextLink
             href="/"
+            aria-label="Easy Plant Life"
             className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
           >
+            <span className="sr-only">Easy Plant Life</span>
             <Image
               src="/images/lockup-logo.png"
-              alt="Easy Plant Life"
+              alt=""
               width={200}
               height={70}
               className="h-16 w-auto"
+              aria-hidden="true"
             />
           </NextLink>
 
@@ -66,9 +66,9 @@ export function Footer() {
             ))}
           </nav>
 
-          {/* Decorative divider */}
+          {/* Divider */}
           <div className="flex items-center gap-4 w-full max-w-xs">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent to-primary-300" />
+            <div className="flex-1 h-px bg-neutral-200" />
             <Image
               src="/images/mark-logo.png"
               alt=""
@@ -77,7 +77,7 @@ export function Footer() {
               className="opacity-50"
               aria-hidden="true"
             />
-            <div className="flex-1 h-px bg-gradient-to-l from-transparent to-primary-300" />
+            <div className="flex-1 h-px bg-neutral-200" />
           </div>
 
           {/* Copyright */}

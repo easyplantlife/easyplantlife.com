@@ -107,8 +107,8 @@ describe("BookCard Component", () => {
     it("Coming Soon badge is visually distinct", () => {
       render(<BookCard book={mockComingSoonBook} />);
       const badge = screen.getByText(/coming soon/i);
-      // Badge should have styling classes
-      expect(badge).toHaveClass("rounded");
+      // Badge should have rounded styling
+      expect(badge.className).toMatch(/rounded/);
     });
   });
 

@@ -29,7 +29,7 @@ const config: Config = {
        * ACCESSIBILITY: Colors optimized for WCAG 2.1 AA contrast ratios.
        */
       primary: {
-        50: "#F1F8E9", // Lightest - subtle backgrounds
+        50: "#E8F5E9", // Lightest - subtle backgrounds (Material Design green-50)
         100: "#DCEDC8", // Light - soft accent
         200: "#C5E1A5", // Light green
         300: "#AED581", // Lime light
@@ -38,7 +38,7 @@ const config: Config = {
         600: "#7CB342", // Medium lime
         700: "#689F38", // Forest lime
         800: "#558B2F", // Deep green
-        900: "#33691E", // Darkest
+        900: "#1B5E20", // Darkest (Material Design green-900, WCAG AA)
         DEFAULT: "#4CAF50", // Vibrant green for CTAs
         light: "#C5E1A5", // Light lime for backgrounds
         bright: "#8BC34A", // Bright lime accent

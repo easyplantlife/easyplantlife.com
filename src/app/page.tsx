@@ -58,7 +58,7 @@ export const metadata: Metadata = {
  */
 export default function Home() {
   return (
-    <main className="bg-background">
+    <main className="min-h-full bg-background">
       {/* JSON-LD Structured Data for SEO */}
       <OrganizationJsonLd />
       <WebSiteJsonLd />

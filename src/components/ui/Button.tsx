@@ -31,10 +31,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 active:from-primary-700 active:to-primary-800 shadow-md hover:shadow-lg transition-all",
+    "bg-primary text-white hover:bg-primary-dark active:bg-primary-dark transition-colors",
   secondary:
-    "bg-white border-2 border-primary-500 text-primary-700 hover:bg-primary-50 hover:border-primary-600 active:bg-primary-100",
-  ghost: "bg-transparent text-primary-700 hover:bg-primary-50 active:bg-primary-100",
+    "bg-transparent border border-neutral-300 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 active:bg-neutral-100",
+  ghost: "bg-transparent text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200",
 };
 
 /**

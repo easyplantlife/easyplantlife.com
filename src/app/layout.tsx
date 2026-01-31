@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Lora, Source_Sans_3 } from "next/font/google";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const headingFont = Lora({
@@ -75,10 +77,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${headingFont.variable} ${bodyFont.variable} antialiased`}
+        className={`${headingFont.variable} ${bodyFont.variable} flex min-h-screen flex-col antialiased`}
       >
         <GoogleAnalytics />
-        {children}
+        <Header />
+        <div className="flex flex-1 flex-col">{children}</div>
+        <Footer />
       </body>
     </html>
   );
