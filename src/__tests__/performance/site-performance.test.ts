@@ -73,9 +73,10 @@ describe("Site Performance (M11-02)", () => {
 
         // Check for native <img tag usage in actual JSX (not template strings)
         // Look for patterns like: <img src= or <img className=
-        const hasNativeImgInJsx = /<img\s+(?:src|className|alt|width|height)=/g.test(
-          codeWithoutComments
-        );
+        const hasNativeImgInJsx =
+          /<img\s+(?:src|className|alt|width|height)=/g.test(
+            codeWithoutComments
+          );
 
         if (hasNativeImgInJsx) {
           // Should also import next/image
@@ -149,7 +150,7 @@ describe("Site Performance (M11-02)", () => {
       const layoutContent = fs.readFileSync(layoutPath, "utf-8");
 
       // Should import from next/font/google
-      expect(layoutContent).toContain("from \"next/font/google\"");
+      expect(layoutContent).toContain('from "next/font/google"');
     });
 
     it("fonts have adjustFontFallback enabled for reduced CLS", () => {
@@ -252,13 +253,15 @@ describe("Site Performance (M11-02)", () => {
           const content = fs.readFileSync(fullPath, "utf-8");
 
           // Should not force dynamic rendering
-          expect(content).not.toContain("export const dynamic = 'force-dynamic'");
-          expect(content).not.toContain('export const dynamic = "force-dynamic"');
+          expect(content).not.toContain(
+            "export const dynamic = 'force-dynamic'"
+          );
+          expect(content).not.toContain(
+            'export const dynamic = "force-dynamic"'
+          );
 
           // Should not disable static generation
-          expect(content).not.toContain(
-            "export const revalidate = 0"
-          );
+          expect(content).not.toContain("export const revalidate = 0");
         }
       }
     });
