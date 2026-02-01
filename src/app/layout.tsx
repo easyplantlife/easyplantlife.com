@@ -29,33 +29,56 @@ const bodyFont = Source_Sans_3({
  * - Twitter card configuration
  * - Favicon and Apple touch icon
  */
+const defaultTitle = "Easy Plant Life";
+const defaultDescription =
+  "A calm approach to plant-based living. Simple, sustainable guidance without complexity or perfection.";
+const ogImageAlt =
+  "Easy Plant Life — Living Vegan Made Simple. A calm approach to plant-based living.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_BASE_URL || "https://easyplantlife.com"
   ),
   title: {
-    default: "Easy Plant Life",
+    default: defaultTitle,
     template: "%s | Easy Plant Life",
   },
-  description:
-    "A calm approach to plant-based living. Simple, sustainable guidance without complexity or perfection.",
+  description: defaultDescription,
+  applicationName: "Easy Plant Life",
+  keywords: [
+    "plant-based",
+    "vegan",
+    "simple living",
+    "sustainable",
+    "lifestyle",
+    "Easy Plant Life",
+  ],
+  authors: [{ name: "Easy Plant Life", url: "https://easyplantlife.com" }],
+  creator: "Easy Plant Life",
   openGraph: {
     type: "website",
     siteName: "Easy Plant Life",
     locale: "en_US",
-    // Note: opengraph-image.tsx will be auto-discovered by Next.js
-    // and merged with this configuration
+    title: defaultTitle,
+    description: defaultDescription,
     images: [
       {
-        url: "/opengraph-image",
+        url: "/images/banner.png",
         width: 1200,
         height: 630,
-        alt: "Easy Plant Life - A calm approach to plant-based living",
+        alt: ogImageAlt,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
+    title: defaultTitle,
+    description: defaultDescription,
+    images: ["/images/banner.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   icons: {
     icon: [
