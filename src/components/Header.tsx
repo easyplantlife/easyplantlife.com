@@ -51,7 +51,7 @@ export function Header() {
               alt=""
               width={48}
               height={48}
-              className="md:hidden"
+              className="md:hidden mt-1"
               priority
               aria-hidden="true"
             />
@@ -61,7 +61,7 @@ export function Header() {
               alt=""
               width={180}
               height={60}
-              className="hidden md:block"
+              className="hidden md:block mt-4"
               priority
               aria-hidden="true"
             />
