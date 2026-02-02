@@ -290,10 +290,10 @@ describe("Layout Correctness - Card Component", () => {
         <p>Card content</p>
       </Card>
     );
-    expect(container.firstChild).toHaveClass("rounded-lg");
+    expect(container.firstChild).toHaveClass("rounded-2xl");
   });
 
-  it("has background color", () => {
+  it("has gradient background", () => {
     const { container } = render(
       <Card>
         <p>Card content</p>

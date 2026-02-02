@@ -359,7 +359,7 @@ describe("Responsive Design - Cards and Lists", () => {
         </Card>
       );
       const card = container.firstChild;
-      expect(card).toHaveClass("rounded-lg");
+      expect(card).toHaveClass("rounded-2xl");
     });
   });
 });

@@ -102,13 +102,16 @@ export function WhatYoullFind({
         </div>
 
         {/* Items Grid */}
-        <div className="grid md:grid-cols-3 gap-8 md:gap-10">
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
           {items.map((item) => (
-            <div key={item.title} className="text-center md:text-left">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
+            <div
+              key={item.title}
+              className="group rounded-2xl border border-neutral-200 bg-gradient-to-br from-white to-primary-50/50 p-6 md:p-7 transition-all duration-300 hover:border-primary-300 hover:shadow-lg text-center md:text-left"
+            >
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-100 text-primary-700 transition-colors group-hover:bg-primary-200">
                 {item.icon}
               </div>
-              <h3 className="font-heading text-xl text-neutral-800 mb-2">
+              <h3 className="font-heading text-xl text-neutral-800 mb-2 group-hover:text-primary-800 transition-colors">
                 {item.title}
               </h3>
               <p className="text-neutral-600 leading-relaxed">

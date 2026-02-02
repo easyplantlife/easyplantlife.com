@@ -53,7 +53,7 @@ describe("Card Component", () => {
     it("has rounded corners", () => {
       render(<Card data-testid="card">Content</Card>);
       const card = screen.getByTestId("card");
-      expect(card).toHaveClass("rounded-lg");
+      expect(card).toHaveClass("rounded-2xl");
     });
 
     it("has padding consistent with spacing scale", () => {
@@ -63,10 +63,11 @@ describe("Card Component", () => {
       expect(card).toHaveClass("p-6");
     });
 
-    it("has background color", () => {
+    it("has gradient background", () => {
       render(<Card data-testid="card">Content</Card>);
       const card = screen.getByTestId("card");
-      expect(card).toHaveClass("bg-background");
+      expect(card).toHaveClass("bg-gradient-to-br");
+      expect(card).toHaveClass("from-white");
     });
   });
 
@@ -141,7 +142,7 @@ describe("Card Component", () => {
         </Card>
       );
       const card = screen.getByTestId("card");
-      expect(card).toHaveClass("hover:border-primary");
+      expect(card).toHaveClass("hover:border-primary-300");
     });
 
     it("has transition for smooth hover effect", () => {
@@ -151,7 +152,7 @@ describe("Card Component", () => {
         </Card>
       );
       const card = screen.getByTestId("card");
-      expect(card).toHaveClass("transition-colors");
+      expect(card).toHaveClass("transition-all");
     });
 
     it("is focusable when clickable", async () => {
@@ -176,13 +177,13 @@ describe("Card Component", () => {
       );
       const card = screen.getByTestId("card");
       expect(card).toHaveClass("focus-visible:ring-2");
-      expect(card).toHaveClass("focus-visible:ring-primary");
+      expect(card).toHaveClass("focus-visible:ring-primary-500");
     });
 
     it("non-clickable card does not have hover styles", () => {
       render(<Card data-testid="card">Non-clickable card</Card>);
       const card = screen.getByTestId("card");
-      expect(card).not.toHaveClass("hover:border-primary");
+      expect(card).not.toHaveClass("hover:border-primary-300");
     });
   });
 
@@ -239,7 +240,7 @@ describe("Card Component", () => {
       const card = screen.getByTestId("card");
       // Should still have base classes
       expect(card).toHaveClass("border");
-      expect(card).toHaveClass("rounded-lg");
+      expect(card).toHaveClass("rounded-2xl");
       expect(card).toHaveClass("p-6");
     });
   });

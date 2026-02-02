@@ -75,24 +75,27 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     "border",
     "border-neutral-200",
     // Rounded corners
-    "rounded-lg",
+    "rounded-2xl",
     // Padding consistent with spacing scale
     "p-6",
-    // Clean background
-    "bg-background",
+    // Gradient background
+    "bg-gradient-to-br",
+    "from-white",
+    "to-primary-50/50",
   ].join(" ");
 
   const clickableStyles = href
     ? [
-        // Hover state
-        "hover:shadow-md",
+        // Hover state with green border
         "hover:border-primary",
-        // Smooth transition
-        "transition-colors duration-200",
+        "hover:shadow-lg",
+        // Smooth transition for all properties
+        "transition-all",
+        "duration-300",
         // Focus styles for accessibility
         "focus-visible:outline-none",
         "focus-visible:ring-2",
-        "focus-visible:ring-primary",
+        "focus-visible:ring-primary-500",
         "focus-visible:ring-offset-2",
         // Block display for proper sizing
         "block",
