@@ -369,7 +369,7 @@ describe("Responsive Design - Button Component", () => {
     render(<Button size="md">Touch Target</Button>);
     const button = screen.getByRole("button");
     // Medium size should have good touch target padding
-    expect(button).toHaveClass("py-2");
+    expect(button).toHaveClass("py-3");
     expect(button).toHaveClass("px-4");
   });
 

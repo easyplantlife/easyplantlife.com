@@ -27,13 +27,13 @@ describe("Button Component", () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole("button");
       // Primary variant should have the primary green background color
-      expect(button).toHaveClass("bg-primary");
+      expect(button).toHaveClass("bg-[var(--primary)]");
     });
 
     it("renders with primary variant explicitly", () => {
       render(<Button variant="primary">Primary</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary");
+      expect(button).toHaveClass("bg-[var(--primary)]");
     });
 
     it("renders with secondary variant", () => {
@@ -58,7 +58,7 @@ describe("Button Component", () => {
       render(<Button>Medium</Button>);
       const button = screen.getByRole("button");
       expect(button).toHaveClass("px-4");
-      expect(button).toHaveClass("py-2");
+      expect(button).toHaveClass("py-3");
     });
 
     it("renders with small size", () => {
@@ -73,7 +73,7 @@ describe("Button Component", () => {
       render(<Button size="md">Medium</Button>);
       const button = screen.getByRole("button");
       expect(button).toHaveClass("px-4");
-      expect(button).toHaveClass("py-2");
+      expect(button).toHaveClass("py-3");
     });
 
     it("renders with large size", () => {

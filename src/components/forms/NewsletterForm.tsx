@@ -129,7 +129,7 @@ export function NewsletterForm({
       aria-label="Newsletter signup form"
       data-testid="newsletter-form"
       onSubmit={handleSubmit}
-      className={`flex flex-col sm:flex-row gap-3 items-start ${className}`.trim()}
+      className={`flex flex-col sm:flex-row gap-3 sm:items-end ${className}`.trim()}
       {...props}
     >
       <div className="w-full sm:flex-1">
@@ -150,7 +150,7 @@ export function NewsletterForm({
         type="submit"
         variant="primary"
         disabled={isLoading}
-        className="w-full sm:w-auto whitespace-nowrap sm:mt-6"
+        className="w-full sm:w-auto whitespace-nowrap"
       >
         {isLoading ? "Subscribing..." : "Subscribe"}
       </Button>

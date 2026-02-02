@@ -31,7 +31,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white hover:bg-primary-dark active:bg-primary-dark transition-colors",
+    "bg-[var(--primary)] text-white hover:bg-[var(--primary-dark)] active:bg-[var(--primary-dark)] transition-colors",
   secondary:
     "bg-transparent border border-neutral-300 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 active:bg-neutral-100",
   ghost: "bg-transparent text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200",
@@ -43,7 +43,7 @@ const variantStyles: Record<ButtonVariant, string> = {
  */
 const sizeStyles: Record<ButtonSize, string> = {
   sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-base",
+  md: "px-4 py-3 text-base",
   lg: "px-6 py-3 text-lg",
 };
 

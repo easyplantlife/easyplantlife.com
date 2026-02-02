@@ -104,11 +104,17 @@ function extractIdFromGuid(guid: string): string {
  * Returns null if the item is missing required fields.
  */
 function parseRssItem(item: RssItem): MediumPost | null {
+  console.log('item', item);
   const title = item.title?.[0];
   const link = item.link?.[0];
   const guid = item.guid?.[0];
   const pubDate = item.pubDate?.[0];
   const description = item.description?.[0];
+  console.log('title', title);
+  console.log('link', link);
+  console.log('guid', guid);
+  console.log('pubDate', pubDate);
+  console.log('description', description);
 
   // All required fields must be present
   if (!title || !link || !guid || !pubDate || !description) {
@@ -193,7 +199,6 @@ export async function fetchMediumPosts(
   }
 
   const xml = await response.text();
-
   let parsed: RssFeed;
   try {
     parsed = await parseStringPromise(xml, {
@@ -205,7 +210,6 @@ export async function fetchMediumPosts(
   }
 
   const items = parsed?.rss?.channel?.[0]?.item || [];
-
   const posts: MediumPost[] = [];
   for (const item of items) {
     if (posts.length >= maxPosts) {
@@ -216,6 +220,7 @@ export async function fetchMediumPosts(
     if (post) {
       posts.push(post);
     }
+    console.log('post', post);
   }
 
   return posts;

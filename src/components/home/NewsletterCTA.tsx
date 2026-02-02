@@ -185,7 +185,7 @@ export function NewsletterCTA({
         <form
           aria-label="Newsletter signup form"
           onSubmit={handleSubmit}
-          className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-md mx-auto"
+          className="flex flex-col sm:flex-row gap-3 justify-center sm:items-end max-w-md mx-auto"
         >
           <div className="w-full sm:flex-1">
             <Input
