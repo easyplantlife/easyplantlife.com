@@ -134,10 +134,8 @@ async function fetchMediumPosts(config: MediumServiceConfig): Promise<MediumPost
 ### Environment Variables
 
 ```env
-# Optional - defaults to @easyplantlife if not set
-MEDIUM_USERNAME=easyplantlife
-
-# Optional - for future flexibility
+# Medium publication URL - defaults to @easyplantlife if not set
+# Supports: https://medium.com/@username or https://username.medium.com
 MEDIUM_PUBLICATION_URL=https://medium.com/@easyplantlife
 ```
 

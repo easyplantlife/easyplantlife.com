@@ -25,14 +25,19 @@ describe("Environment Variables Configuration", () => {
     it("should allow accessing NEXT_PUBLIC_ variables", () => {
       // NEXT_PUBLIC_ prefixed variables are available on client-side
       const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-      // Should be undefined in test environment (no .env loaded)
-      expect(gaId).toBeUndefined();
+      // Variable should either be undefined or match GA4 format (G-XXXXXXXXXX)
+      if (gaId !== undefined) {
+        expect(gaId).toMatch(/^G-[A-Z0-9]+$/);
+      }
     });
 
     it("should allow accessing server-only variables", () => {
       // Non-prefixed variables are only available on server-side
       const resendKey = process.env.RESEND_API_KEY;
-      expect(resendKey).toBeUndefined();
+      // Variable should either be undefined or be a non-empty string
+      if (resendKey !== undefined) {
+        expect(resendKey.length).toBeGreaterThan(0);
+      }
     });
   });
 

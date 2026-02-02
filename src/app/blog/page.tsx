@@ -30,6 +30,25 @@ function convertToBlogPost(mediumPost: {
 }
 
 /**
+ * Extracts the username from a Medium publication URL.
+ * Handles formats like:
+ * - https://medium.com/@username
+ * - https://username.medium.com
+ */
+function extractUsernameFromUrl(url: string): string {
+  // Handle https://medium.com/@username format
+  const atMatch = url.match(/medium\.com\/@([^\/]+)/);
+  if (atMatch) return atMatch[1];
+
+  // Handle https://username.medium.com format
+  const subdomainMatch = url.match(/^https?:\/\/([^.]+)\.medium\.com/);
+  if (subdomainMatch) return subdomainMatch[1];
+
+  // Fallback: return the URL as-is (let fetchMediumPosts handle it)
+  return url;
+}
+
+/**
  * Blog Page
  *
  * Displays blog posts fetched from Medium via RSS feed.
@@ -47,8 +66,13 @@ export default async function BlogPage() {
   let error: string | undefined;
 
   try {
+    const publicationUrl = process.env.MEDIUM_PUBLICATION_URL;
+    const username = publicationUrl
+      ? extractUsernameFromUrl(publicationUrl)
+      : "easyplantlife";
+
     const mediumPosts = await fetchMediumPosts({
-      username: process.env.MEDIUM_USERNAME || "easyplantlife",
+      username,
       maxPosts: 10,
     });
     posts = mediumPosts.map(convertToBlogPost);

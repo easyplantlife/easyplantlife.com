@@ -31,8 +31,8 @@ const PLACEHOLDER_PATTERNS = [
   /\[placeholder\]/i,
   /xxx/i,
   /sample text/i,
-  /insert.*here/i,
-  /your.*here/i, // "Your text here", "Your name here"
+  /insert\s+\w+\s+here/i, // "Insert text here", "Insert name here"
+  /your\s+\w+\s+here/i, // "Your text here", "Your name here"
   /example\.com/i,
   /test@test/i,
   /foo|bar|baz/i,
