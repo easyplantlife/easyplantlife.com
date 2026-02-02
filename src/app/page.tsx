@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { Hero, NewsletterCTA, SecondaryCTAs } from "@/components/home";
+import {
+  Hero,
+  NewsletterCTA,
+  SecondaryCTAs,
+  WhatYoullFind,
+} from "@/components/home";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 
 /**
@@ -65,6 +70,9 @@ export default function Home() {
 
       {/* Hero Section - First impression and brand message */}
       <Hero />
+
+      {/* What You'll Find - Build credibility and set expectations */}
+      <WhatYoullFind />
 
       {/* Newsletter CTA - Primary conversion goal */}
       <NewsletterCTA />

@@ -62,10 +62,11 @@ describe("BlogPostsList Component", () => {
       expect(screen.getByText("Understanding Your Plants")).toBeInTheDocument();
     });
 
-    it("renders each post as an article", () => {
+    it("renders each post as a clickable card link", () => {
       render(<BlogPostsList posts={mockPosts} />);
-      const articles = screen.getAllByRole("article");
-      expect(articles).toHaveLength(3);
+      // BlogPostCard renders as a link (Card with href)
+      const links = screen.getAllByRole("link");
+      expect(links).toHaveLength(3);
     });
 
     it("uses semantic list markup", () => {

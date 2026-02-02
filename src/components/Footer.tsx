@@ -51,7 +51,8 @@ export function Footer() {
 
           {/* Tagline */}
           <p className="text-neutral-600 text-center text-sm max-w-md">
-            A calm approach to plant-based living. Simple, sustainable, no perfection required.
+            A calm approach to plant-based living. Simple, sustainable, no
+            perfection required.
           </p>
 
           {/* Navigation */}

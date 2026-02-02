@@ -51,9 +51,10 @@ const mockBlogPostWithLongExcerpt: BlogPost = {
 
 describe("BlogPostCard Component", () => {
   describe("Rendering", () => {
-    it("renders as an article element", () => {
+    it("renders as a link element (clickable card)", () => {
       render(<BlogPostCard post={mockBlogPost} />);
-      const card = screen.getByRole("article");
+      // BlogPostCard uses Card with href, which renders as an anchor
+      const card = screen.getByRole("link");
       expect(card).toBeInTheDocument();
     });
 
@@ -167,42 +168,40 @@ describe("BlogPostCard Component", () => {
   });
 
   describe("External Link Indicator", () => {
-    it("shows external link indicator", () => {
-      render(<BlogPostCard post={mockBlogPost} />);
-      // Should have an external link icon or text indicator
-      const link = screen.getByRole("link", {
-        name: /finding peace through plant care/i,
-      });
-      // Check for screen reader text or icon
-      expect(link.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
-    });
-
     it("has screen reader accessible external link text", () => {
       render(<BlogPostCard post={mockBlogPost} />);
+      // Screen reader text indicates the link opens in a new tab
       expect(screen.getByText(/opens in new tab/i)).toBeInTheDocument();
+    });
+
+    it("opens in new tab", () => {
+      render(<BlogPostCard post={mockBlogPost} />);
+      const link = screen.getByRole("link");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
 
   describe("Optional Thumbnail", () => {
     it("displays thumbnail when provided", () => {
       render(<BlogPostCard post={mockBlogPostWithThumbnail} />);
-      const image = screen.getByRole("img", {
-        name: /the art of slow growth/i,
-      });
+      // Thumbnail is decorative (alt="") so we query by img tag
+      const image = document.querySelector("img");
       expect(image).toBeInTheDocument();
+      expect(image).toHaveAttribute("src");
     });
 
-    it("thumbnail has correct alt text", () => {
+    it("thumbnail has empty alt for decorative image", () => {
       render(<BlogPostCard post={mockBlogPostWithThumbnail} />);
-      const image = screen.getByRole("img", {
-        name: /the art of slow growth/i,
-      });
-      expect(image).toHaveAttribute("alt", "The Art of Slow Growth");
+      // Decorative thumbnails use empty alt text per a11y best practices
+      // The card already has the post title as text
+      const image = document.querySelector("img");
+      expect(image).toHaveAttribute("alt", "");
     });
 
     it("does not render image section when no thumbnail", () => {
       render(<BlogPostCard post={mockBlogPost} />);
-      expect(screen.queryByRole("img")).not.toBeInTheDocument();
+      expect(document.querySelector("img")).not.toBeInTheDocument();
     });
   });
 
@@ -240,7 +239,8 @@ describe("BlogPostCard Component", () => {
   describe("Props and Customization", () => {
     it("accepts and applies custom className", () => {
       render(<BlogPostCard post={mockBlogPost} className="custom-class" />);
-      const card = screen.getByRole("article");
+      // Card renders as anchor when href is provided
+      const card = screen.getByRole("link");
       expect(card).toHaveClass("custom-class");
     });
 

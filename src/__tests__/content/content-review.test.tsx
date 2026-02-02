@@ -35,7 +35,7 @@ const PLACEHOLDER_PATTERNS = [
   /your\s+\w+\s+here/i, // "Your text here", "Your name here"
   /example\.com/i,
   /test@test/i,
-  /foo|bar|baz/i,
+  /\b(foo|bar|baz)\b/i,
 ];
 
 // Words that violate brand tone (preachy, hype, activist)

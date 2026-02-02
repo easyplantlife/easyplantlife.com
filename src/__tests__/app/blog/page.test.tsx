@@ -87,9 +87,11 @@ describe("Blog Page", () => {
       const list = screen.getByRole("list", { name: /blog posts/i });
       expect(list).toBeInTheDocument();
 
-      // Each post renders as an article
-      const articles = screen.getAllByRole("article");
-      expect(articles).toHaveLength(2);
+      // Each post renders as a clickable link (Card with href)
+      const postLinks = screen
+        .getAllByRole("link")
+        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
+      expect(postLinks).toHaveLength(2);
     });
 
     it("clearly indicates posts link to Medium with external link icons", async () => {
@@ -239,8 +241,11 @@ describe("Blog Page", () => {
     it("renders post cards within the list", async () => {
       const Page = await BlogPage();
       render(Page);
-      const articles = screen.getAllByRole("article");
-      expect(articles.length).toBeGreaterThan(0);
+      // Post cards render as links (Card with href)
+      const postLinks = screen
+        .getAllByRole("link")
+        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
+      expect(postLinks.length).toBeGreaterThan(0);
     });
 
     it("converts MediumPost to BlogPost format", async () => {
@@ -319,11 +324,14 @@ describe("Blog Page", () => {
       expect(screen.getByRole("main")).toBeInTheDocument();
     });
 
-    it("post cards are marked as articles for semantics", async () => {
+    it("post cards render as accessible links", async () => {
       const Page = await BlogPage();
       render(Page);
-      const articles = screen.getAllByRole("article");
-      expect(articles.length).toBeGreaterThan(0);
+      // Post cards render as links with proper accessibility
+      const postLinks = screen
+        .getAllByRole("link")
+        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
+      expect(postLinks.length).toBeGreaterThan(0);
     });
 
     it("external links have accessible indication", async () => {

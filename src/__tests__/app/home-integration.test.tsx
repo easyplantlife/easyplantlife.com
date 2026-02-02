@@ -102,7 +102,9 @@ describe("Home Page Integration Tests", () => {
       render(<Home />);
 
       // Logo
-      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
+      expect(
+        screen.getByRole("img", { name: /easy plant life/i })
+      ).toBeVisible();
 
       // Tagline
       expect(screen.getByTestId("hero-tagline")).toBeVisible();
@@ -285,7 +287,10 @@ describe("Home Page Integration Tests", () => {
       render(<Home />);
 
       // Should have exactly one h1 with brand name
-      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", {
+        level: 1,
+        name: /easy plant life/i,
+      });
       expect(h1).toBeInTheDocument();
     });
 
@@ -345,11 +350,11 @@ describe("Home Page Integration Tests", () => {
       ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
-    it("has exactly three main sections", () => {
+    it("has exactly four main sections", () => {
       render(<Home />);
 
       const sections = screen.getAllByRole("region");
-      expect(sections).toHaveLength(3);
+      expect(sections).toHaveLength(4);
     });
 
     it("all sections have consistent background styling", () => {
@@ -378,7 +383,9 @@ describe("Home Page Integration Tests", () => {
       render(<Home />);
 
       // Brand name/logo
-      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
+      expect(
+        screen.getByRole("img", { name: /easy plant life/i })
+      ).toBeVisible();
 
       // Tagline
       const tagline = screen.getByTestId("hero-tagline");

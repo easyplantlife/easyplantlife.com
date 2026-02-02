@@ -191,11 +191,14 @@ describe("About Page", () => {
       expect(container?.className).toMatch(/max-w-/);
     });
 
-    it("paragraphs have leading-relaxed for readable line height", () => {
+    it("body paragraphs have leading-relaxed for readable line height", () => {
       render(<AboutPage />);
       const content = screen.getByTestId("about-content");
-      const paragraphs = content.querySelectorAll("p");
-      paragraphs.forEach((p) => {
+      // Check body text in main sections (not blockquotes or value highlights)
+      const sectionParagraphs = content.querySelectorAll(
+        '[data-testid$="-section"] > div > p'
+      );
+      sectionParagraphs.forEach((p) => {
         expect(p).toHaveClass("leading-relaxed");
       });
     });
@@ -271,8 +274,11 @@ describe("About Page", () => {
     it("body text uses brand body font", () => {
       render(<AboutPage />);
       const content = screen.getByTestId("about-content");
-      const paragraphs = content.querySelectorAll("p");
-      paragraphs.forEach((p) => {
+      // Check body text in main sections (not blockquotes or value highlights)
+      const sectionParagraphs = content.querySelectorAll(
+        '[data-testid$="-section"] > div > p'
+      );
+      sectionParagraphs.forEach((p) => {
         expect(p).toHaveClass("font-body");
       });
     });

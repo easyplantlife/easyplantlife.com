@@ -38,7 +38,10 @@ describe("Hero Component", () => {
 
     it("renders logo with heading structure for prominence", () => {
       render(<Hero />);
-      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", {
+        level: 1,
+        name: /easy plant life/i,
+      });
       expect(h1).toHaveClass("font-heading");
     });
 
@@ -147,7 +150,10 @@ describe("Hero Component", () => {
     it("has proper heading hierarchy", () => {
       render(<Hero />);
       // Logo should be h1 (main page heading) with accessible name from image alt
-      const h1 = screen.getByRole("heading", { level: 1, name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", {
+        level: 1,
+        name: /easy plant life/i,
+      });
       expect(h1).toBeInTheDocument();
     });
 
@@ -157,7 +163,9 @@ describe("Hero Component", () => {
       const explanation = screen.getByTestId("hero-explanation");
       expect(tagline.tagName).toBe("P");
       // Explanation is a div container with paragraph children
-      expect(explanation.querySelectorAll("p").length).toBeGreaterThanOrEqual(1);
+      expect(explanation.querySelectorAll("p").length).toBeGreaterThanOrEqual(
+        1
+      );
     });
 
     it("section has appropriate aria-label", () => {
@@ -218,7 +226,9 @@ describe("Hero Component", () => {
       render(<Hero />);
 
       // Brand name/logo is visible
-      expect(screen.getByRole("img", { name: /easy plant life/i })).toBeVisible();
+      expect(
+        screen.getByRole("img", { name: /easy plant life/i })
+      ).toBeVisible();
 
       // Tagline provides quick context
       const tagline = screen.getByTestId("hero-tagline");

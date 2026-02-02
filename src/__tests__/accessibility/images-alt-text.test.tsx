@@ -88,21 +88,22 @@ describe("Image Alt Text", () => {
       thumbnail: "/images/blog/indoor-plants.jpg",
     };
 
-    it("has descriptive alt text for blog post thumbnail", () => {
+    it("uses empty alt for decorative blog post thumbnail", () => {
       render(<BlogPostCard post={mockPost} />);
-      const image = screen.getByRole("img");
-
-      expect(image).toHaveAttribute("alt");
-      const altText = image.getAttribute("alt");
-      expect(altText).not.toBe("");
-      expect(altText).toBe(mockPost.title);
+      // Thumbnail is decorative - the card already has the post title as text
+      const image = document.querySelector("img");
+      expect(image).toBeInTheDocument();
+      // Empty alt is correct for decorative images per WCAG
+      expect(image).toHaveAttribute("alt", "");
     });
 
-    it("uses post title as alt text", () => {
+    it("thumbnail is decorative (post title already visible as text)", () => {
       render(<BlogPostCard post={mockPost} />);
-      const image = screen.getByRole("img");
-
-      expect(image.getAttribute("alt")).toBe("How to Care for Indoor Plants");
+      // The post title is displayed as text, so the image is purely decorative
+      expect(screen.getByText(mockPost.title)).toBeInTheDocument();
+      const image = document.querySelector("img");
+      // Decorative images should have empty alt to not be announced by screen readers
+      expect(image?.getAttribute("alt")).toBe("");
     });
   });
 

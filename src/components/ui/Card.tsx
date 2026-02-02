@@ -18,6 +18,10 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   image?: ReactNode;
   /** URL for clickable card variant (renders as anchor) */
   href?: string;
+  /** Target for external links (e.g., "_blank") */
+  target?: string;
+  /** Relationship for external links (e.g., "noopener noreferrer") */
+  rel?: string;
 }
 
 /**
@@ -54,7 +58,16 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
  * ```
  */
 export const Card = forwardRef<HTMLElement, CardProps>(function Card(
-  { children, as: Component = "div", image, href, className = "", ...props },
+  {
+    children,
+    as: Component = "div",
+    image,
+    href,
+    target,
+    rel,
+    className = "",
+    ...props
+  },
   ref
 ) {
   const baseStyles = [
@@ -108,6 +121,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
       <NextLink
         ref={ref as React.Ref<HTMLAnchorElement>}
         href={href}
+        target={target}
+        rel={rel}
         className={combinedClassName}
         {...(props as HTMLAttributes<HTMLAnchorElement>)}
       >

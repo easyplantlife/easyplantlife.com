@@ -27,13 +27,13 @@ describe("Button Component", () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole("button");
       // Primary variant should have the primary green background color
-      expect(button).toHaveClass("bg-[var(--primary)]");
+      expect(button).toHaveClass("bg-primary");
     });
 
     it("renders with primary variant explicitly", () => {
       render(<Button variant="primary">Primary</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-[var(--primary)]");
+      expect(button).toHaveClass("bg-primary");
     });
 
     it("renders with secondary variant", () => {

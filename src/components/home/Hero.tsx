@@ -28,21 +28,21 @@ export function Hero({ className = "", ...props }: HeroProps) {
     <section
       aria-label="Hero section"
       data-testid="hero-section"
-      className={`bg-gradient-to-b from-primary-100 to-neutral-100 py-14 md:py-16 lg:py-20 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
+      className={`bg-gradient-to-b from-primary-100 via-primary-50 to-white py-16 md:py-20 lg:py-28 px-4 md:px-6 lg:px-8 text-center ${className}`.trim()}
       {...props}
     >
       {/* Content */}
       <div className="text-center">
         <div className="max-w-3xl mx-auto">
           {/* Logo - h1 for semantic structure and accessibility */}
-          <h1 className="mb-6 flex justify-center font-heading">
+          <h1 className="mb-8 flex justify-center font-heading">
             <span className="sr-only">Easy Plant Life</span>
             <Image
               src="/images/lockup-logo.png"
               alt="Easy Plant Life"
               width={400}
               height={150}
-              className="w-64 md:w-80 lg:w-96 h-auto"
+              className="w-72 md:w-80 lg:w-96 h-auto drop-shadow-sm"
               priority
             />
           </h1>
@@ -50,7 +50,7 @@ export function Hero({ className = "", ...props }: HeroProps) {
           {/* Tagline - 2-4 words */}
           <p
             data-testid="hero-tagline"
-            className="font-heading text-2xl md:text-3xl lg:text-4xl text-primary-800 mb-6 font-medium"
+            className="font-heading text-2xl md:text-3xl lg:text-4xl text-primary-800 mb-8 font-medium tracking-tight"
           >
             Vegan living made simple.
           </p>
@@ -58,25 +58,32 @@ export function Hero({ className = "", ...props }: HeroProps) {
           {/* Brand Explanation - expanded for clarity and content */}
           <div
             data-testid="hero-explanation"
-            className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-3"
+            className="font-body text-lg md:text-xl text-neutral-600 leading-relaxed max-w-2xl mx-auto space-y-4"
           >
-            <p>Living vegan does not need to feel like a project.</p>
-            <p>No perfection or rules—just easy choices that fit your real life.</p>
-            <p>Here you will find calm guidance: practical ideas, honest writing, and simple steps toward a plant-based life that feels sustainable instead of overwhelming.</p>
+            <p className="text-neutral-700 font-medium">
+              Living vegan does not need to feel like a project.
+            </p>
+            <p>
+              No perfection or rules—just easy choices that fit your real life.
+            </p>
+            <p className="text-neutral-500">
+              Calm guidance, practical ideas, and honest writing for a
+              plant-based life that feels sustainable instead of overwhelming.
+            </p>
           </div>
 
           {/* Decorative divider */}
-          <div className="mt-10 flex justify-center items-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-primary-300" />
+          <div className="mt-12 flex justify-center items-center gap-4">
+            <div className="h-px w-20 bg-gradient-to-r from-transparent to-primary-300" />
             <Image
               src="/images/mark-logo.png"
               alt=""
               width={28}
               height={28}
-              className="opacity-70"
+              className="opacity-60"
               aria-hidden="true"
             />
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-primary-300" />
+            <div className="h-px w-20 bg-gradient-to-l from-transparent to-primary-300" />
           </div>
         </div>
       </div>

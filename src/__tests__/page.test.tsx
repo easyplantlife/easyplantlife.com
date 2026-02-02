@@ -144,8 +144,8 @@ describe("Home Page", () => {
       render(<Home />);
       // Count all section elements
       const sections = screen.getAllByRole("region");
-      // Should have exactly 3 sections: Hero, Newsletter, Secondary CTAs
-      expect(sections).toHaveLength(3);
+      // Should have exactly 4 sections: Hero, What You'll Find, Newsletter, Secondary CTAs
+      expect(sections).toHaveLength(4);
     });
   });
 
