@@ -45,9 +45,10 @@ export interface MediumServiceConfig {
 interface RssItem {
   title?: string[];
   link?: string[];
-  guid?: string[];
+  guid?: Array<string | { _?: string; $?: Record<string, unknown> }>;
   pubDate?: string[];
   description?: string[];
+  "content:encoded"?: string[];
   category?: string[];
   "media:thumbnail"?: Array<{ $?: { url?: string } }>;
 }
@@ -91,6 +92,17 @@ function decodeHtmlEntities(text: string): string {
 }
 
 /**
+ * Extracts the guid string from RSS item (handles both string and object formats).
+ */
+function getGuidString(
+  guid: string | { _?: string; $?: Record<string, unknown> } | undefined
+): string | null {
+  if (!guid) return null;
+  if (typeof guid === "string") return guid;
+  return guid._ ?? null;
+}
+
+/**
  * Extracts the post ID from a Medium guid URL.
  * Example: "https://medium.com/p/abc123" -> "abc123"
  */
@@ -99,22 +111,21 @@ function extractIdFromGuid(guid: string): string {
   return match ? match[1] : guid;
 }
 
+/** Max excerpt length when derived from full content. */
+const MAX_EXCERPT_LENGTH = 300;
+
 /**
  * Validates and creates a MediumPost from an RSS item.
  * Returns null if the item is missing required fields.
  */
 function parseRssItem(item: RssItem): MediumPost | null {
-  console.log('item', item);
   const title = item.title?.[0];
   const link = item.link?.[0];
-  const guid = item.guid?.[0];
+  const guidRaw = item.guid?.[0];
+  const guid = getGuidString(guidRaw);
   const pubDate = item.pubDate?.[0];
-  const description = item.description?.[0];
-  console.log('title', title);
-  console.log('link', link);
-  console.log('guid', guid);
-  console.log('pubDate', pubDate);
-  console.log('description', description);
+  // Medium often omits description; use content:encoded as fallback
+  const description = item.description?.[0] ?? item["content:encoded"]?.[0];
 
   // All required fields must be present
   if (!title || !link || !guid || !pubDate || !description) {
@@ -127,8 +138,11 @@ function parseRssItem(item: RssItem): MediumPost | null {
     return null;
   }
 
-  // Sanitize excerpt
-  const excerpt = decodeHtmlEntities(stripHtml(description)).trim();
+  // Sanitize excerpt (truncate when from full content)
+  let excerpt = decodeHtmlEntities(stripHtml(description)).trim();
+  if (excerpt.length > MAX_EXCERPT_LENGTH) {
+    excerpt = excerpt.slice(0, MAX_EXCERPT_LENGTH).replace(/\s+\S*$/, "") + "…";
+  }
   if (!excerpt) {
     return null;
   }
@@ -220,7 +234,6 @@ export async function fetchMediumPosts(
     if (post) {
       posts.push(post);
     }
-    console.log('post', post);
   }
 
   return posts;
