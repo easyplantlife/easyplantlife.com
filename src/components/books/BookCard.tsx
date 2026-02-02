@@ -68,16 +68,14 @@ export function BookCard({ book, className = "", ...props }: BookCardProps) {
           {hasLinks && (
             <div className="flex flex-wrap gap-3 pt-2">
               {purchaseLinks.map((link) => (
-                <a
+                // Using span instead of <a> to avoid nested anchor tags (invalid HTML)
+                // The card itself is the link; these are visual labels showing available retailers
+                <span
                   key={link.url}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
-                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-medium text-white"
                 >
                   {link.label}
-                </a>
+                </span>
               ))}
             </div>
           )}

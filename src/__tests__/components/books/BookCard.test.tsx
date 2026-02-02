@@ -50,10 +50,17 @@ const mockComingSoonBook: Book = {
 
 describe("BookCard Component", () => {
   describe("Rendering", () => {
-    it("renders as an article element", () => {
-      render(<BookCard book={mockAvailableBook} />);
+    it("renders as an article element for coming-soon books", () => {
+      render(<BookCard book={mockComingSoonBook} />);
       const card = screen.getByRole("article");
       expect(card).toBeInTheDocument();
+    });
+
+    it("renders as a clickable card link for available books", () => {
+      render(<BookCard book={mockAvailableBook} />);
+      // The card itself is a link to the first purchase URL
+      const cardLink = screen.getAllByRole("link")[0];
+      expect(cardLink).toHaveAttribute("href", "https://amazon.com/test-book");
     });
 
     it("renders the book title", () => {
@@ -113,33 +120,30 @@ describe("BookCard Component", () => {
   });
 
   describe("Purchase Links - Available Book", () => {
-    it("displays purchase links for available books", () => {
+    it("displays retailer labels for available books", () => {
       render(<BookCard book={mockAvailableBook} />);
-      expect(screen.getByRole("link", { name: /amazon/i })).toBeInTheDocument();
-      expect(
-        screen.getByRole("link", { name: /barnes & noble/i })
-      ).toBeInTheDocument();
+      // Retailer names are shown as visual labels
+      expect(screen.getByText("Amazon")).toBeInTheDocument();
+      expect(screen.getByText("Barnes & Noble")).toBeInTheDocument();
     });
 
-    it("purchase links have correct href", () => {
+    it("card links to first purchase URL", () => {
       render(<BookCard book={mockAvailableBook} />);
-      const amazonLink = screen.getByRole("link", { name: /amazon/i });
-      expect(amazonLink).toHaveAttribute(
-        "href",
-        "https://amazon.com/test-book"
-      );
+      // The card itself is the link to the first purchase URL
+      const cardLink = screen.getByRole("link");
+      expect(cardLink).toHaveAttribute("href", "https://amazon.com/test-book");
     });
 
-    it("external links open in new tab", () => {
+    it("card link opens in new tab", () => {
       render(<BookCard book={mockAvailableBook} />);
-      const amazonLink = screen.getByRole("link", { name: /amazon/i });
-      expect(amazonLink).toHaveAttribute("target", "_blank");
+      const cardLink = screen.getByRole("link");
+      expect(cardLink).toHaveAttribute("target", "_blank");
     });
 
-    it("external links have proper security attributes", () => {
+    it("card link has proper security attributes", () => {
       render(<BookCard book={mockAvailableBook} />);
-      const amazonLink = screen.getByRole("link", { name: /amazon/i });
-      expect(amazonLink).toHaveAttribute("rel", "noopener noreferrer");
+      const cardLink = screen.getByRole("link");
+      expect(cardLink).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
 
@@ -160,19 +164,25 @@ describe("BookCard Component", () => {
       expect(heading).toBeInTheDocument();
     });
 
-    it("purchase links are keyboard accessible", () => {
+    it("card link is keyboard accessible", () => {
       render(<BookCard book={mockAvailableBook} />);
-      const links = screen.getAllByRole("link");
-      links.forEach((link) => {
-        // Links are focusable by default
-        expect(link).not.toHaveAttribute("tabindex", "-1");
-      });
+      const link = screen.getByRole("link");
+      // Links are focusable by default
+      expect(link).not.toHaveAttribute("tabindex", "-1");
     });
   });
 
   describe("Props and Customization", () => {
     it("accepts and applies custom className", () => {
       render(<BookCard book={mockAvailableBook} className="custom-class" />);
+      // For available books, the card renders as a link
+      const card = screen.getByRole("link");
+      expect(card).toHaveClass("custom-class");
+    });
+
+    it("accepts and applies custom className to article cards", () => {
+      render(<BookCard book={mockComingSoonBook} className="custom-class" />);
+      // For coming-soon books, the card renders as an article
       const card = screen.getByRole("article");
       expect(card).toHaveClass("custom-class");
     });

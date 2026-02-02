@@ -47,7 +47,12 @@ export const books: Book[] = [
     description:
       "Not a cookbook or a manifesto. A calm guide to building simple default meals and systems so vegan eating fits naturally into busy, imperfect days—without constant planning, recipes, or willpower.",
     coverImage: "/images/books/easy-plant-life-the-everyday-vegan-playbook.png",
-    status: "coming-soon",
-    purchaseLinks: [],
+    status: "available",
+    purchaseLinks: [
+      {
+        label: "Buy on Amazon",
+        url: "https://www.amazon.com/dp/B0GL118S83",
+      },
+    ],
   },
 ];

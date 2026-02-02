@@ -52,25 +52,33 @@ describe("BooksList Component", () => {
       expect(screen.getByText("Third Book")).toBeInTheDocument();
     });
 
-    it("renders correct number of book articles", () => {
+    it("renders correct number of book cards", () => {
       render(<BooksList books={mockBooks} />);
 
-      const articles = screen.getAllByRole("article");
-      expect(articles).toHaveLength(3);
+      // Available books render as links, coming-soon books render as articles
+      // mockBooks has 2 available and 1 coming-soon
+      const articles = screen.queryAllByRole("article");
+      const headings = screen.getAllByRole("heading", { level: 3 });
+      // Each book should have a heading
+      expect(headings).toHaveLength(3);
+      // Only coming-soon book renders as article
+      expect(articles).toHaveLength(1);
     });
 
     it("renders empty state when no books provided", () => {
       render(<BooksList books={[]} />);
 
-      // Should not crash and should have no articles
+      // Should not crash and should have no book cards
       expect(screen.queryAllByRole("article")).toHaveLength(0);
+      expect(screen.queryAllByRole("heading", { level: 3 })).toHaveLength(0);
     });
 
     it("renders a single book correctly", () => {
       render(<BooksList books={[mockBooks[0]]} />);
 
       expect(screen.getByText("First Book")).toBeInTheDocument();
-      expect(screen.getAllByRole("article")).toHaveLength(1);
+      // Available book renders as a link card
+      expect(screen.getByRole("heading", { name: "First Book" })).toBeInTheDocument();
     });
   });
 
@@ -125,14 +133,22 @@ describe("BooksList Component", () => {
     it("book cards are distinct and navigable", () => {
       render(<BooksList books={mockBooks} />);
 
-      const articles = screen.getAllByRole("article");
-      expect(articles.length).toBeGreaterThan(0);
+      // Each book should have a heading
+      const headings = screen.getAllByRole("heading", { level: 3 });
+      expect(headings).toHaveLength(3);
 
-      // Each article should contain its book's heading
-      articles.forEach((article) => {
-        const heading = article.querySelector('[role="heading"], h1, h2, h3');
-        expect(heading).toBeInTheDocument();
-      });
+      // Book titles should be present
+      expect(screen.getByText("First Book")).toBeInTheDocument();
+      expect(screen.getByText("Second Book")).toBeInTheDocument();
+      expect(screen.getByText("Third Book")).toBeInTheDocument();
+    });
+
+    it("available books are keyboard accessible links", () => {
+      render(<BooksList books={mockBooks} />);
+
+      // Available books (2 of them) render as clickable card links
+      const links = screen.getAllByRole("link");
+      expect(links).toHaveLength(2);
     });
   });
 });

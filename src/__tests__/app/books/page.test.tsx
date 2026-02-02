@@ -44,9 +44,10 @@ describe("Books Page", () => {
     it("renders the same number of book cards as books in the data source", () => {
       render(<BooksPage />);
 
-      // BookCard renders as article elements
-      const articles = screen.getAllByRole("article");
-      expect(articles).toHaveLength(books.length);
+      // BookCard renders as links for available books (card is clickable)
+      // Each book has a level 3 heading
+      const bookHeadings = screen.getAllByRole("heading", { level: 3 });
+      expect(bookHeadings).toHaveLength(books.length);
     });
 
     it("external purchase links have target='_blank' attribute", () => {
@@ -192,9 +193,9 @@ describe("Books Page", () => {
 
     it("renders book cards within the list", () => {
       render(<BooksPage />);
-      // BookCard renders as article elements
-      const articles = screen.getAllByRole("article");
-      expect(articles.length).toBeGreaterThan(0);
+      // BookCard renders as clickable links for available books
+      const bookHeadings = screen.getAllByRole("heading", { level: 3 });
+      expect(bookHeadings.length).toBeGreaterThan(0);
     });
   });
 
@@ -247,10 +248,11 @@ describe("Books Page", () => {
       expect(screen.getByRole("main")).toBeInTheDocument();
     });
 
-    it("book cards are marked as articles for semantics", () => {
+    it("book cards are clickable links for available books", () => {
       render(<BooksPage />);
-      const articles = screen.getAllByRole("article");
-      expect(articles.length).toBeGreaterThan(0);
+      // Available books render as clickable card links
+      const links = screen.getAllByRole("link");
+      expect(links.length).toBeGreaterThan(0);
     });
   });
 

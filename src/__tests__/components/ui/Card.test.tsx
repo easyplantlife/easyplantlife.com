@@ -142,7 +142,7 @@ describe("Card Component", () => {
         </Card>
       );
       const card = screen.getByTestId("card");
-      expect(card).toHaveClass("hover:border-primary-300");
+      expect(card).toHaveClass("hover:border-primary");
     });
 
     it("has transition for smooth hover effect", () => {
