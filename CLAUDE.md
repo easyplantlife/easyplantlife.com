@@ -72,6 +72,6 @@ npm test -- path/to/test.ts  # Run single test file
 ## Brand Guidelines (Critical)
 
 - **Tone**: Calm, honest, non-authoritative. Never preachy or activist
-- **Visual**: Minimal UI, strong white space, soft greens, warm neutrals
+- **Visual**: Professional UI, white, plant greens, warm neutrals
 - **Content**: No hype words, no marketing language, no frequency pressure
 - **Complexity**: If it doesn't increase clarity, it doesn't belong in MVP
