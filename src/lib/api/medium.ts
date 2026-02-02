@@ -111,6 +111,21 @@ function extractIdFromGuid(guid: string): string {
   return match ? match[1] : guid;
 }
 
+/** URLs to exclude from image extraction (tracking pixels, etc.). */
+const EXCLUDED_IMAGE_PATTERNS = [/medium\.com\/_\//, /^data:/];
+
+/**
+ * Extracts the first image URL from HTML content.
+ * Skips tracking pixels and data URLs.
+ */
+function extractFirstImageFromHtml(html: string): string | null {
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (!match) return null;
+  const url = match[1];
+  if (EXCLUDED_IMAGE_PATTERNS.some((p) => p.test(url))) return null;
+  return url;
+}
+
 /** Max excerpt length when derived from full content. */
 const MAX_EXCERPT_LENGTH = 300;
 
@@ -160,8 +175,11 @@ function parseRssItem(item: RssItem): MediumPost | null {
     post.categories = item.category;
   }
 
-  // Add optional thumbnail
-  const thumbnailUrl = item["media:thumbnail"]?.[0]?.$?.url;
+  // Add optional thumbnail: prefer media:thumbnail, fallback to first image in content
+  const contentEncoded = item["content:encoded"]?.[0];
+  const thumbnailUrl =
+    item["media:thumbnail"]?.[0]?.$?.url ??
+    (contentEncoded ? extractFirstImageFromHtml(contentEncoded) : null);
   if (thumbnailUrl) {
     post.thumbnail = thumbnailUrl;
   }

@@ -50,67 +50,51 @@ export function BlogPostCard({
   return (
     <Card
       as="article"
-      className={className}
-      image={
-        thumbnail ? (
-          <Image
-            src={thumbnail}
-            alt={title}
-            width={400}
-            height={225}
-            className="h-auto w-full object-cover"
-          />
-        ) : undefined
-      }
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`group ${className}`.trim()}
       {...props}
     >
-      <div className="space-y-3">
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
-        >
+      <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+        <div className="min-w-0 flex-1 space-y-3">
           <Heading
             level={3}
             className="group-hover:text-primary transition-colors"
           >
             {title}
           </Heading>
-          <span className="sr-only">(opens in new tab)</span>
-          <svg
-            aria-hidden="true"
-            className="ml-1 inline-block h-4 w-4 text-text-secondary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
-        </a>
 
-        <Text color="secondary" className="line-clamp-3">
-          {excerpt}
-        </Text>
+          <Text color="secondary" className="line-clamp-3">
+            {excerpt}
+          </Text>
 
-        <div className="flex items-center gap-3 text-sm text-text-secondary">
-          <time dateTime={formatDateISO(publishedDate)}>
-            {formatDate(publishedDate)}
-          </time>
-          {readTime && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>{readTime} min read</span>
-            </>
-          )}
+          <div className="flex items-center gap-3 text-sm text-text-secondary">
+            <time dateTime={formatDateISO(publishedDate)}>
+              {formatDate(publishedDate)}
+            </time>
+            {readTime && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span>{readTime} min read</span>
+              </>
+            )}
+          </div>
         </div>
+
+        {thumbnail && (
+          <div className="shrink-0 overflow-hidden rounded">
+            <Image
+              src={thumbnail}
+              alt=""
+              width={224}
+              height={168}
+              className="h-32 w-44 object-cover sm:h-40 sm:w-64"
+            />
+          </div>
+        )}
       </div>
+      <span className="sr-only">(opens in new tab)</span>
     </Card>
   );
 }
