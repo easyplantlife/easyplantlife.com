@@ -56,7 +56,7 @@ export function BlogPostCard({
       className={`group ${className}`.trim()}
       {...props}
     >
-      <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
         <div className="min-w-0 flex-1 space-y-3">
           <Heading
             level={3}
