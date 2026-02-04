@@ -44,17 +44,20 @@ export function Header() {
             aria-label="Easy Plant Life"
             className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
           >
-            <span className="sr-only">Easy Plant Life</span>
-            {/* Mark logo for mobile */}
-            <Image
-              src="/images/mark-logo.png"
-              alt=""
-              width={48}
-              height={48}
-              className="md:hidden mt-1"
-              priority
-              aria-hidden="true"
-            />
+            {/* Mark logo + text for mobile */}
+            <div className="md:hidden flex items-center gap-2">
+              <Image
+                src="/images/mark-logo.png"
+                alt=""
+                width={40}
+                height={40}
+                priority
+                aria-hidden="true"
+              />
+              <span className="font-heading text-lg font-semibold text-text">
+                Easy Plant Life
+              </span>
+            </div>
             {/* Lockup logo for desktop */}
             <Image
               src="/images/lockup-logo.png"
