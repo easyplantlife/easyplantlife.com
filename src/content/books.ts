@@ -45,13 +45,27 @@ export const books: Book[] = [
     id: "easy-plant-life-the-everyday-vegan-playbook",
     title: "The Everyday Vegan Playbook",
     description:
-      "Not a cookbook or a manifesto. A calm guide to building simple default meals and systems so vegan eating fits naturally into busy, imperfect days—without constant planning, recipes, or willpower.",
+      "Not a cookbook or a manifesto. A calm guide to building simple default meals and systems so vegan eating fits naturally into busy, imperfect days. No constant planning, recipes, or willpower.",
     coverImage: "/images/books/easy-plant-life-the-everyday-vegan-playbook.png",
     status: "available",
     purchaseLinks: [
       {
         label: "Buy on Amazon",
         url: "https://www.amazon.com/dp/B0GL118S83",
+      },
+    ],
+  },
+  {
+    id: "easy-plant-life-the-normal-vegan",
+    title: "The Normal Vegan",
+    description:
+      "A story about eating without effort. Follow Maya, a remote software engineer, as she discovers that the problem was never veganism itself. It was friction. No rules, no meal plans, no pressure. Just a gentle reframing of how food can fit into real life.",
+    coverImage: "/images/books/easy-plant-life-the-normal-vegan.png",
+    status: "available",
+    purchaseLinks: [
+      {
+        label: "Buy on Amazon",
+        url: "https://www.amazon.com/dp/B0GLGFYLTZ",
       },
     ],
   },
