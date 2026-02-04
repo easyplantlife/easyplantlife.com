@@ -43,9 +43,17 @@ const mockPosts: MediumPost[] = [
 ];
 
 describe("Blog Page", () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env = { ...originalEnv };
+    delete process.env.MEDIUM_PUBLICATION_URL;
     (mediumService.fetchMediumPosts as jest.Mock).mockResolvedValue(mockPosts);
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
   });
 
   /**
@@ -355,6 +363,56 @@ describe("Blog Page", () => {
 
       const errorElement = screen.getByRole("alert");
       expect(errorElement).toBeInTheDocument();
+    });
+  });
+
+  describe("Username Extraction from Environment", () => {
+    it("uses default username when MEDIUM_PUBLICATION_URL is not set", async () => {
+      delete process.env.MEDIUM_PUBLICATION_URL;
+
+      const Page = await BlogPage();
+      render(Page);
+
+      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
+        username: "easyplantlife",
+        maxPosts: 10,
+      });
+    });
+
+    it("extracts username from @username format", async () => {
+      process.env.MEDIUM_PUBLICATION_URL = "https://medium.com/@testuser";
+
+      const Page = await BlogPage();
+      render(Page);
+
+      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
+        username: "testuser",
+        maxPosts: 10,
+      });
+    });
+
+    it("extracts username from subdomain format", async () => {
+      process.env.MEDIUM_PUBLICATION_URL = "https://mycompany.medium.com";
+
+      const Page = await BlogPage();
+      render(Page);
+
+      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
+        username: "mycompany",
+        maxPosts: 10,
+      });
+    });
+
+    it("uses URL as-is when format is unrecognized", async () => {
+      process.env.MEDIUM_PUBLICATION_URL = "some-random-username";
+
+      const Page = await BlogPage();
+      render(Page);
+
+      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
+        username: "some-random-username",
+        maxPosts: 10,
+      });
     });
   });
 

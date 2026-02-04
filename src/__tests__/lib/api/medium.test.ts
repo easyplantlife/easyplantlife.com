@@ -403,6 +403,211 @@ describe("Medium Data Fetching Service", () => {
     });
   });
 
+  describe("Edge cases in parsing", () => {
+    it("handles guid as object with underscore property", async () => {
+      const rssWithObjectGuid = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with object guid</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid isPermaLink="false">https://medium.com/p/objguid123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description for object guid</description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithObjectGuid),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].id).toBe("objguid123");
+    });
+
+    it("skips items with invalid date", async () => {
+      const rssWithInvalidDate = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with invalid date</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>not-a-valid-date</pubDate>
+      <description>Test description</description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithInvalidDate),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(0);
+    });
+
+    it("truncates very long excerpts", async () => {
+      const longDescription = "A".repeat(500);
+      const rssWithLongDescription = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with long description</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>${longDescription}</description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithLongDescription),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].excerpt.length).toBeLessThanOrEqual(301); // 300 + ellipsis
+      expect(posts[0].excerpt).toContain("…");
+    });
+
+    it("skips items with empty description after sanitization", async () => {
+      const rssWithEmptyDescription = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with empty content</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description><![CDATA[<p>   </p>]]></description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithEmptyDescription),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(0);
+    });
+
+    it("extracts thumbnail from content:encoded when no media:thumbnail", async () => {
+      const rssWithImageInContent = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with image in content</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+      <content:encoded><![CDATA[<p>Some content</p><img src="https://example.com/image.jpg" alt="test"/>]]></content:encoded>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithImageInContent),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].thumbnail).toBe("https://example.com/image.jpg");
+    });
+
+    it("skips tracking pixel images when extracting thumbnail", async () => {
+      const rssWithTrackingPixel = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with tracking pixel</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+      <content:encoded><![CDATA[<img src="https://medium.com/_/stat/pixel.gif"/>]]></content:encoded>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithTrackingPixel),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].thumbnail).toBeUndefined();
+    });
+
+    it("skips data URL images when extracting thumbnail", async () => {
+      const rssWithDataUrl = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with data URL</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+      <content:encoded><![CDATA[<img src="data:image/png;base64,abc123"/>]]></content:encoded>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithDataUrl),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].thumbnail).toBeUndefined();
+    });
+
+    it("uses content:encoded as fallback when description is missing", async () => {
+      const rssWithContentOnly = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post without description</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <content:encoded><![CDATA[<p>This is the full content used as excerpt fallback.</p>]]></content:encoded>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithContentOnly),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].excerpt).toContain("full content used as excerpt");
+    });
+  });
+
   describe("Excerpt sanitization", () => {
     it("strips HTML tags from excerpt", async () => {
       const rssWithHtmlDescription = mockRssResponse.replace(

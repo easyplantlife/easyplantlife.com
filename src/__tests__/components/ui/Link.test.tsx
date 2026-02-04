@@ -284,5 +284,70 @@ describe("Link Component", () => {
         "Read on Medium"
       );
     });
+
+    it("calls custom onClick handler when provided on external link", async () => {
+      const user = userEvent.setup();
+      const handleClick = jest.fn();
+      render(
+        <Link href="https://medium.com/article" onClick={handleClick}>
+          Click me
+        </Link>
+      );
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(handleClick).toHaveBeenCalled();
+      expect(analytics.trackOutboundClick).toHaveBeenCalled();
+    });
+
+    it("tracks with undefined linkText when children produce empty string", async () => {
+      const user = userEvent.setup();
+      render(
+        <Link href="https://medium.com/article">
+          <span>{""}</span>
+        </Link>
+      );
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://medium.com/article",
+        undefined
+      );
+    });
+
+    it("handles null/undefined children gracefully", async () => {
+      const user = userEvent.setup();
+      render(
+        <Link href="https://medium.com/article">
+          {null}
+          {undefined}
+          {false}
+        </Link>
+      );
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://medium.com/article",
+        undefined
+      );
+    });
+
+    it("handles number children correctly", async () => {
+      const user = userEvent.setup();
+      render(<Link href="https://medium.com/article">{42}</Link>);
+      const link = screen.getByRole("link");
+
+      await user.click(link);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://medium.com/article",
+        "42"
+      );
+    });
   });
 });

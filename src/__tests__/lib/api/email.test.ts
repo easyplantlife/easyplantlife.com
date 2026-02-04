@@ -138,6 +138,22 @@ describe("Email Service Layer", () => {
         "Failed to add contact to newsletter: Network error"
       );
     });
+
+    it("should re-throw non-ResendConfigError errors from getResendClient", async () => {
+      const unexpectedError = new TypeError("Unexpected type error");
+      mockGetResendClient.mockImplementation(() => {
+        throw unexpectedError;
+      });
+
+      const params: AddToNewsletterParams = {
+        email: "test@example.com",
+      };
+
+      await expect(addToNewsletter(params)).rejects.toThrow(TypeError);
+      await expect(addToNewsletter(params)).rejects.toThrow(
+        "Unexpected type error"
+      );
+    });
   });
 
   describe("sendEmail", () => {
@@ -288,6 +304,65 @@ describe("Email Service Layer", () => {
       await expect(sendEmail(params)).rejects.toThrow(EmailServiceError);
       await expect(sendEmail(params)).rejects.toThrow(
         "Failed to send email: Connection timeout"
+      );
+    });
+
+    it("should re-throw non-ResendConfigError errors from getResendClient", async () => {
+      const unexpectedError = new TypeError("Unexpected type error");
+      mockGetResendClient.mockImplementation(() => {
+        throw unexpectedError;
+      });
+
+      const params: SendEmailParams = {
+        to: "recipient@example.com",
+        subject: "Test",
+        html: "<p>Content</p>",
+      };
+
+      await expect(sendEmail(params)).rejects.toThrow(TypeError);
+      await expect(sendEmail(params)).rejects.toThrow("Unexpected type error");
+    });
+
+    it("should support both html and text content together", async () => {
+      mockEmailsSend.mockResolvedValue({
+        data: { id: "email_both" },
+        error: null,
+      });
+
+      const params: SendEmailParams = {
+        to: "recipient@example.com",
+        subject: "Both formats",
+        html: "<p>HTML content</p>",
+        text: "Plain text content",
+      };
+
+      await sendEmail(params);
+
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          html: "<p>HTML content</p>",
+          text: "Plain text content",
+        })
+      );
+    });
+
+    it("should default to empty text when neither html nor text provided", async () => {
+      mockEmailsSend.mockResolvedValue({
+        data: { id: "email_empty" },
+        error: null,
+      });
+
+      const params: SendEmailParams = {
+        to: "recipient@example.com",
+        subject: "No content",
+      };
+
+      await sendEmail(params);
+
+      expect(mockEmailsSend).toHaveBeenCalledWith(
+        expect.objectContaining({
+          text: "",
+        })
       );
     });
   });

@@ -186,7 +186,7 @@ describe("MobileNav Component", () => {
       }
     });
 
-    it("traps focus within menu when open", async () => {
+    it("traps focus within menu when open (forward tab)", async () => {
       const user = userEvent.setup();
       render(<MobileNav links={navLinks} />);
 
@@ -216,6 +216,27 @@ describe("MobileNav Component", () => {
       // Tab from last link should go back to close button (focus trap)
       await user.tab();
       expect(closeButton).toHaveFocus();
+    });
+
+    it("traps focus within menu when open (backward shift+tab)", async () => {
+      const user = userEvent.setup();
+      render(<MobileNav links={navLinks} />);
+
+      const menuButton = screen.getByRole("button", { name: /menu/i });
+      await user.click(menuButton);
+
+      // Get all focusable elements in the mobile nav
+      const nav = screen.getByRole("navigation", { name: /mobile/i });
+      const links = within(nav).getAllByRole("link");
+      const closeButton = screen.getByRole("button", { name: /close/i });
+
+      // Focus the first focusable element (close button)
+      closeButton.focus();
+      expect(closeButton).toHaveFocus();
+
+      // Shift+tab from first element should wrap to last link (focus trap)
+      await user.tab({ shift: true });
+      expect(links[links.length - 1]).toHaveFocus();
     });
 
     it("returns focus to menu button when closed", async () => {

@@ -173,6 +173,39 @@ describe("POST /api/newsletter", () => {
       expect(data.error).toBe("Email is required");
       expect(mockAddToNewsletter).not.toHaveBeenCalled();
     });
+
+    it("should return 400 for whitespace-only email", async () => {
+      const request = createRequest({ email: "   " });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe("Email is required");
+      expect(mockAddToNewsletter).not.toHaveBeenCalled();
+    });
+
+    it("should return 400 for null email", async () => {
+      const request = createRequest({ email: null });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe("Email is required");
+      expect(mockAddToNewsletter).not.toHaveBeenCalled();
+    });
+
+    it("should return 400 for object email", async () => {
+      const request = createRequest({ email: { value: "test@example.com" } });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe("Email is required");
+      expect(mockAddToNewsletter).not.toHaveBeenCalled();
+    });
   });
 
   describe("Duplicate email handling (idempotent)", () => {

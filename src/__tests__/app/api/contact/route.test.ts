@@ -274,6 +274,36 @@ describe("POST /api/contact", () => {
       expect(mockSendEmail).not.toHaveBeenCalled();
     });
 
+    it("should return 400 for whitespace-only email", async () => {
+      const request = createRequest({
+        name: "John Doe",
+        email: "   ",
+        message: "Hello",
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe("Email is required");
+      expect(mockSendEmail).not.toHaveBeenCalled();
+    });
+
+    it("should return 400 for null email", async () => {
+      const request = createRequest({
+        name: "John Doe",
+        email: null,
+        message: "Hello",
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.success).toBe(false);
+      expect(data.error).toBe("Email is required");
+      expect(mockSendEmail).not.toHaveBeenCalled();
+    });
+
     it("should accept valid email formats", async () => {
       mockSendEmail.mockResolvedValue({
         success: true,
