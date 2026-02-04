@@ -25,16 +25,13 @@ interface NewsletterSignupBody {
 }
 
 /**
- * Validates and normalizes an email address.
+ * Validates and normalizes an email address format.
+ * Assumes the email is already verified to be a non-empty string.
  *
- * @param email - The raw email input
- * @returns Normalized email or null if invalid
+ * @param email - The email string to validate
+ * @returns Normalized email or null if invalid format
  */
-function validateEmail(email: unknown): string | null {
-  if (typeof email !== "string" || !email.trim()) {
-    return null;
-  }
-
+function validateEmail(email: string): string | null {
   const normalized = email.trim().toLowerCase();
 
   if (!EMAIL_REGEX.test(normalized)) {

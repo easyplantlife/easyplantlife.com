@@ -37,6 +37,83 @@ function createRequest(body: unknown): NextRequest {
   });
 }
 
+describe("Environment configuration", () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    process.env = { ...originalEnv };
+  });
+
+  afterAll(() => {
+    process.env = originalEnv;
+  });
+
+  it("uses CONTACT_EMAIL when set", async () => {
+    process.env.CONTACT_EMAIL = "custom@easyplantlife.com";
+
+    // Re-import to pick up new env
+    jest.resetModules();
+    const { POST: freshPOST } = await import("@/app/api/contact/route");
+    const { sendEmail: freshSendEmail } = await import("@/lib/api/email");
+
+    (freshSendEmail as jest.Mock).mockResolvedValue({
+      success: true,
+      emailId: "email_custom",
+    });
+
+    const request = new NextRequest("http://localhost:3000/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Test",
+        email: "test@example.com",
+        message: "Hello",
+      }),
+    });
+
+    await freshPOST(request);
+
+    expect(freshSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "custom@easyplantlife.com",
+      })
+    );
+  });
+
+  it("falls back to default email when CONTACT_EMAIL is not set", async () => {
+    delete process.env.CONTACT_EMAIL;
+
+    // Re-import to pick up the absence of env var
+    jest.resetModules();
+    const { POST: freshPOST } = await import("@/app/api/contact/route");
+    const { sendEmail: freshSendEmail } = await import("@/lib/api/email");
+
+    (freshSendEmail as jest.Mock).mockResolvedValue({
+      success: true,
+      emailId: "email_default",
+    });
+
+    const request = new NextRequest("http://localhost:3000/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Test",
+        email: "test@example.com",
+        message: "Hello",
+      }),
+    });
+
+    await freshPOST(request);
+
+    expect(freshSendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "hello@easyplantlife.com",
+      })
+    );
+  });
+});
+
 describe("POST /api/contact", () => {
   beforeEach(() => {
     jest.clearAllMocks();

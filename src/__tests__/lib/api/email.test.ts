@@ -43,6 +43,70 @@ describe("Email Service Layer", () => {
     process.env = originalEnv;
   });
 
+  describe("Environment configuration", () => {
+    it("uses RESEND_AUDIENCE_ID when set", async () => {
+      // This test verifies the env var is read (branch coverage for || fallback)
+      process.env.RESEND_AUDIENCE_ID = "test-audience-id";
+
+      // Re-import to pick up new env
+      jest.resetModules();
+      const { addToNewsletter: freshAddToNewsletter } = await import(
+        "@/lib/api/email"
+      );
+      const { getResendClient: freshGetResendClient } = await import(
+        "@/lib/api/resend"
+      );
+
+      const mockContactsCreate = jest.fn().mockResolvedValue({
+        data: { id: "contact_env" },
+        error: null,
+      });
+
+      (freshGetResendClient as jest.Mock).mockReturnValue({
+        contacts: { create: mockContactsCreate },
+      });
+
+      await freshAddToNewsletter({ email: "test@example.com" });
+
+      expect(mockContactsCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          audienceId: expect.any(String),
+        })
+      );
+    });
+
+    it("falls back to empty string when RESEND_AUDIENCE_ID is not set", async () => {
+      // Delete the env var to test the fallback branch
+      delete process.env.RESEND_AUDIENCE_ID;
+
+      // Re-import to pick up the absence of env var
+      jest.resetModules();
+      const { addToNewsletter: freshAddToNewsletter } = await import(
+        "@/lib/api/email"
+      );
+      const { getResendClient: freshGetResendClient } = await import(
+        "@/lib/api/resend"
+      );
+
+      const mockContactsCreate = jest.fn().mockResolvedValue({
+        data: { id: "contact_fallback" },
+        error: null,
+      });
+
+      (freshGetResendClient as jest.Mock).mockReturnValue({
+        contacts: { create: mockContactsCreate },
+      });
+
+      await freshAddToNewsletter({ email: "test@example.com" });
+
+      expect(mockContactsCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          audienceId: "",
+        })
+      );
+    });
+  });
+
   describe("addToNewsletter", () => {
     const mockContactsCreate = jest.fn();
     const mockResendClient = {

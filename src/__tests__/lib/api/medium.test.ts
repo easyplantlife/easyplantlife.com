@@ -462,6 +462,33 @@ describe("Medium Data Fetching Service", () => {
       expect(posts[0].id).toBe("simple-guid-without-p-pattern");
     });
 
+    it("skips items when guid object has no underscore property", async () => {
+      // This tests the edge case where guid is parsed as an object
+      // but doesn't have the expected _ property
+      const rssWithEmptyGuidObject = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with problematic guid</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid isPermaLink="false"></guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithEmptyGuidObject),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      // Item should be skipped because guid is empty/null
+      expect(posts.length).toBe(0);
+    });
+
     it("extracts thumbnail from media:thumbnail when present", async () => {
       const rssWithMediaThumbnail = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">

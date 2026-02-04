@@ -1,10 +1,22 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import DesignSystemPage from "@/app/dev/design-system/page";
 
+// Mock clipboard API
+const mockWriteText = jest.fn().mockResolvedValue(undefined);
+Object.assign(navigator, {
+  clipboard: {
+    writeText: mockWriteText,
+  },
+});
+
 describe("Design System Reference Page", () => {
+  beforeEach(() => {
+    mockWriteText.mockClear();
+  });
+
   describe("Development Access", () => {
     it("renders the page in development mode", () => {
       // Development mode is the default for Jest
@@ -12,6 +24,32 @@ describe("Design System Reference Page", () => {
       expect(
         screen.getByRole("heading", { name: /design system/i, level: 1 })
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("Production Mode", () => {
+    const originalEnv = process.env.NODE_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it("returns null in production mode", async () => {
+      // Set production mode
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "production",
+        writable: true,
+        configurable: true,
+      });
+
+      // Re-import the module to pick up the new env
+      jest.resetModules();
+      const { default: ProductionPage } = await import(
+        "@/app/dev/design-system/page"
+      );
+
+      const { container } = render(<ProductionPage />);
+      expect(container.firstChild).toBeNull();
     });
   });
 
@@ -162,6 +200,45 @@ describe("Design System Reference Page", () => {
       // Find copy buttons
       const copyButtons = screen.getAllByRole("button", { name: /copy/i });
       expect(copyButtons.length).toBeGreaterThan(0);
+    });
+
+    it("copies code to clipboard when copy button is clicked", async () => {
+      render(<DesignSystemPage />);
+
+      const copyButtons = screen.getAllByRole("button", { name: /copy/i });
+
+      await act(async () => {
+        fireEvent.click(copyButtons[0]);
+      });
+
+      expect(mockWriteText).toHaveBeenCalled();
+    });
+
+    it("shows 'Copied!' feedback after copying", async () => {
+      jest.useFakeTimers();
+
+      render(<DesignSystemPage />);
+
+      const copyButtons = screen.getAllByRole("button", { name: /copy/i });
+
+      await act(async () => {
+        fireEvent.click(copyButtons[0]);
+      });
+
+      // Should show "Copied!" text
+      expect(screen.getByText("Copied!")).toBeInTheDocument();
+
+      // After 2 seconds, should revert back to "Copy"
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+      });
+
+      // The button text should revert to "Copy"
+      await waitFor(() => {
+        expect(copyButtons[0]).toHaveTextContent("Copy");
+      });
+
+      jest.useRealTimers();
     });
   });
 
