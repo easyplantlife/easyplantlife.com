@@ -127,6 +127,26 @@ describe("NewsletterContent Component", () => {
         expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
       });
     });
+
+    it("shows default error message when API fails without error field", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ success: false }), // No 'error' field
+      });
+
+      const user = userEvent.setup();
+      render(<NewsletterContent />);
+
+      const input = screen.getByRole("textbox", { name: /email/i });
+      const button = screen.getByRole("button", { name: /subscribe/i });
+
+      await user.type(input, "test@example.com");
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
+      });
+    });
   });
 
   describe("Brand Compliance", () => {

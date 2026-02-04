@@ -139,6 +139,19 @@ describe("Email Service Layer", () => {
       );
     });
 
+    it("should handle non-Error thrown values with default message", async () => {
+      mockContactsCreate.mockRejectedValue("string error");
+
+      const params: AddToNewsletterParams = {
+        email: "test@example.com",
+      };
+
+      await expect(addToNewsletter(params)).rejects.toThrow(EmailServiceError);
+      await expect(addToNewsletter(params)).rejects.toThrow(
+        "Failed to add contact to newsletter: Unknown error occurred"
+      );
+    });
+
     it("should re-throw non-ResendConfigError errors from getResendClient", async () => {
       const unexpectedError = new TypeError("Unexpected type error");
       mockGetResendClient.mockImplementation(() => {
@@ -304,6 +317,21 @@ describe("Email Service Layer", () => {
       await expect(sendEmail(params)).rejects.toThrow(EmailServiceError);
       await expect(sendEmail(params)).rejects.toThrow(
         "Failed to send email: Connection timeout"
+      );
+    });
+
+    it("should handle non-Error thrown values with default message", async () => {
+      mockEmailsSend.mockRejectedValue("string error");
+
+      const params: SendEmailParams = {
+        to: "recipient@example.com",
+        subject: "Test",
+        html: "<p>Content</p>",
+      };
+
+      await expect(sendEmail(params)).rejects.toThrow(EmailServiceError);
+      await expect(sendEmail(params)).rejects.toThrow(
+        "Failed to send email: Unknown error occurred"
       );
     });
 

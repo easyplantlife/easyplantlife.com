@@ -218,6 +218,14 @@ describe("Medium Data Fetching Service", () => {
       ).rejects.toThrow("Failed to fetch Medium posts");
     });
 
+    it("handles non-Error thrown values with default message", async () => {
+      global.fetch = jest.fn().mockRejectedValue("string error");
+
+      await expect(
+        fetchMediumPosts({ username: "easyplantlife" })
+      ).rejects.toThrow("Failed to fetch Medium posts: Unknown error");
+    });
+
     it("throws error when response is not ok", async () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: false,
@@ -429,6 +437,57 @@ describe("Medium Data Fetching Service", () => {
       expect(posts[0].id).toBe("objguid123");
     });
 
+    it("handles guid without /p/ pattern - uses full guid as id", async () => {
+      const rssWithSimpleGuid = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with simple guid</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>simple-guid-without-p-pattern</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithSimpleGuid),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].id).toBe("simple-guid-without-p-pattern");
+    });
+
+    it("extracts thumbnail from media:thumbnail when present", async () => {
+      const rssWithMediaThumbnail = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>Test</title>
+    <item>
+      <title>Post with media thumbnail</title>
+      <link>https://medium.com/@test/post-1</link>
+      <guid>https://medium.com/p/abc123</guid>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <description>Test description</description>
+      <media:thumbnail url="https://example.com/media-thumb.jpg"/>
+    </item>
+  </channel>
+</rss>`;
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithMediaThumbnail),
+      });
+
+      const posts = await fetchMediumPosts({ username: "test" });
+      expect(posts.length).toBe(1);
+      expect(posts[0].thumbnail).toBe("https://example.com/media-thumb.jpg");
+    });
+
     it("skips items with invalid date", async () => {
       const rssWithInvalidDate = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
@@ -609,6 +668,23 @@ describe("Medium Data Fetching Service", () => {
   });
 
   describe("Excerpt sanitization", () => {
+    it("preserves unknown HTML entities as-is", async () => {
+      const rssWithUnknownEntity = mockRssResponse.replace(
+        "A gentle introduction",
+        "Test &unknownentity; text"
+      );
+
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve(rssWithUnknownEntity),
+      });
+
+      const posts = await fetchMediumPosts({ username: "easyplantlife" });
+
+      // Unknown entities should be preserved as-is
+      expect(posts[0].excerpt).toContain("&unknownentity;");
+    });
+
     it("strips HTML tags from excerpt", async () => {
       const rssWithHtmlDescription = mockRssResponse.replace(
         "A gentle introduction",

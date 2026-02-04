@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "@/components/forms/ContactForm";
 import * as analytics from "@/lib/analytics/events";
@@ -348,6 +348,111 @@ describe("ContactForm Component", () => {
           expect(error).toHaveTextContent(/valid email/i);
         }
       });
+    });
+  });
+
+  describe("Client-side JS Validation (bypassing HTML5)", () => {
+    it("shows error when name is empty", async () => {
+      const handleSubmit = jest.fn();
+      render(<ContactForm onSubmit={handleSubmit} />);
+      const form = screen.getByRole("form");
+
+      // Fill email and message but leave name empty
+      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
+        target: { value: "test@example.com" },
+      });
+      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
+        target: { value: "Hello there!" },
+      });
+
+      // Submit form directly
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+        expect(screen.getByTestId("contact-error")).toHaveTextContent(/name/i);
+      });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it("shows error when email is empty", async () => {
+      const handleSubmit = jest.fn();
+      render(<ContactForm onSubmit={handleSubmit} />);
+      const form = screen.getByRole("form");
+
+      // Fill name and message but leave email empty
+      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
+        target: { value: "John Doe" },
+      });
+      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
+        target: { value: "Hello there!" },
+      });
+
+      // Submit form directly
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+        expect(screen.getByTestId("contact-error")).toHaveTextContent(/email/i);
+      });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it("shows error when email format is invalid", async () => {
+      const handleSubmit = jest.fn();
+      render(<ContactForm onSubmit={handleSubmit} />);
+      const form = screen.getByRole("form");
+
+      // Fill all fields but with invalid email
+      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
+        target: { value: "John Doe" },
+      });
+      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
+        target: { value: "invalid@nodot" },
+      });
+      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
+        target: { value: "Hello there!" },
+      });
+
+      // Submit form directly
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+        expect(screen.getByTestId("contact-error")).toHaveTextContent(
+          /valid email/i
+        );
+      });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+
+    it("shows error when message is empty", async () => {
+      const handleSubmit = jest.fn();
+      render(<ContactForm onSubmit={handleSubmit} />);
+      const form = screen.getByRole("form");
+
+      // Fill name and email but leave message empty
+      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
+        target: { value: "John Doe" },
+      });
+      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
+        target: { value: "test@example.com" },
+      });
+
+      // Submit form directly
+      fireEvent.submit(form);
+
+      await waitFor(() => {
+        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+        expect(screen.getByTestId("contact-error")).toHaveTextContent(
+          /message/i
+        );
+      });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
   });
 

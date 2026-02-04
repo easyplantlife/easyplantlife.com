@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { ContactContent } from "@/components/contact";
 
 /**
@@ -23,7 +24,14 @@ jest.mock("@/components/forms/ContactForm", () => ({
   ),
 }));
 
+// Mock fetch for API calls
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
+
 describe("ContactContent", () => {
+  beforeEach(() => {
+    mockFetch.mockReset();
+  });
   describe("Rendering", () => {
     it("renders the component with data-testid", () => {
       render(<ContactContent />);
@@ -129,3 +137,4 @@ describe("ContactContent", () => {
     });
   });
 });
+

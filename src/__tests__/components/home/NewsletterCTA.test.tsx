@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NewsletterCTA } from "@/components/home/NewsletterCTA";
 import { handleNewsletterSubmit } from "@/components/home/NewsletterCTA";
@@ -331,6 +331,30 @@ describe("NewsletterCTA Component", () => {
       await user.click(button);
 
       expect(handleSubmit).toHaveBeenCalledWith("valid@email.com");
+    });
+
+    it("shows JS validation error when form submitted with invalid email bypassing HTML5 validation", async () => {
+      const handleSubmit = jest.fn();
+      render(<NewsletterCTA onSubmit={handleSubmit} />);
+      const form = screen.getByRole("form");
+      const input = screen.getByRole("textbox", { name: /email/i });
+
+      // Set an invalid email that fails the regex (no dot in domain)
+      fireEvent.change(input, { target: { value: "invalid@nodot" } });
+
+      // Submit form directly, bypassing HTML5 validation
+      fireEvent.submit(form);
+
+      // Client-side JS validation should catch this and show error
+      await waitFor(() => {
+        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
+        expect(screen.getByTestId("newsletter-error")).toHaveTextContent(
+          /valid email/i
+        );
+      });
+
+      // onSubmit should not have been called
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
   });
 
