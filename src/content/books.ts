@@ -59,7 +59,7 @@ export const books: Book[] = [
     id: "easy-plant-life-the-normal-vegan",
     title: "The Normal Vegan",
     description:
-      "A story about eating without effort. Follow Maya, a remote software engineer, as she discovers that the problem was never veganism itself. It was friction. No rules, no meal plans, no pressure. Just a gentle reframing of how food can fit into real life.",
+      "A story about eating without effort. Follow Maya, a remote software engineer, as she discovers that the problem was not veganism itself. It was friction. No rules, no meal plans, no pressure. Just a gentle reframing of how food can fit into real life.",
     coverImage: "/images/books/easy-plant-life-the-normal-vegan.png",
     status: "available",
     purchaseLinks: [
