@@ -1,10 +1,14 @@
+"use client";
+
 import {
   forwardRef,
   type ElementType,
   type HTMLAttributes,
   type ReactNode,
+  type MouseEvent,
 } from "react";
 import NextLink from "next/link";
+import { trackOutboundClick } from "@/lib/analytics/events";
 
 /**
  * Allowed semantic HTML elements for the Card
@@ -22,6 +26,15 @@ export interface CardProps extends HTMLAttributes<HTMLElement> {
   target?: string;
   /** Relationship for external links (e.g., "noopener noreferrer") */
   rel?: string;
+  /** Label for analytics tracking (e.g., book title, blog post title) */
+  trackingLabel?: string;
+}
+
+/**
+ * Determines if a URL is external (for analytics tracking)
+ */
+function isExternalLink(href: string): boolean {
+  return /^(https?:\/\/|mailto:|tel:)/.test(href);
 }
 
 /**
@@ -65,11 +78,23 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     href,
     target,
     rel,
+    trackingLabel,
     className = "",
+    onClick,
     ...props
   },
   ref
 ) {
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    // Track outbound clicks for external links
+    if (href && isExternalLink(href)) {
+      trackOutboundClick(href, trackingLabel);
+    }
+    // Call original onClick if provided
+    if (onClick) {
+      onClick(e as unknown as MouseEvent<HTMLElement>);
+    }
+  };
   const baseStyles = [
     // Minimal card styling per brand guidelines
     "border",
@@ -127,6 +152,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
         target={target}
         rel={rel}
         className={combinedClassName}
+        onClick={handleClick}
         {...(props as HTMLAttributes<HTMLAnchorElement>)}
       >
         {content}

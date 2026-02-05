@@ -1,6 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Card } from "@/components/ui/Card";
+import * as analytics from "@/lib/analytics/events";
+
+// Mock the analytics module
+jest.mock("@/lib/analytics/events", () => ({
+  trackOutboundClick: jest.fn(),
+}));
 
 /**
  * Card Component Tests
@@ -265,6 +271,106 @@ describe("Card Component", () => {
         </Card>
       );
       expect(ref.current).toBeInstanceOf(HTMLElement);
+    });
+  });
+
+  describe("Analytics Tracking", () => {
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("tracks outbound click for external https links", async () => {
+      const user = userEvent.setup();
+      render(
+        <Card
+          href="https://example.com/book"
+          trackingLabel="Test Book"
+          data-testid="card"
+        >
+          Buy Book
+        </Card>
+      );
+
+      const card = screen.getByTestId("card");
+      await user.click(card);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://example.com/book",
+        "Test Book"
+      );
+    });
+
+    it("tracks outbound click for external http links", async () => {
+      const user = userEvent.setup();
+      render(
+        <Card
+          href="http://medium.com/article"
+          trackingLabel="Blog Post"
+          data-testid="card"
+        >
+          Read Article
+        </Card>
+      );
+
+      const card = screen.getByTestId("card");
+      await user.click(card);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "http://medium.com/article",
+        "Blog Post"
+      );
+    });
+
+    it("does not track internal links", async () => {
+      const user = userEvent.setup();
+      render(
+        <Card href="/about" trackingLabel="About" data-testid="card">
+          About Us
+        </Card>
+      );
+
+      const card = screen.getByTestId("card");
+      await user.click(card);
+
+      expect(analytics.trackOutboundClick).not.toHaveBeenCalled();
+    });
+
+    it("tracks without label when trackingLabel not provided", async () => {
+      const user = userEvent.setup();
+      render(
+        <Card href="https://example.com" data-testid="card">
+          Click me
+        </Card>
+      );
+
+      const card = screen.getByTestId("card");
+      await user.click(card);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalledWith(
+        "https://example.com",
+        undefined
+      );
+    });
+
+    it("calls original onClick handler along with tracking", async () => {
+      const user = userEvent.setup();
+      const handleClick = jest.fn();
+      render(
+        <Card
+          href="https://example.com"
+          trackingLabel="Test"
+          onClick={handleClick}
+          data-testid="card"
+        >
+          Click me
+        </Card>
+      );
+
+      const card = screen.getByTestId("card");
+      await user.click(card);
+
+      expect(analytics.trackOutboundClick).toHaveBeenCalled();
+      expect(handleClick).toHaveBeenCalled();
     });
   });
 });

@@ -33,6 +33,7 @@ export function BookCard({ book, className = "", ...props }: BookCardProps) {
       href={hasLinks ? purchaseLinks[0]?.url : undefined}
       target={hasLinks ? "_blank" : undefined}
       rel={hasLinks ? "noopener noreferrer" : undefined}
+      trackingLabel={hasLinks ? title : undefined}
       className={`group transition-all duration-300 hover:border-primary hover:shadow-lg ${className}`.trim()}
       {...props}
     >

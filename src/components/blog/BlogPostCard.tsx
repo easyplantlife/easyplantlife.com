@@ -53,6 +53,7 @@ export function BlogPostCard({
       href={url}
       target="_blank"
       rel="noopener noreferrer"
+      trackingLabel={title}
       className={`group ${className}`.trim()}
       {...props}
     >
