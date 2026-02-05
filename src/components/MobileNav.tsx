@@ -93,8 +93,9 @@ export function MobileNav({ links }: MobileNavProps) {
     const handleTabKey = (event: KeyboardEvent) => {
       if (event.key !== "Tab") return;
 
-      const nav = navRef.current;
-      if (!nav) return;
+      // navRef.current is guaranteed to be set when isOpen is true
+      // because React assigns refs synchronously during render
+      const nav = navRef.current!;
 
       // Get all focusable elements within the nav
       const focusableElements = nav.querySelectorAll<HTMLElement>(

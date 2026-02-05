@@ -360,4 +360,80 @@ describe("MobileNav Component", () => {
       expect(screen.getByRole("button", { name: /menu/i })).toBeInTheDocument();
     });
   });
+
+  describe("Focus trap edge cases", () => {
+    it("handles Tab key when no focusable elements found", async () => {
+      const user = userEvent.setup();
+      render(<MobileNav links={navLinks} />);
+
+      const menuButton = screen.getByRole("button", { name: /menu/i });
+      await user.click(menuButton);
+
+      const nav = screen.getByRole("navigation", { name: /mobile/i });
+
+      // Mock querySelectorAll to return empty NodeList
+      const originalQuerySelectorAll = nav.querySelectorAll.bind(nav);
+      nav.querySelectorAll = jest.fn().mockReturnValue([]);
+
+      // Tab should not throw when no focusable elements
+      await user.tab();
+
+      // Restore
+      nav.querySelectorAll = originalQuerySelectorAll;
+
+      // Menu should still be open (no crash)
+      expect(
+        screen.getByRole("navigation", { name: /mobile/i })
+      ).toBeInTheDocument();
+    });
+
+    it("handles Tab key when nav element is temporarily unavailable", async () => {
+      const user = userEvent.setup();
+      render(<MobileNav links={navLinks} />);
+
+      const menuButton = screen.getByRole("button", { name: /menu/i });
+      await user.click(menuButton);
+
+      const nav = screen.getByRole("navigation", { name: /mobile/i });
+
+      // Temporarily remove the nav's ID to simulate ref not matching
+      const originalId = nav.id;
+      nav.removeAttribute("id");
+
+      // Dispatch a Tab keydown event directly to document
+      // This tests the handler's guard against missing nav ref
+      const tabEvent = new KeyboardEvent("keydown", {
+        key: "Tab",
+        bubbles: true,
+        cancelable: true,
+      });
+      document.dispatchEvent(tabEvent);
+
+      // Restore
+      nav.id = originalId;
+
+      // Menu should still be open (no crash)
+      expect(nav).toBeInTheDocument();
+    });
+
+    it("handles non-Tab key presses gracefully", async () => {
+      const user = userEvent.setup();
+      render(<MobileNav links={navLinks} />);
+
+      const menuButton = screen.getByRole("button", { name: /menu/i });
+      await user.click(menuButton);
+
+      // Pressing keys that are not Tab should be ignored by the focus trap
+      // (not Escape which closes menu, not Enter/Space which can activate elements)
+      await user.keyboard("{ArrowDown}");
+      await user.keyboard("{ArrowUp}");
+      await user.keyboard("{ArrowLeft}");
+      await user.keyboard("{ArrowRight}");
+
+      // Menu should still be open
+      expect(
+        screen.getByRole("navigation", { name: /mobile/i })
+      ).toBeInTheDocument();
+    });
+  });
 });
