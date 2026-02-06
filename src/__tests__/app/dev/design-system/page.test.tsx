@@ -1,7 +1,13 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import DesignSystemPage from "@/app/dev/design-system/page";
 
 // Mock clipboard API
@@ -44,9 +50,8 @@ describe("Design System Reference Page", () => {
 
       // Re-import the module to pick up the new env
       jest.resetModules();
-      const { default: ProductionPage } = await import(
-        "@/app/dev/design-system/page"
-      );
+      const { default: ProductionPage } =
+        await import("@/app/dev/design-system/page");
 
       const { container } = render(<ProductionPage />);
       expect(container.firstChild).toBeNull();

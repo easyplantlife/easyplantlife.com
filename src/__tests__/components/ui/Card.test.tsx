@@ -82,6 +82,7 @@ describe("Card Component", () => {
       render(
         <Card
           data-testid="card"
+          // eslint-disable-next-line @next/next/no-img-element
           image={<img src="/test.jpg" alt="Test image" />}
         >
           Content
@@ -94,6 +95,7 @@ describe("Card Component", () => {
       render(
         <Card
           data-testid="card"
+          // eslint-disable-next-line @next/next/no-img-element
           image={<img src="/test.jpg" alt="Test image" data-testid="image" />}
         >
           <span data-testid="content">Content</span>
@@ -116,6 +118,7 @@ describe("Card Component", () => {
 
     it("image container has proper styling", () => {
       render(
+        // eslint-disable-next-line @next/next/no-img-element
         <Card data-testid="card" image={<img src="/test.jpg" alt="Test" />}>
           Content
         </Card>

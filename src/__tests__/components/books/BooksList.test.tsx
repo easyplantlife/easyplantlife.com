@@ -78,7 +78,9 @@ describe("BooksList Component", () => {
 
       expect(screen.getByText("First Book")).toBeInTheDocument();
       // Available book renders as a link card
-      expect(screen.getByRole("heading", { name: "First Book" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "First Book" })
+      ).toBeInTheDocument();
     });
   });
 

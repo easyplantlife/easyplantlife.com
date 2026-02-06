@@ -50,12 +50,10 @@ describe("Email Service Layer", () => {
 
       // Re-import to pick up new env
       jest.resetModules();
-      const { addToNewsletter: freshAddToNewsletter } = await import(
-        "@/lib/api/email"
-      );
-      const { getResendClient: freshGetResendClient } = await import(
-        "@/lib/api/resend"
-      );
+      const { addToNewsletter: freshAddToNewsletter } =
+        await import("@/lib/api/email");
+      const { getResendClient: freshGetResendClient } =
+        await import("@/lib/api/resend");
 
       const mockContactsCreate = jest.fn().mockResolvedValue({
         data: { id: "contact_env" },
@@ -81,12 +79,10 @@ describe("Email Service Layer", () => {
 
       // Re-import to pick up the absence of env var
       jest.resetModules();
-      const { addToNewsletter: freshAddToNewsletter } = await import(
-        "@/lib/api/email"
-      );
-      const { getResendClient: freshGetResendClient } = await import(
-        "@/lib/api/resend"
-      );
+      const { addToNewsletter: freshAddToNewsletter } =
+        await import("@/lib/api/email");
+      const { getResendClient: freshGetResendClient } =
+        await import("@/lib/api/resend");
 
       const mockContactsCreate = jest.fn().mockResolvedValue({
         data: { id: "contact_fallback" },
