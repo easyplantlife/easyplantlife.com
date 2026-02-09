@@ -1,5 +1,6 @@
 import { type HTMLAttributes } from "react";
 import Image from "next/image";
+import NextLink from "next/link";
 
 export interface AboutContentProps extends HTMLAttributes<HTMLElement> {
   /** Additional CSS classes */
@@ -178,6 +179,23 @@ export function AboutContent({ className = "", ...props }: AboutContentProps) {
             </p>
           </div>
         </div>
+      </section>
+
+      {/* Books imagery - link to books page */}
+      <section data-testid="about-books-image" className="mb-12">
+        <NextLink
+          href="/books"
+          className="block rounded-xl overflow-hidden border border-neutral-200 bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 max-w-2xl mx-auto"
+          aria-label="View Easy Plant Life books"
+        >
+          <Image
+            src="/images/easy-plant-life-books-on-table.jpeg"
+            alt="Easy Plant Life books on a table with a plant and tea"
+            width={800}
+            height={533}
+            className="w-full h-auto object-cover"
+          />
+        </NextLink>
       </section>
 
       {/* Decorative divider */}
