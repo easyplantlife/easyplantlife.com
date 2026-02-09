@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
 
@@ -112,7 +112,8 @@ describe("Home Page", () => {
 
     it("renders link to Books page", () => {
       render(<Home />);
-      const booksLink = screen.getByRole("link", { name: /book/i });
+      const secondaryCTAs = screen.getByTestId("secondary-ctas");
+      const booksLink = within(secondaryCTAs).getByRole("link", { name: /book/i });
       expect(booksLink).toBeInTheDocument();
       expect(booksLink).toHaveAttribute("href", "/books");
     });

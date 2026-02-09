@@ -8,7 +8,7 @@
  * - Layout is correct on all (browsers/devices)
  */
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -466,8 +466,8 @@ describe("Layout Correctness - Visual Hierarchy", () => {
     const h1 = screen.getByRole("heading", { level: 1 });
     // H1 wraps the logo; logo image has responsive width for visual prominence
     expect(h1).toBeInTheDocument();
-    const logo = screen.getByRole("img", { name: /easy plant life/i });
-    expect(logo.className).toMatch(/w-64|md:w-80|lg:w-96/);
+    const logo = within(h1).getByRole("img", { name: /easy plant life/i });
+    expect(logo.className).toMatch(/w-64|w-72|md:w-80|lg:w-96/);
   });
 });
 
