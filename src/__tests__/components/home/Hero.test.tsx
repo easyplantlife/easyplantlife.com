@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { Hero } from "@/components/home/Hero";
 
 /**
@@ -32,7 +32,8 @@ describe("Hero Component", () => {
   describe("Logo Display", () => {
     it("displays the brand name prominently", () => {
       render(<Hero />);
-      const logo = screen.getByRole("img", { name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", { level: 1 });
+      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
       expect(logo).toBeInTheDocument();
     });
 
@@ -47,7 +48,8 @@ describe("Hero Component", () => {
 
     it("logo is visually prominent with appropriate size", () => {
       render(<Hero />);
-      const logo = screen.getByRole("img", { name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", { level: 1 });
+      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
       // Should have responsive width classes for prominence
       expect(logo.className).toMatch(/w-64|md:w-80|lg:w-96/);
     });
@@ -225,9 +227,10 @@ describe("Hero Component", () => {
     it("contains all elements needed for brand understanding", () => {
       render(<Hero />);
 
-      // Brand name/logo is visible
+      // Brand name/logo is visible (logo is the image inside the h1)
+      const h1 = screen.getByRole("heading", { level: 1 });
       expect(
-        screen.getByRole("img", { name: /easy plant life/i })
+        within(h1).getByRole("img", { name: /easy plant life/i })
       ).toBeVisible();
 
       // Tagline provides quick context

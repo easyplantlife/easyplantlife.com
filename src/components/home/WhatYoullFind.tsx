@@ -86,12 +86,12 @@ export function WhatYoullFind({
     <section
       aria-label="What you'll find"
       data-testid="what-youll-find"
-      className={`bg-white py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 ${className}`.trim()}
+      className={`bg-white py-10 md:py-14 lg:py-16 px-4 md:px-6 lg:px-8 ${className}`.trim()}
       {...props}
     >
       <div className="max-w-5xl mx-auto">
         {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-8 md:mb-10">
           <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl text-neutral-800 mb-4">
             What You&apos;ll Find Here
           </h2>
@@ -102,7 +102,7 @@ export function WhatYoullFind({
         </div>
 
         {/* Items Grid */}
-        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-3 gap-5 md:gap-6">
           {items.map((item) => (
             <div
               key={item.title}
@@ -122,7 +122,7 @@ export function WhatYoullFind({
         </div>
 
         {/* Decorative element */}
-        <div className="mt-16 flex justify-center items-center gap-4">
+        <div className="mt-10 flex justify-center items-center gap-4">
           <div className="h-px w-20 bg-gradient-to-r from-transparent to-neutral-200" />
           <Image
             src="/images/mark-logo.png"

@@ -78,10 +78,10 @@ export function NewsletterCTA({
     "bg-gradient-to-b",
     "from-neutral-50",
     "to-primary-50/30",
-    // Generous vertical padding
-    "py-16",
-    "md:py-20",
-    "lg:py-24",
+    // Vertical padding
+    "py-10",
+    "md:py-14",
+    "lg:py-16",
     // Horizontal padding
     "px-4",
     "md:px-6",

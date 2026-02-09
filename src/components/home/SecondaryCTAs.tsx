@@ -32,7 +32,7 @@ export function SecondaryCTAs({
     <section
       aria-label="Secondary navigation"
       data-testid="secondary-ctas"
-      className={`bg-white py-16 md:py-20 lg:py-24 px-4 md:px-6 lg:px-8 text-center border-t border-neutral-100 ${className}`.trim()}
+      className={`bg-white py-10 md:py-14 lg:py-16 px-4 md:px-6 lg:px-8 text-center border-t border-neutral-100 ${className}`.trim()}
       {...props}
     >
       <div className="max-w-4xl mx-auto">
@@ -40,13 +40,13 @@ export function SecondaryCTAs({
         <h2 className="font-heading text-2xl md:text-3xl text-neutral-800 text-center mb-4">
           Go Further
         </h2>
-        <p className="text-neutral-600 text-center mb-12 max-w-xl mx-auto">
+        <p className="text-neutral-600 text-center mb-8 max-w-xl mx-auto">
           Use what helps. Ignore what does not. More depth lives in the blog and
           in longer-form guides.
         </p>
 
         {/* Cards container */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid md:grid-cols-2 gap-5 md:gap-6">
           {/* Blog Card */}
           <NextLink
             href="/blog"

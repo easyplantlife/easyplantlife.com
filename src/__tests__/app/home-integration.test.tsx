@@ -46,7 +46,8 @@ describe("Home Page Integration Tests", () => {
     it("displays the Easy Plant Life logo/brand name", () => {
       render(<Home />);
 
-      const logo = screen.getByRole("img", { name: /easy plant life/i });
+      const h1 = screen.getByRole("heading", { level: 1 });
+      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
       expect(logo).toBeVisible();
     });
 
@@ -90,9 +91,9 @@ describe("Home Page Integration Tests", () => {
       expect(blogLink).toBeInTheDocument();
       expect(blogLink).toHaveAttribute("href", "/blog");
 
-      const booksLink = screen.getByRole("link", { name: /book/i });
-      expect(booksLink).toBeInTheDocument();
-      expect(booksLink).toHaveAttribute("href", "/books");
+      const booksLinks = screen.getAllByRole("link", { name: /book/i });
+      expect(booksLinks.length).toBeGreaterThanOrEqual(1);
+      expect(booksLinks[0]).toHaveAttribute("href", "/books");
     });
 
     /**
@@ -101,9 +102,10 @@ describe("Home Page Integration Tests", () => {
     it("renders all essential brand elements on initial load", () => {
       render(<Home />);
 
-      // Logo
+      // Logo (inside h1)
+      const h1 = screen.getByRole("heading", { level: 1 });
       expect(
-        screen.getByRole("img", { name: /easy plant life/i })
+        within(h1).getByRole("img", { name: /easy plant life/i })
       ).toBeVisible();
 
       // Tagline
@@ -116,7 +118,7 @@ describe("Home Page Integration Tests", () => {
 
       // Navigation links
       expect(screen.getByRole("link", { name: /blog/i })).toBeInTheDocument();
-      expect(screen.getByRole("link", { name: /book/i })).toBeInTheDocument();
+      expect(screen.getAllByRole("link", { name: /book/i }).length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -270,7 +272,9 @@ describe("Home Page Integration Tests", () => {
       render(<Home />);
 
       const blogLink = screen.getByRole("link", { name: /blog/i });
-      const booksLink = screen.getByRole("link", { name: /book/i });
+      const booksLinks = screen.getAllByRole("link", { name: /book/i });
+      expect(booksLinks.length).toBeGreaterThanOrEqual(1);
+      const booksLink = booksLinks[0];
 
       // Links should be accessible (not hidden, not disabled)
       expect(blogLink).toBeVisible();
@@ -314,7 +318,12 @@ describe("Home Page Integration Tests", () => {
       const user = userEvent.setup();
       render(<Home />);
 
-      // Tab through the page
+      // Tab through the page (hero book image link, then newsletter, then secondary CTAs)
+      await user.tab();
+      expect(
+        screen.getByRole("link", { name: /view easy plant life books/i })
+      ).toHaveFocus();
+
       await user.tab();
       expect(screen.getByRole("textbox", { name: /email/i })).toHaveFocus();
 
@@ -325,7 +334,7 @@ describe("Home Page Integration Tests", () => {
       expect(screen.getByRole("link", { name: /blog/i })).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole("link", { name: /book/i })).toHaveFocus();
+      expect(screen.getByRole("link", { name: /view books/i })).toHaveFocus();
     });
   });
 
@@ -382,9 +391,10 @@ describe("Home Page Integration Tests", () => {
     it("displays all essential brand elements above the fold conceptually", () => {
       render(<Home />);
 
-      // Brand name/logo
+      // Brand name/logo (inside h1)
+      const h1 = screen.getByRole("heading", { level: 1 });
       expect(
-        screen.getByRole("img", { name: /easy plant life/i })
+        within(h1).getByRole("img", { name: /easy plant life/i })
       ).toBeVisible();
 
       // Tagline
