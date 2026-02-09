@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import {
+  BookImagery,
   Hero,
   NewsletterCTA,
   SecondaryCTAs,
@@ -79,6 +80,9 @@ export default function Home() {
 
       {/* Secondary CTAs - Additional navigation to content */}
       <SecondaryCTAs />
+
+      {/* Book imagery - below Go Further */}
+      <BookImagery />
     </main>
   );
 }

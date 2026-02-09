@@ -120,33 +120,35 @@ describe("Home Page", () => {
   });
 
   describe("Section Order and Flow", () => {
-    it("renders sections in correct order (Hero → Newsletter → Secondary)", () => {
+    it("renders sections in correct order (Hero → Newsletter → Secondary → Book imagery)", () => {
       render(<Home />);
       const hero = screen.getByTestId("hero-section");
       const newsletter = screen.getByTestId("newsletter-cta");
       const secondary = screen.getByTestId("secondary-ctas");
+      const bookImagery = screen.getByTestId("book-imagery");
 
       // Get the positions in the DOM
       const heroPosition = hero.compareDocumentPosition(newsletter);
       const newsletterPosition = newsletter.compareDocumentPosition(secondary);
+      const secondaryPosition = secondary.compareDocumentPosition(bookImagery);
 
       // Node.DOCUMENT_POSITION_FOLLOWING = 4
-      // Hero should come before Newsletter
       expect(heroPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING
       );
-      // Newsletter should come before Secondary
       expect(newsletterPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      );
+      expect(secondaryPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
         Node.DOCUMENT_POSITION_FOLLOWING
       );
     });
 
     it("has no unnecessary sections", () => {
       render(<Home />);
-      // Count all section elements
       const sections = screen.getAllByRole("region");
-      // Should have exactly 4 sections: Hero, What You'll Find, Newsletter, Secondary CTAs
-      expect(sections).toHaveLength(4);
+      // Hero, What You'll Find, Newsletter, Secondary CTAs, Book imagery
+      expect(sections).toHaveLength(5);
     });
   });
 

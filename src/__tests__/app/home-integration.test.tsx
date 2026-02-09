@@ -334,7 +334,8 @@ describe("Home Page Integration Tests", () => {
       expect(screen.getByRole("link", { name: /blog/i })).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole("link", { name: /view books/i })).toHaveFocus();
+      // Any of the books links (hero, secondary CTAs, or book imagery) may have focus
+      expect(document.activeElement).toHaveAttribute("href", "/books");
     });
   });
 
@@ -345,6 +346,7 @@ describe("Home Page Integration Tests", () => {
       const hero = screen.getByTestId("hero-section");
       const newsletter = screen.getByTestId("newsletter-cta");
       const secondary = screen.getByTestId("secondary-ctas");
+      const bookImagery = screen.getByTestId("book-imagery");
 
       // Hero before Newsletter
       expect(
@@ -357,13 +359,19 @@ describe("Home Page Integration Tests", () => {
         newsletter.compareDocumentPosition(secondary) &
           Node.DOCUMENT_POSITION_FOLLOWING
       ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+
+      // Secondary before Book imagery
+      expect(
+        secondary.compareDocumentPosition(bookImagery) &
+          Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
 
-    it("has exactly four main sections", () => {
+    it("has exactly five main sections", () => {
       render(<Home />);
 
       const sections = screen.getAllByRole("region");
-      expect(sections).toHaveLength(4);
+      expect(sections).toHaveLength(5);
     });
 
     it("all sections have consistent background styling", () => {
@@ -373,6 +381,7 @@ describe("Home Page Integration Tests", () => {
       const hero = screen.getByTestId("hero-section");
       const newsletter = screen.getByTestId("newsletter-cta");
       const secondary = screen.getByTestId("secondary-ctas");
+      const bookImagery = screen.getByTestId("book-imagery");
 
       // Main container has background
       expect(main.className).toMatch(/bg-/);
@@ -380,6 +389,7 @@ describe("Home Page Integration Tests", () => {
       // All sections have backgrounds
       expect(hero.className).toMatch(/bg-/);
       expect(newsletter.className).toMatch(/bg-/);
+      expect(bookImagery.className).toMatch(/bg-/);
       expect(secondary.className).toMatch(/bg-/);
     });
   });

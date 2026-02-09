@@ -1,3 +1,5 @@
+export { BookImagery } from "./BookImagery";
+export type { BookImageryProps } from "./BookImagery";
 export { Hero } from "./Hero";
 export { NewsletterCTA, handleNewsletterSubmit } from "./NewsletterCTA";
 export type { NewsletterCTAProps } from "./NewsletterCTA";
