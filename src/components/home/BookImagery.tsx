@@ -27,7 +27,7 @@ export function BookImagery({ className = "", ...props }: BookImageryProps) {
           aria-label="Easy Plant Life books on a table — View books"
         >
           <Image
-            src="/images/easy-plant-life-books-on-table.jpeg"
+            src="/images/easy-plant-life-books-on-table.png"
             alt="Easy Plant Life books on a table with a plant and tea"
             width={800}
             height={533}
