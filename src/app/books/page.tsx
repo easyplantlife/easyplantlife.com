@@ -35,9 +35,8 @@ export default function BooksPage() {
         className="mb-12 rounded-2xl border border-primary-200 bg-primary-100/80 px-6 py-8 md:px-8 md:py-10"
       >
         <p className="text-lg leading-relaxed text-neutral-700 md:text-xl">
-          Simple, honest guides for living with plants. No complicated care
-          schedules, no pressure—just calm advice for bringing nature into your
-          space.
+          Simple, honest guides for living a happy vegan life. No complicated
+          schedules, no pressure—just calm advice for making living vegan easy.
         </p>
       </div>
       <BooksList books={books} data-testid="books-list" />
