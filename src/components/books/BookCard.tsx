@@ -44,7 +44,7 @@ export function BookCard({ book, className = "", ...props }: BookCardProps) {
             src={coverImage}
             alt={`${title} cover`}
             width={160}
-            height={240}
+            height={260}
             className="h-60 w-40 object-cover sm:h-72 sm:w-48"
           />
         </div>
