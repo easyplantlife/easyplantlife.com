@@ -34,10 +34,17 @@ describe("Design System Reference Page", () => {
   });
 
   describe("Production Mode", () => {
-    const originalEnv = process.env.NODE_ENV;
+    const originalNodeEnv = Object.getOwnPropertyDescriptor(
+      process.env,
+      "NODE_ENV"
+    );
 
     afterEach(() => {
-      process.env.NODE_ENV = originalEnv;
+      if (originalNodeEnv) {
+        Object.defineProperty(process.env, "NODE_ENV", originalNodeEnv);
+      } else {
+        delete (process.env as { NODE_ENV?: string }).NODE_ENV;
+      }
     });
 
     it("returns null in production mode", async () => {

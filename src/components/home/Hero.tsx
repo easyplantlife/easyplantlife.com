@@ -89,7 +89,10 @@ export function Hero({ className = "", ...props }: HeroProps) {
         </div>
 
         {/* Book image - links to books page */}
-        <div className="mt-8 md:mt-10 flex justify-center px-0 md:px-4" data-testid="hero-books">
+        <div
+          className="mt-8 md:mt-10 flex justify-center px-0 md:px-4"
+          data-testid="hero-books"
+        >
           <NextLink
             href="/books"
             className="block w-full max-w-6xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-lg"

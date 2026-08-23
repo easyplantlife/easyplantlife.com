@@ -113,7 +113,9 @@ describe("Home Page", () => {
     it("renders link to Books page", () => {
       render(<Home />);
       const secondaryCTAs = screen.getByTestId("secondary-ctas");
-      const booksLink = within(secondaryCTAs).getByRole("link", { name: /book/i });
+      const booksLink = within(secondaryCTAs).getByRole("link", {
+        name: /book/i,
+      });
       expect(booksLink).toBeInTheDocument();
       expect(booksLink).toHaveAttribute("href", "/books");
     });

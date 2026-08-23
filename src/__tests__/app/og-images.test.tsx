@@ -49,7 +49,9 @@ describe("Open Graph Image Generation", () => {
 
     it("includes brand name in the image", async () => {
       const { default: Image } = await import("@/app/opengraph-image");
-      const result = (await Image()) as { element: React.ReactElement };
+      const result = (await Image()) as unknown as {
+        element: React.ReactElement;
+      };
 
       // The element should contain the brand name
       const elementStr = JSON.stringify(result.element);
@@ -58,7 +60,9 @@ describe("Open Graph Image Generation", () => {
 
     it("includes tagline in the image", async () => {
       const { default: Image } = await import("@/app/opengraph-image");
-      const result = (await Image()) as { element: React.ReactElement };
+      const result = (await Image()) as unknown as {
+        element: React.ReactElement;
+      };
 
       const elementStr = JSON.stringify(result.element);
       expect(elementStr).toContain("A calm approach to plant-based living");
@@ -92,7 +96,9 @@ describe("Open Graph Image Generation", () => {
 
     it("uses brand background color", async () => {
       const { default: Icon } = await import("@/app/apple-icon");
-      const result = (await Icon()) as { element: React.ReactElement };
+      const result = (await Icon()) as unknown as {
+        element: React.ReactElement;
+      };
 
       const elementStr = JSON.stringify(result.element);
       // Should use the warm white background
@@ -101,7 +107,9 @@ describe("Open Graph Image Generation", () => {
 
     it("uses brand green gradient", async () => {
       const { default: Icon } = await import("@/app/apple-icon");
-      const result = (await Icon()) as { element: React.ReactElement };
+      const result = (await Icon()) as unknown as {
+        element: React.ReactElement;
+      };
 
       const elementStr = JSON.stringify(result.element);
       // Should use the brand green colors

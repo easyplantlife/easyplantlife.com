@@ -118,7 +118,9 @@ describe("Home Page Integration Tests", () => {
 
       // Navigation links
       expect(screen.getByRole("link", { name: /blog/i })).toBeInTheDocument();
-      expect(screen.getAllByRole("link", { name: /book/i }).length).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByRole("link", { name: /book/i }).length
+      ).toBeGreaterThanOrEqual(1);
     });
   });
 
