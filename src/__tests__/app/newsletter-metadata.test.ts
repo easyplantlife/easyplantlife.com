@@ -115,8 +115,7 @@ describe("Newsletter Page SEO Metadata", () => {
   describe("Additional SEO Best Practices", () => {
     it("has robots metadata allowing indexing", () => {
       const robots = metadata.robots as
-        | { index?: boolean; follow?: boolean }
-        | undefined;
+        { index?: boolean; follow?: boolean } | undefined;
       if (robots) {
         expect(robots.index).toBe(true);
         expect(robots.follow).toBe(true);
