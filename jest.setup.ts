@@ -1,5 +1,15 @@
+import { TextDecoder, TextEncoder } from "util";
 import "@testing-library/jest-dom";
 import { toHaveNoViolations } from "jest-axe";
+
+// postal-mime (pulled in by resend >= 6.9.2) uses TextEncoder at module load.
+// jsdom does not provide these globals.
+if (typeof globalThis.TextEncoder === "undefined") {
+  globalThis.TextEncoder = TextEncoder;
+}
+if (typeof globalThis.TextDecoder === "undefined") {
+  globalThis.TextDecoder = TextDecoder as typeof globalThis.TextDecoder;
+}
 
 // Extend expect with jest-axe matchers
 expect.extend(toHaveNoViolations);
