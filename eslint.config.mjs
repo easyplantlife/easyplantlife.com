@@ -20,6 +20,12 @@ const eslintConfig = defineConfig([
   ]),
   // TypeScript strict rules
   {
+    settings: {
+      // eslint-plugin-react (via eslint-config-next) still calls
+      // context.getFilename() when version is "detect". ESLint 10 removed
+      // that method; pin an explicit React version to skip auto-detection.
+      react: { version: "19.2.8" },
+    },
     rules: {
       // Ensure TypeScript type errors are caught
       "@typescript-eslint/no-unused-vars": "error",
