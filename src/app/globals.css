@@ -1,56 +1,140 @@
 @import "tailwindcss";
 
 /*
- * Easy Plant Life - Global Styles
+ * Easy Plant Life - Global Styles & Design Tokens
  *
- * Brand colors and typography are defined in tailwind.config.ts.
- * This file uses CSS custom properties that map to brand values
- * for consistency across the application.
+ * Direction: "Quiet Editorial". Warm off-white ground, one deep green accent,
+ * hairlines instead of cards, Lora for headings and Source Sans 3 for body.
+ *
+ * Raw tokens live on :root as CSS custom properties and are swapped by the
+ * [data-theme="dark"] attribute (set before paint by the theme init script in
+ * src/lib/theme.ts). The @theme block maps them to Tailwind utilities, so
+ * components only ever use semantic classes such as bg-ground, text-ink,
+ * border-line or text-accent and never a raw hex value.
  *
  * Typography:
- * - Headings: Lora (serif) - warm, human, organic feel
- * - Body: Source Sans 3 (sans-serif) - highly readable, friendly
- *
- * Note: This is a calm, brand-first website. We intentionally
- * do not support dark mode to maintain visual consistency
- * with the brand's warm, light aesthetic.
+ * - Headings: Lora (serif) via --font-heading from next/font
+ * - Body: Source Sans 3 (sans-serif) via --font-body from next/font
  */
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  /* Brand colors - vibrant greens matching the logo */
-  --background: #FDFCFB; /* Warm white */
-  --foreground: #2D2D2D; /* Dark text */
-  --primary: #4CAF50; /* Vibrant green */
-  --primary-light: #C5E1A5; /* Light lime */
-  --primary-bright: #8BC34A; /* Bright lime from logo */
-  --primary-dark: #2E7D32; /* Deep green */
-  --accent: #FDD835; /* Sunshine yellow */
-  --accent-light: #FFF9C4; /* Soft yellow */
+  color-scheme: light;
+
+  /* Surfaces */
+  --ground: #fbfaf7; /* page background */
+  --surface: #f6f4ee; /* alternate bands, footer, panels */
+  --tint: #edf3e7; /* success notes, hover fills */
+  --field: #ffffff; /* form controls */
+
+  /* Lines */
+  --line: #e3e0d7; /* hairlines, borders */
+  --tint-line: #b7c7ae; /* borders on tinted surfaces */
+
+  /* Text - all meet WCAG 2.1 AA (4.5:1) on --ground */
+  --ink: #22281f; /* headings, body */
+  --ink-soft: #3e4538; /* long-form prose */
+  --muted: #5b6155; /* secondary text */
+  --faint: #6e746a; /* captions, helper text */
+
+  /* Accent - one deep green for links, buttons and eyebrows */
+  --accent: #2f5d3a;
+  --accent-hover: #264b2f;
+  --on-accent: #fbfaf7;
+
+  /* Feedback */
+  --error: #8a3b2c;
+
+  /* Effects */
+  --shadow-cover: 0 10px 24px rgba(34, 40, 31, 0.14);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ground: #181c16;
+  --surface: #1f2520;
+  --tint: #23321f;
+  --field: #232a22;
+
+  --line: #2e352c;
+  --tint-line: #5a7a54;
+
+  --ink: #efede6;
+  --ink-soft: #d5d9cf;
+  --muted: #c3c8bb;
+  --faint: #98a091;
+
+  --accent: #9fc48f;
+  --accent-hover: #bbd9ae;
+  --on-accent: #181c16;
+
+  --error: #f0a28f;
+
+  --shadow-cover: 0 14px 30px rgba(0, 0, 0, 0.45);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-light: var(--primary-light);
-  --color-primary-dark: var(--primary-dark);
+  /* Replace the default palette so only brand tokens exist as utilities. */
+  --color-*: initial;
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-tint: var(--tint);
+  --color-field: var(--field);
+  --color-line: var(--line);
+  --color-tint-line: var(--tint-line);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
   --color-accent: var(--accent);
-  --font-sans: var(--font-body);
-  --font-serif: var(--font-heading);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-error: var(--error);
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --font-serif: var(--font-heading), Georgia, serif;
+  --font-sans: var(--font-body), system-ui, sans-serif;
+
+  --shadow-cover: var(--shadow-cover);
+  --radius-pill: 999px;
+
+  /* Content widths (max-w-content, max-w-prose, max-w-narrow, max-w-wide) */
+  --container-content: 70rem; /* 1120px */
+  --container-prose: 42.5rem; /* 680px */
+  --container-narrow: 44rem; /* 704px */
+  --container-wide: 80rem; /* 1280px */
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--ground);
+  color: var(--ink);
   font-family: var(--font-body), system-ui, sans-serif;
-  line-height: 1.75; /* Relaxed line height for body text readability */
+  line-height: 1.6; /* Relaxed line height for body text readability */
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 /*
  * Heading styles
  * Apply serif font to all headings for consistent brand typography
  */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading), Georgia, serif;
-  line-height: 1.25; /* Tighter line height for headings */
+  line-height: 1.2; /* Tighter line height for headings */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
 }
