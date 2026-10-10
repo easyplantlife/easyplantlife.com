@@ -1,38 +1,25 @@
 import type { HTMLAttributes } from "react";
-import { BookCard } from "./BookCard";
 import type { Book } from "@/content/books";
+import { cn } from "@/lib/utils";
+import { BookItem } from "./BookItem";
 
 export interface BooksListProps extends HTMLAttributes<HTMLDivElement> {
-  /** Array of books to display */
   books: Book[];
 }
 
 /**
- * BooksList Component
+ * BooksList
  *
- * Displays a list of books in a responsive grid/column layout.
- * Uses BookCard components for individual book display.
- *
- * Layout:
- * - Single column on mobile for easy scanning
- * - May expand to multi-column on larger screens
- * - Consistent spacing between book cards
- *
- * @example
- * ```tsx
- * import { books } from "@/content/books";
- *
- * <BooksList books={books} />
- * ```
+ * Full book rows separated by hairlines.
  */
 export function BooksList({ books, className = "", ...props }: BooksListProps) {
   return (
     <div
-      className={`grid grid-cols-1 gap-10 sm:gap-14 ${className}`}
+      className={cn("flex flex-col border-b border-line", className)}
       {...props}
     >
       {books.map((book) => (
-        <BookCard key={book.id} book={book} />
+        <BookItem key={book.id} book={book} variant="full" />
       ))}
     </div>
   );

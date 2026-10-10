@@ -1,47 +1,41 @@
 import type { HTMLAttributes } from "react";
-import { BlogPostCard } from "@/components/blog/BlogPostCard";
 import { Text } from "@/components/ui/Text";
 import type { BlogPost } from "@/lib/types/blog";
+import { cn } from "@/lib/utils";
+import { BlogPostRow } from "./BlogPostRow";
 
 export interface BlogPostsListProps extends HTMLAttributes<HTMLElement> {
-  /** Array of blog posts to display */
   posts: BlogPost[];
-  /** Whether posts are currently loading */
   isLoading?: boolean;
-  /** Error message to display */
+  /** Message shown instead of the list when the feed failed to load. */
   error?: string;
+  /** Show at most this many posts. */
+  limit?: number;
+  headingLevel?: 2 | 3;
 }
 
 /**
- * BlogPostsList Component
+ * BlogPostsList
  *
- * Displays a list of blog posts with support for loading, empty, and error states.
- * Uses semantic list markup and BlogPostCard components for each post.
- *
- * @example
- * ```tsx
- * <BlogPostsList posts={posts} />
- * <BlogPostsList posts={[]} isLoading />
- * <BlogPostsList posts={[]} error="Failed to load posts" />
- * ```
+ * Hairline list of posts with calm loading, error and empty states.
  */
 export function BlogPostsList({
   posts,
   isLoading = false,
   error,
+  limit,
+  headingLevel = 2,
   className = "",
   ...props
 }: BlogPostsListProps) {
-  // Loading state
   if (isLoading) {
     return (
       <div role="status" aria-live="polite" className={className} {...props}>
-        <Text color="secondary">Loading posts...</Text>
+        <Text color="secondary">Loading posts…</Text>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div role="alert" className={className} {...props}>
@@ -50,25 +44,28 @@ export function BlogPostsList({
     );
   }
 
-  // Empty state
-  if (posts.length === 0) {
+  const visible = typeof limit === "number" ? posts.slice(0, limit) : posts;
+
+  if (visible.length === 0) {
     return (
       <div className={className} {...props}>
-        <Text color="secondary">No posts available yet. Check back soon!</Text>
+        <Text color="secondary">
+          Nothing published yet. New writing appears here as soon as it is on
+          Medium.
+        </Text>
       </div>
     );
   }
 
-  // Posts list
   return (
     <ul
       aria-label="Blog posts"
-      className={`space-y-8 ${className}`.trim()}
+      className={cn("flex flex-col border-b border-line", className)}
       {...props}
     >
-      {posts.map((post) => (
+      {visible.map((post) => (
         <li key={post.url}>
-          <BlogPostCard post={post} />
+          <BlogPostRow post={post} headingLevel={headingLevel} />
         </li>
       ))}
     </ul>
