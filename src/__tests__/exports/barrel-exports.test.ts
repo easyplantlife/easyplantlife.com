@@ -100,18 +100,17 @@ describe("Barrel Exports", () => {
     });
   });
 
+  describe("lib/blog/index.ts", () => {
+    it("exports the post loader and the Markdown renderer", async () => {
+      const blog = await import("@/lib/blog");
+      expect(typeof blog.getAllPosts).toBe("function");
+      expect(typeof blog.getPostBySlug).toBe("function");
+      expect(typeof blog.getPostSlugs).toBe("function");
+      expect(typeof blog.renderMarkdown).toBe("function");
+    });
+  });
+
   describe("lib/api/index.ts", () => {
-    it("exports fetchMediumPosts function", async () => {
-      const { fetchMediumPosts } = await import("@/lib/api");
-      expect(fetchMediumPosts).toBeDefined();
-      expect(typeof fetchMediumPosts).toBe("function");
-    });
-
-    it("exports getBlogPosts function", async () => {
-      const { getBlogPosts } = await import("@/lib/api");
-      expect(typeof getBlogPosts).toBe("function");
-    });
-
     it("exports the browser form callers", async () => {
       const { subscribeToNewsletter, sendContactMessage } =
         await import("@/lib/api");

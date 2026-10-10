@@ -85,13 +85,12 @@ describe("Site Performance (M11-02)", () => {
       }
     });
 
-    it("next.config.ts allows Medium image domains for optimization", () => {
+    it("next.config.ts no longer allow-lists Medium image hosts", () => {
       const configPath = path.join(process.cwd(), "next.config.ts");
       const configContent = fs.readFileSync(configPath, "utf-8");
 
-      // Should configure remote patterns for Medium images
-      expect(configContent).toContain("remotePatterns");
-      expect(configContent).toContain("miro.medium.com");
+      // Post images are served from /public, so no remote host is needed
+      expect(configContent).not.toContain("medium.com");
     });
 
     it("images in public folder use optimized formats", () => {
