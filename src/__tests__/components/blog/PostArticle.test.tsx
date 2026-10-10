@@ -84,6 +84,55 @@ describe("PostArticle", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("renders the cover with its caption before the body", () => {
+    render(
+      <PostArticle
+        post={{
+          ...post,
+          cover: {
+            src: "/images/blog/default-meals/00.jpeg",
+            alt: "A sink",
+            caption: "Soft light.",
+          },
+        }}
+      />
+    );
+    const cover = screen.getByTestId("post-cover");
+    expect(cover.tagName).toBe("FIGURE");
+    const img = within(cover).getByRole("img", { name: "A sink" });
+    expect(decodeURIComponent(img.getAttribute("src") ?? "")).toContain(
+      "/images/blog/default-meals/00.jpeg"
+    );
+    expect(img).not.toHaveAttribute("loading", "lazy");
+    expect(within(cover).getByText("Soft light.").tagName).toBe("FIGCAPTION");
+    const body = screen.getByTestId("post-body");
+    expect(
+      cover.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
+  it("omits the cover and its caption when the post has none", () => {
+    render(
+      <PostArticle post={{ ...post, cover: { src: "/a.jpeg", alt: "A" } }} />
+    );
+    expect(
+      screen.getByTestId("post-cover").querySelector("figcaption")
+    ).toBeNull();
+    render(<PostArticle post={post} />);
+    expect(screen.getAllByTestId("post-cover")).toHaveLength(1);
+  });
+
+  it("keeps the date line in a meta rail next to the body", () => {
+    render(<PostArticle post={post} />);
+    const rail = screen.getByTestId("post-meta");
+    expect(within(rail).getByText("March 14, 2026").tagName).toBe("TIME");
+    expect(within(rail).getByText("4 min read")).toBeInTheDocument();
+    expect(rail.parentElement?.className).toContain("flex-wrap");
+    expect(rail.parentElement).toContainElement(
+      screen.getByTestId("post-body")
+    );
+  });
+
   it("forwards extra props", () => {
     render(<PostArticle post={post} className="mt-2" id="post" />);
     expect(screen.getByRole("article")).toHaveAttribute("id", "post");

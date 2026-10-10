@@ -40,6 +40,7 @@ const post: BlogPostContent = {
   lead: "The meal you do not have to think about.",
   thumbnail: "/images/blog/default-meals/01.jpeg",
   originalUrl: "https://easyplantlife.medium.com/default-meals-abc123",
+  cover: { src: "/images/blog/default-meals/01.jpeg", alt: "A pot" },
   html: "<p>The body of the post.</p>\n<h2>A section</h2>\n",
 };
 
@@ -93,6 +94,14 @@ describe("Blog Post Page", () => {
       expect(
         screen.getByRole("heading", { level: 2, name: "A section" })
       ).toBeInTheDocument();
+    });
+
+    it("renders the cover at the page content width", async () => {
+      await renderPost();
+      const main = screen.getByRole("main");
+      expect(main.querySelector(".max-w-content")).not.toBeNull();
+      expect(main.querySelector(":scope > .max-w-prose")).toBeNull();
+      expect(screen.getByRole("img", { name: "A pot" })).toBeInTheDocument();
     });
 
     it("includes BlogPosting structured data", async () => {

@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <main className="flex-1 pb-24 pt-20">
-      <Container variant="prose">
+      <Container>
         <BlogPostingJsonLd post={post} />
         <PostArticle post={post} />
         <PreferEmail />

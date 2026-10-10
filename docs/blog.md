@@ -1,4 +1,4 @@
-# Blog
+| `image` | no | Used for social previews and structured data (see below). |# Blog
 
 The blog is self-hosted. Each post is one Markdown file in
 `src/content/posts/`, read at build time by `src/lib/blog/posts.ts` and
@@ -37,6 +37,9 @@ network call: adding a post is adding a file.
 
 4. Write the body in CommonMark. House rules:
    - `##` for section headings (the title is the h1).
+   - An image on the very first line of the body is the cover: it is shown
+     full width above the text instead of inside it. Point `image` at the
+     same file so social previews match.
    - An image on its own line becomes a `<figure>`. Its title becomes the
      caption: `![alt text](/images/blog/<slug>/02.jpeg "Caption")`.
    - End a line with `\` for a hard line break inside a paragraph.

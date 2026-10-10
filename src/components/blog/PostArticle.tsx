@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { HTMLAttributes } from "react";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -26,50 +27,75 @@ function formatDateISO(date: Date): string {
 /**
  * PostArticle
  *
- * One full post: eyebrow, title, optional lead and a date line, then the
- * body rendered from Markdown, then a hairline footer with the way back to
- * the list and, when the piece was first published elsewhere, a quiet
- * pointer to the original.
+ * One full post. The header (eyebrow, title, optional lead) and the cover
+ * run the full content width. Below them a meta rail (date, read time)
+ * sits beside the prose column on wide screens and above it on narrow
+ * ones. A hairline footer holds the way back to the list and, when the
+ * piece was first published elsewhere, a quiet pointer to the original.
  */
 export function PostArticle({
   post,
   className = "",
   ...props
 }: PostArticleProps) {
-  const { title, lead, html, publishedDate, readTime, originalUrl } = post;
+  const { title, lead, html, cover, publishedDate, readTime, originalUrl } =
+    post;
 
   return (
     <article
       data-testid="post-article"
-      className={cn("flex flex-col gap-10", className)}
+      className={cn("flex flex-col gap-12", className)}
       {...props}
     >
       <header className="flex flex-col gap-5">
         <Eyebrow>Blog</Eyebrow>
-        <Heading level={1}>{title}</Heading>
+        <Heading level={1} className="max-w-[18ch]">
+          {title}
+        </Heading>
         {lead && (
           <Text size="xl" color="secondary" className="max-w-[54ch]">
             {lead}
           </Text>
         )}
-        <p className="font-sans text-[15px] text-faint">
+      </header>
+
+      {cover && (
+        <figure data-testid="post-cover" className="flex flex-col gap-3">
+          <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-surface">
+            <Image
+              src={cover.src}
+              alt={cover.alt}
+              fill
+              priority
+              sizes="(max-width: 70rem) 100vw, 1120px"
+              className="object-cover"
+            />
+          </div>
+          {cover.caption && (
+            <figcaption className="text-center font-sans text-sm text-faint">
+              {cover.caption}
+            </figcaption>
+          )}
+        </figure>
+      )}
+
+      <div className="flex flex-wrap gap-x-20 gap-y-6">
+        <p
+          data-testid="post-meta"
+          className="flex w-44 shrink-0 flex-col gap-1 pt-1 font-sans text-[15px] text-faint"
+        >
           <time dateTime={formatDateISO(publishedDate)}>
             {formatDate(publishedDate)}
           </time>
-          {readTime && (
-            <>
-              <span aria-hidden="true"> · </span>
-              <span>{readTime} min read</span>
-            </>
-          )}
+          {readTime && <span>{readTime} min read</span>}
         </p>
-      </header>
 
-      <div
-        data-testid="post-body"
-        className="post-body"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+        <div
+          data-testid="post-body"
+          className="post-body min-w-0 max-w-prose flex-1 basis-[30rem]"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
 
       <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6">
         <ArrowLink href="/blog">All posts</ArrowLink>
