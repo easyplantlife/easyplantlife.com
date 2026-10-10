@@ -12,6 +12,9 @@ const config: Config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    // marked publishes ESM only; Jest runs CommonJS, so point it at the UMD
+    // build of the same source. Next.js itself uses the ESM entry.
+    "^marked$": "<rootDir>/node_modules/marked/lib/marked.umd.js",
   },
   testPathIgnorePatterns: ["<rootDir>/node_modules/", "<rootDir>/.next/"],
   collectCoverageFrom: [
