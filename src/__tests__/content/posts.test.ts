@@ -56,9 +56,12 @@ describe("Published posts", () => {
     });
 
     it("only references local images that exist", () => {
-      const sources = [...post.html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(
-        (match) => match[1]
-      );
+      const sources = [
+        ...(post.cover ? [post.cover.src] : []),
+        ...[...post.html.matchAll(/<img[^>]+src="([^"]+)"/g)].map(
+          (match) => match[1]
+        ),
+      ];
       expect(sources.length).toBeGreaterThan(0);
       for (const src of sources) {
         expect(src).toMatch(/^\/images\/blog\//);

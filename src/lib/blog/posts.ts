@@ -21,7 +21,7 @@ import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
 import type { BlogPostContent, BlogPostEntry } from "@/lib/types/blog";
-import { renderMarkdown } from "./markdown";
+import { renderMarkdown, splitLeadImage } from "./markdown";
 
 /** Where the post files live. */
 export const POSTS_DIRECTORY = path.join(
@@ -196,10 +196,18 @@ export function getAllPosts(): BlogPostEntry[] {
 
 /**
  * One post with its body rendered to HTML, or null when there is no such
- * post. Slugs that could escape the posts directory are treated as missing.
+ * post. An image that opens the body becomes the cover instead of part of
+ * the HTML. Slugs that could escape the posts directory are treated as
+ * missing.
  */
 export function getPostBySlug(slug: string): BlogPostContent | null {
   const post = readPostFile(slug);
   if (!post) return null;
-  return { ...post.entry, html: renderMarkdown(post.body) };
+  const { cover, body } = splitLeadImage(post.body);
+  const content: BlogPostContent = {
+    ...post.entry,
+    html: renderMarkdown(body),
+  };
+  if (cover) content.cover = cover;
+  return content;
 }

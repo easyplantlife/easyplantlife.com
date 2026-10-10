@@ -45,9 +45,24 @@ export interface BlogPostEntry extends BlogPost {
 }
 
 /**
+ * An image that stands on its own, with the alt text and optional caption
+ * the author wrote in Markdown.
+ */
+export interface PostImage {
+  /** Image path under public/ */
+  src: string;
+  /** Alt text; empty when the image is decorative */
+  alt: string;
+  /** Optional caption shown under the image */
+  caption?: string;
+}
+
+/**
  * A post with its body rendered to HTML, for the post page.
  */
 export interface BlogPostContent extends BlogPostEntry {
+  /** The image that opened the body, shown full width above the text */
+  cover?: PostImage;
   /** Body rendered from Markdown */
   html: string;
 }

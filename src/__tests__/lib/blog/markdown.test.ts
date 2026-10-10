@@ -1,4 +1,4 @@
-import { renderMarkdown } from "@/lib/blog/markdown";
+import { renderMarkdown, splitLeadImage } from "@/lib/blog/markdown";
 
 describe("renderMarkdown", () => {
   it("renders headings, paragraphs and emphasis", () => {
@@ -48,5 +48,39 @@ describe("renderMarkdown", () => {
 
   it("returns an empty string for empty input", () => {
     expect(renderMarkdown("")).toBe("");
+  });
+});
+
+describe("splitLeadImage", () => {
+  it("lifts an image that opens the body out as the cover", () => {
+    const { cover, body } = splitLeadImage(
+      '![A sink](/images/blog/post/01.jpeg "Soft light.")\n\nFirst paragraph.'
+    );
+    expect(cover).toEqual({
+      src: "/images/blog/post/01.jpeg",
+      alt: "A sink",
+      caption: "Soft light.",
+    });
+    expect(body).toBe("First paragraph.");
+  });
+
+  it("leaves the caption out when the image has no title", () => {
+    const { cover } = splitLeadImage("![A sink](/img.jpeg)\n\nText.");
+    expect(cover).toEqual({ src: "/img.jpeg", alt: "A sink" });
+    expect(cover).not.toHaveProperty("caption");
+  });
+
+  it("keeps the body whole when it does not open with an image", () => {
+    const markdown = "First paragraph.\n\n![A sink](/img.jpeg)";
+    expect(splitLeadImage(markdown)).toEqual({ body: markdown });
+  });
+
+  it("does not take an image that shares its paragraph with text", () => {
+    const markdown = "![A sink](/img.jpeg) and some words.";
+    expect(splitLeadImage(markdown)).toEqual({ body: markdown });
+  });
+
+  it("handles an empty body", () => {
+    expect(splitLeadImage("")).toEqual({ body: "" });
   });
 });

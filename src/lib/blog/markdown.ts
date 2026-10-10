@@ -11,6 +11,7 @@
  */
 
 import { Marked, type Tokens } from "marked";
+import type { PostImage } from "@/lib/types/blog";
 
 function escapeHtml(value: string): string {
   return value
@@ -49,6 +50,32 @@ const marked = new Marked({
     },
   },
 });
+
+export interface SplitLeadImage {
+  /** The image that opened the body, when there was one. */
+  cover?: PostImage;
+  /** The body without that image. */
+  body: string;
+}
+
+/**
+ * Lifts an image that opens the body out as the cover. Only a lone image in
+ * the very first paragraph counts; everything else stays in the body.
+ */
+export function splitLeadImage(markdown: string): SplitLeadImage {
+  const [first] = marked.lexer(markdown);
+  if (
+    first?.type !== "paragraph" ||
+    !first.tokens ||
+    !isLoneImage(first.tokens)
+  ) {
+    return { body: markdown };
+  }
+  const [image] = first.tokens;
+  const cover: PostImage = { src: image.href, alt: image.text };
+  if (image.title) cover.caption = image.title;
+  return { cover, body: markdown.slice(first.raw.length).trim() };
+}
 
 /**
  * Renders a Markdown string to HTML.

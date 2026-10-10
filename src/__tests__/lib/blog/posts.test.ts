@@ -133,6 +133,13 @@ describe("getPostBySlug", () => {
     expect(post?.html).toMatch(/<p>/);
   });
 
+  it("lifts the opening image out of the body as the cover", () => {
+    const post = getPostBySlug(getPostSlugs()[0]);
+    expect(post?.cover?.src).toBe(post?.thumbnail);
+    expect(post?.cover?.alt).toEqual(expect.any(String));
+    expect(post?.html).not.toContain(post?.thumbnail);
+  });
+
   it("returns null for an unknown slug", () => {
     expect(getPostBySlug("missing")).toBeNull();
   });
