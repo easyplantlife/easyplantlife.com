@@ -36,6 +36,17 @@ describe("BlogPostsList", () => {
       expect(within(list).getAllByRole("article")).toHaveLength(3);
     });
 
+    it("shows thumbnails only when asked", () => {
+      const withCover = [
+        { ...posts[0], thumbnail: "/images/blog/first/01.jpeg" },
+      ];
+      const { unmount } = render(<BlogPostsList posts={withCover} />);
+      expect(screen.queryByTestId("post-thumbnail")).not.toBeInTheDocument();
+      unmount();
+      render(<BlogPostsList posts={withCover} showThumbnails />);
+      expect(screen.getByTestId("post-thumbnail")).toBeInTheDocument();
+    });
+
     it("closes the hairline list with a bottom border", () => {
       render(<BlogPostsList posts={posts} />);
       expect(screen.getByRole("list").className).toContain("border-b");

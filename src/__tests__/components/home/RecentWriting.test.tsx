@@ -78,4 +78,21 @@ describe("RecentWriting", () => {
     render(<RecentWriting posts={[]} />);
     expect(screen.getByText(/nothing published yet/i)).toBeInTheDocument();
   });
+
+  it("keeps the list text-only even when posts have covers", () => {
+    render(
+      <RecentWriting
+        posts={[
+          {
+            title: "With a cover",
+            excerpt: "An excerpt.",
+            url: "/blog/with-a-cover",
+            publishedDate: new Date("2026-01-01T00:00:00Z"),
+            thumbnail: "/images/blog/with-a-cover/01.jpeg",
+          },
+        ]}
+      />
+    );
+    expect(screen.queryByTestId("post-thumbnail")).not.toBeInTheDocument();
+  });
 });

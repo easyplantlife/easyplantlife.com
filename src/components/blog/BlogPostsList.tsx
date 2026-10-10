@@ -12,6 +12,8 @@ export interface BlogPostsListProps extends HTMLAttributes<HTMLElement> {
   /** Show at most this many posts. */
   limit?: number;
   headingLevel?: 2 | 3;
+  /** Show each post's cover as a thumbnail on wide screens. */
+  showThumbnails?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function BlogPostsList({
   error,
   limit,
   headingLevel = 2,
+  showThumbnails = false,
   className = "",
   ...props
 }: BlogPostsListProps) {
@@ -64,7 +67,11 @@ export function BlogPostsList({
     >
       {visible.map((post) => (
         <li key={post.url}>
-          <BlogPostRow post={post} headingLevel={headingLevel} />
+          <BlogPostRow
+            post={post}
+            headingLevel={headingLevel}
+            showThumbnail={showThumbnails}
+          />
         </li>
       ))}
     </ul>

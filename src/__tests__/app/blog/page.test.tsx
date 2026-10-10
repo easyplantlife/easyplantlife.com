@@ -100,6 +100,13 @@ describe("Blog Page", () => {
       }
     });
 
+    it("shows each post's cover as a thumbnail when it has one", () => {
+      renderBlog();
+      const thumbnails = screen.getAllByTestId("post-thumbnail");
+      expect(thumbnails).toHaveLength(1);
+      expect(thumbnails[0]).toHaveAttribute("href", "/blog/good-enough");
+    });
+
     it("shows excerpts, dates and read times", () => {
       renderBlog();
       expect(

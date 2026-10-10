@@ -1,3 +1,5 @@
+import Image from "next/image";
+import NextLink from "next/link";
 import type { HTMLAttributes } from "react";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Heading, type HeadingLevel } from "@/components/ui/Heading";
@@ -10,6 +12,8 @@ export interface BlogPostRowProps extends HTMLAttributes<HTMLElement> {
   post: BlogPost;
   /** Heading level for the post title; 2 on the blog page, 3 on the home page. */
   headingLevel?: Extract<HeadingLevel, 2 | 3>;
+  /** Show the cover as a small thumbnail at the end of the row on wide screens. */
+  showThumbnail?: boolean;
 }
 
 function formatDate(date: Date): string {
@@ -28,16 +32,19 @@ function formatDateISO(date: Date): string {
  * BlogPostRow
  *
  * One post in a hairline list: date and read time on the left, title,
- * excerpt and a "Read the post" link on the right. The row wraps to a
- * single column when it gets narrow.
+ * excerpt and a "Read the post" link on the right, and optionally the cover
+ * as a small thumbnail at the end. The row wraps to a single column when it
+ * gets narrow, and the thumbnail only appears from the large breakpoint, where the
+ * three columns fit side by side.
  */
 export function BlogPostRow({
   post,
   headingLevel = 3,
+  showThumbnail = false,
   className = "",
   ...props
 }: BlogPostRowProps) {
-  const { title, excerpt, url, publishedDate, readTime } = post;
+  const { title, excerpt, url, publishedDate, readTime, thumbnail } = post;
 
   return (
     <article
@@ -80,6 +87,26 @@ export function BlogPostRow({
           Read the post
         </ArrowLink>
       </div>
+
+      {showThumbnail && thumbnail && (
+        // The title already links to the post, so the picture is a silent
+        // duplicate: out of the tab order and invisible to screen readers.
+        <NextLink
+          href={url}
+          aria-hidden="true"
+          tabIndex={-1}
+          data-testid="post-thumbnail"
+          className="relative hidden aspect-[16/10] w-40 shrink-0 self-start overflow-hidden rounded-xl bg-surface lg:block"
+        >
+          <Image
+            src={thumbnail}
+            alt=""
+            fill
+            sizes="160px"
+            className="object-cover"
+          />
+        </NextLink>
+      )}
     </article>
   );
 }

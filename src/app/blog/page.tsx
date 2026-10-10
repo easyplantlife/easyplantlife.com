@@ -26,6 +26,7 @@ export default function BlogPage() {
       <BlogPostsList
         posts={posts}
         headingLevel={2}
+        showThumbnails
         data-testid="blog-posts-list"
       />
 

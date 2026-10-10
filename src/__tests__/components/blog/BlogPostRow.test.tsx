@@ -79,6 +79,31 @@ describe("BlogPostRow", () => {
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
+  it("renders the cover as a thumbnail at the end of the row when asked", () => {
+    render(
+      <BlogPostRow
+        post={{ ...post, thumbnail: "/images/blog/default-meals/01.jpeg" }}
+        showThumbnail
+      />
+    );
+    const thumbnail = screen.getByTestId("post-thumbnail");
+    expect(thumbnail).toHaveAttribute("href", post.url);
+    expect(thumbnail).toHaveAttribute("aria-hidden", "true");
+    expect(thumbnail).toHaveAttribute("tabindex", "-1");
+    const img = thumbnail.querySelector("img");
+    expect(decodeURIComponent(img?.getAttribute("src") ?? "")).toContain(
+      "/images/blog/default-meals/01.jpeg"
+    );
+    expect(img).toHaveAttribute("alt", "");
+    const article = screen.getByRole("article");
+    expect(article.lastElementChild).toBe(thumbnail);
+  });
+
+  it("skips the thumbnail when the post has no cover", () => {
+    render(<BlogPostRow post={post} showThumbnail />);
+    expect(screen.queryByTestId("post-thumbnail")).not.toBeInTheDocument();
+  });
+
   it("forwards extra props", () => {
     render(<BlogPostRow post={post} data-testid="row" className="mt-2" />);
     expect(screen.getByTestId("row").className).toContain("mt-2");
