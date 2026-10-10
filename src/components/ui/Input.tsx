@@ -1,100 +1,86 @@
 import { forwardRef, useId, type InputHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
+import { controlBorderStyles, controlStyles, FormField } from "./FormField";
 
 export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "size"
 > {
-  /** Label text for the input */
   label?: string;
-  /** Error message to display below the input */
+  /** Keep the label for assistive tech but do not show it. */
+  hideLabel?: boolean;
+  hint?: string;
   error?: string;
+  /** Classes for the wrapping field (label + control), e.g. flex sizing. */
+  wrapperClassName?: string;
 }
 
 /**
- * Input Component
+ * Input
  *
- * A reusable input component following the Easy Plant Life design system.
- * Supports labels, error states, and includes proper accessibility features.
- *
- * @example
- * ```tsx
- * // Basic input with label
- * <Input label="Email" placeholder="Enter your email" />
- *
- * // Input with error state
- * <Input label="Email" error="Email is required" />
- *
- * // Input without label
- * <Input placeholder="Search..." aria-label="Search" />
- * ```
+ * Single-line text control. With a label it renders a full FormField; without
+ * one it renders the bare control (pass aria-label in that case).
  */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
     label,
+    hideLabel = false,
+    hint,
     error,
+    wrapperClassName,
     id: providedId,
     type = "text",
     disabled = false,
     className = "",
+    "aria-describedby": describedBy,
     ...props
   },
   ref
 ) {
   const generatedId = useId();
-  const inputId = providedId || (label ? generatedId : undefined);
-  const errorId = inputId ? `${inputId}-error` : undefined;
+  const inputId = providedId ?? generatedId;
+  const hintId = `${inputId}-hint`;
+  const errorId = `${inputId}-error`;
 
-  const baseStyles = [
-    // Base styling
-    "w-full",
-    "px-4 py-3",
-    "font-body text-base",
-    "rounded-md",
-    "border",
-    "bg-white",
-    "text-neutral-800",
-    "transition-colors duration-200",
-    // Placeholder styling (subtle)
-    "placeholder:text-text-secondary",
-    // Focus styles for accessibility
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:border-primary",
-    // Border color based on error state
-    error ? "border-red-500" : "border-neutral-200",
-    // Disabled styles
-    disabled && "opacity-50 cursor-not-allowed bg-neutral-100",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const describedByIds =
+    [error ? errorId : hint ? hintId : undefined, describedBy]
+      .filter(Boolean)
+      .join(" ") || undefined;
+
+  const control = (
+    <input
+      ref={ref}
+      id={inputId}
+      type={type}
+      disabled={disabled}
+      aria-invalid={error ? "true" : undefined}
+      aria-describedby={describedByIds}
+      className={cn(
+        controlStyles,
+        "h-12",
+        controlBorderStyles(Boolean(error)),
+        className
+      )}
+      {...props}
+    />
+  );
+
+  if (!label) {
+    return control;
+  }
 
   return (
-    <div className="flex flex-col gap-1">
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="font-body text-sm font-medium text-text"
-        >
-          {label}
-        </label>
-      )}
-      <input
-        ref={ref}
-        id={inputId}
-        type={type}
-        disabled={disabled}
-        aria-invalid={error ? "true" : undefined}
-        aria-describedby={error && errorId ? errorId : undefined}
-        className={`${baseStyles} ${className}`.trim()}
-        {...props}
-      />
-      {error && (
-        <span
-          id={errorId}
-          className="font-body text-sm text-red-600"
-          role="alert"
-        >
-          {error}
-        </span>
-      )}
-    </div>
+    <FormField
+      htmlFor={inputId}
+      label={label}
+      hideLabel={hideLabel}
+      hint={hint}
+      hintId={hintId}
+      error={error}
+      errorId={errorId}
+      className={wrapperClassName}
+    >
+      {control}
+    </FormField>
   );
 });

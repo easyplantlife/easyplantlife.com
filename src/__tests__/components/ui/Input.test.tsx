@@ -54,18 +54,18 @@ describe("Input Component", () => {
 
   describe("Error State", () => {
     it("displays error message when error prop is provided", () => {
-      render(<Input error="Email is required" />);
+      render(<Input label="Email" error="Email is required" />);
       expect(screen.getByText("Email is required")).toBeInTheDocument();
     });
 
     it("has error styling when error prop is provided", () => {
-      render(<Input error="Email is required" />);
+      render(<Input label="Email" error="Email is required" />);
       const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("border-red-500");
+      expect(input).toHaveClass("border-error");
     });
 
     it("associates error message with input via aria-describedby", () => {
-      render(<Input error="Email is required" id="email" />);
+      render(<Input label="Email" error="Email is required" id="email" />);
       const input = screen.getByRole("textbox");
       const errorMessage = screen.getByText("Email is required");
       expect(input).toHaveAttribute("aria-describedby", "email-error");
@@ -73,7 +73,7 @@ describe("Input Component", () => {
     });
 
     it("sets aria-invalid when error is present", () => {
-      render(<Input error="Invalid email" />);
+      render(<Input label="Email" error="Invalid email" />);
       const input = screen.getByRole("textbox");
       expect(input).toHaveAttribute("aria-invalid", "true");
     });
@@ -81,7 +81,50 @@ describe("Input Component", () => {
     it("does not have error styling when no error", () => {
       render(<Input />);
       const input = screen.getByRole("textbox");
-      expect(input).not.toHaveClass("border-red-500");
+      expect(input).not.toHaveClass("border-error");
+      expect(input).toHaveClass("border-line");
+    });
+
+    it("announces the error as an alert", () => {
+      render(<Input label="Email" error="Email is required" />);
+      expect(screen.getByRole("alert")).toHaveTextContent("Email is required");
+    });
+  });
+
+  describe("Hint", () => {
+    it("shows a hint and links it via aria-describedby", () => {
+      render(<Input label="Email" hint="Only used to reply to you." />);
+      const input = screen.getByRole("textbox");
+      const hint = screen.getByText("Only used to reply to you.");
+      expect(input).toHaveAttribute("aria-describedby", hint.id);
+    });
+
+    it("replaces the hint with the error when both are given", () => {
+      render(<Input label="Email" hint="Hint" error="Email is required" />);
+      expect(screen.queryByText("Hint")).not.toBeInTheDocument();
+      expect(screen.getByText("Email is required")).toBeInTheDocument();
+    });
+  });
+
+  describe("Hidden Label", () => {
+    it("keeps the label for assistive tech when hideLabel is set", () => {
+      render(<Input label="Email address" hideLabel />);
+      expect(screen.getByText("Email address")).toHaveClass("sr-only");
+      expect(screen.getByLabelText("Email address")).toBeInTheDocument();
+    });
+  });
+
+  describe("Sizing", () => {
+    it("is 48px tall with a 10px radius", () => {
+      render(<Input />);
+      const input = screen.getByRole("textbox");
+      expect(input).toHaveClass("h-12");
+      expect(input).toHaveClass("rounded-[10px]");
+    });
+
+    it("renders the bare control when no label is given", () => {
+      const { container } = render(<Input />);
+      expect(container.firstElementChild?.tagName).toBe("INPUT");
     });
   });
 
@@ -89,8 +132,8 @@ describe("Input Component", () => {
     it("has subtle placeholder styling", () => {
       render(<Input placeholder="Enter text" />);
       const input = screen.getByRole("textbox");
-      // Placeholder should use muted/secondary text color
-      expect(input).toHaveClass("placeholder:text-text-secondary");
+      // Placeholder should use the faint text color
+      expect(input).toHaveClass("placeholder:text-faint");
     });
   });
 
@@ -103,7 +146,7 @@ describe("Input Component", () => {
       await user.tab();
 
       expect(input).toHaveFocus();
-      expect(input).toHaveClass("focus-visible:ring-primary");
+      expect(input).toHaveClass("focus-visible:ring-accent");
     });
 
     it("has visible focus ring styles", () => {
@@ -144,8 +187,8 @@ describe("Input Component", () => {
     it("has disabled styling when disabled", () => {
       render(<Input disabled />);
       const input = screen.getByRole("textbox");
-      expect(input).toHaveClass("opacity-50");
-      expect(input).toHaveClass("cursor-not-allowed");
+      expect(input).toHaveClass("disabled:opacity-60");
+      expect(input).toHaveClass("disabled:cursor-not-allowed");
     });
 
     it("supports required attribute", () => {

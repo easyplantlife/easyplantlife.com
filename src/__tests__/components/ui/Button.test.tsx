@@ -26,30 +26,34 @@ describe("Button Component", () => {
     it("renders with primary variant by default", () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole("button");
-      // Primary variant should have the primary green background color
-      expect(button).toHaveClass("bg-primary");
+      // Primary variant is the filled accent pill
+      expect(button).toHaveClass("bg-accent");
+      expect(button).toHaveClass("text-on-accent");
+      expect(button).toHaveClass("rounded-pill");
     });
 
     it("renders with primary variant explicitly", () => {
       render(<Button variant="primary">Primary</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("bg-primary");
+      expect(button).toHaveClass("bg-accent");
     });
 
     it("renders with secondary variant", () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole("button");
-      // Secondary variant should have a border and transparent background
+      // Secondary variant is outlined: tinted border, accent text
       expect(button).toHaveClass("bg-transparent");
-      expect(button).toHaveClass("border");
+      expect(button).toHaveClass("border-tint-line");
+      expect(button).toHaveClass("text-accent");
     });
 
     it("renders with ghost variant", () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole("button");
-      // Ghost variant should have no background
+      // Ghost variant is text only
       expect(button).toHaveClass("bg-transparent");
-      expect(button).not.toHaveClass("border");
+      expect(button).toHaveClass("text-accent");
+      expect(button).not.toHaveClass("border-tint-line");
     });
   });
 
@@ -57,30 +61,28 @@ describe("Button Component", () => {
     it("renders with medium size by default", () => {
       render(<Button>Medium</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("px-4");
-      expect(button).toHaveClass("py-3");
+      // 48px tall: a comfortable touch target
+      expect(button).toHaveClass("h-12");
+      expect(button).toHaveClass("text-base");
     });
 
     it("renders with small size", () => {
       render(<Button size="sm">Small</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("px-3");
-      expect(button).toHaveClass("py-1.5");
-      expect(button).toHaveClass("text-sm");
+      expect(button).toHaveClass("h-10");
+      expect(button).toHaveClass("text-[15px]");
     });
 
     it("renders with medium size explicitly", () => {
       render(<Button size="md">Medium</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("px-4");
-      expect(button).toHaveClass("py-3");
+      expect(button).toHaveClass("h-12");
     });
 
     it("renders with large size", () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("px-6");
-      expect(button).toHaveClass("py-3");
+      expect(button).toHaveClass("h-14");
       expect(button).toHaveClass("text-lg");
     });
   });
@@ -119,7 +121,7 @@ describe("Button Component", () => {
     it("applies disabled styles when disabled", () => {
       render(<Button disabled>Disabled</Button>);
       const button = screen.getByRole("button");
-      expect(button).toHaveClass("opacity-50");
+      expect(button).toHaveClass("opacity-60");
       expect(button).toHaveClass("cursor-not-allowed");
     });
   });

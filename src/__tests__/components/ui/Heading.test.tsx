@@ -66,52 +66,42 @@ describe("Heading Component", () => {
   });
 
   describe("Styling", () => {
-    it("applies heading font family", () => {
+    it("applies the serif heading font and medium weight", () => {
       render(<Heading level={1}>Styled Heading</Heading>);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("font-heading");
+      expect(heading).toHaveClass("font-serif");
+      expect(heading).toHaveClass("font-medium");
     });
 
-    it("applies correct font size for h1", () => {
+    it("scales h1 fluidly with tight tracking", () => {
       render(<Heading level={1}>H1</Heading>);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-5xl");
+      expect(heading.className).toMatch(/text-\[clamp\(/);
+      expect(heading).toHaveClass("tracking-[-0.015em]");
     });
 
-    it("applies correct font size for h2", () => {
+    it("applies the section size for h2", () => {
       render(<Heading level={2}>H2</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-4xl");
+      expect(screen.getByRole("heading")).toHaveClass("text-[2.125rem]");
     });
 
-    it("applies correct font size for h3", () => {
+    it("applies the item size for h3", () => {
       render(<Heading level={3}>H3</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-3xl");
+      expect(screen.getByRole("heading")).toHaveClass("text-2xl");
     });
 
-    it("applies correct font size for h4", () => {
-      render(<Heading level={4}>H4</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-2xl");
+    it("steps down through h4, h5 and h6", () => {
+      const { rerender } = render(<Heading level={4}>H4</Heading>);
+      expect(screen.getByRole("heading")).toHaveClass("text-xl");
+      rerender(<Heading level={5}>H5</Heading>);
+      expect(screen.getByRole("heading")).toHaveClass("text-lg");
+      rerender(<Heading level={6}>H6</Heading>);
+      expect(screen.getByRole("heading")).toHaveClass("text-base");
     });
 
-    it("applies correct font size for h5", () => {
-      render(<Heading level={5}>H5</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-xl");
-    });
-
-    it("applies correct font size for h6", () => {
-      render(<Heading level={6}>H6</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-lg");
-    });
-
-    it("applies tight line height for headings", () => {
+    it("applies a tight line height to every level", () => {
       render(<Heading level={1}>Heading</Heading>);
-      const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("leading-tight");
+      expect(screen.getByRole("heading").className).toMatch(/leading-\[1\./);
     });
   });
 
@@ -119,7 +109,7 @@ describe("Heading Component", () => {
     it("renders with default color", () => {
       render(<Heading level={1}>Default</Heading>);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-text");
+      expect(heading).toHaveClass("text-ink");
     });
 
     it("renders with secondary color variant", () => {
@@ -129,7 +119,7 @@ describe("Heading Component", () => {
         </Heading>
       );
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-text-secondary");
+      expect(heading).toHaveClass("text-muted");
     });
 
     it("renders with accent color variant", () => {
@@ -139,7 +129,7 @@ describe("Heading Component", () => {
         </Heading>
       );
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-text-accent");
+      expect(heading).toHaveClass("text-accent");
     });
 
     it("renders with inverse color variant", () => {
@@ -149,7 +139,7 @@ describe("Heading Component", () => {
         </Heading>
       );
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("text-text-inverse");
+      expect(heading).toHaveClass("text-on-accent");
     });
   });
 
@@ -171,7 +161,7 @@ describe("Heading Component", () => {
         </Heading>
       );
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("font-heading");
+      expect(heading).toHaveClass("font-serif");
       expect(heading).toHaveClass("custom-class");
     });
   });

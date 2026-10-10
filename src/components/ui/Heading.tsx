@@ -1,67 +1,36 @@
 import { type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-/**
- * Heading level options (1-6)
- */
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/**
- * Color variants for headings
- * - default: Main text color
- * - secondary: Muted/secondary text
- * - accent: Brand green accent
- * - inverse: White text for dark backgrounds
- */
 export type HeadingColor = "default" | "secondary" | "accent" | "inverse";
 
 export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
-  /** Heading level (1-6), determines the HTML tag (h1-h6) */
   level: HeadingLevel;
-  /** Color variant */
   color?: HeadingColor;
 }
 
-/**
- * Font size mapping for each heading level
- * Uses the typography scale from tailwind.config.ts
- */
 const levelStyles: Record<HeadingLevel, string> = {
-  1: "text-5xl",
-  2: "text-4xl",
-  3: "text-3xl",
-  4: "text-2xl",
-  5: "text-xl",
-  6: "text-lg",
+  1: "text-[clamp(2.375rem,4.4vw,3.625rem)] leading-[1.1] tracking-[-0.015em]",
+  2: "text-[2.125rem] leading-[1.2]",
+  3: "text-2xl leading-[1.3]",
+  4: "text-xl leading-[1.3]",
+  5: "text-lg leading-[1.4]",
+  6: "text-base leading-[1.4]",
 };
 
-/**
- * Color styles mapping
- */
 const colorStyles: Record<HeadingColor, string> = {
-  default: "text-text",
-  secondary: "text-text-secondary",
-  accent: "text-text-accent",
-  inverse: "text-text-inverse",
+  default: "text-ink",
+  secondary: "text-muted",
+  accent: "text-accent",
+  inverse: "text-on-accent",
 };
 
 /**
- * Heading Component
+ * Heading
  *
- * A reusable heading component that enforces the typography scale
- * and prevents one-off styling. Uses semantic HTML tags (h1-h6)
- * and the brand serif font (Lora).
- *
- * @example
- * ```tsx
- * // Page title
- * <Heading level={1}>Welcome to Easy Plant Life</Heading>
- *
- * // Section heading
- * <Heading level={2} color="accent">Our Story</Heading>
- *
- * // Sub-section with custom class
- * <Heading level={3} className="mb-4">Chapter One</Heading>
- * ```
+ * Serif heading with a calm scale. Level sets the element and size; pass a
+ * className only to adjust spacing, not type.
  */
 export function Heading({
   level,
@@ -72,15 +41,16 @@ export function Heading({
 }: HeadingProps) {
   const Tag = `h${level}` as const;
 
-  const baseStyles = [
-    "font-heading",
-    "leading-tight",
-    levelStyles[level],
-    colorStyles[color],
-  ].join(" ");
-
   return (
-    <Tag className={`${baseStyles} ${className}`.trim()} {...props}>
+    <Tag
+      className={cn(
+        "font-serif font-medium",
+        levelStyles[level],
+        colorStyles[color],
+        className
+      )}
+      {...props}
+    >
       {children}
     </Tag>
   );
