@@ -1,4 +1,4 @@
-| `image` | no | Used for social previews and structured data (see below). |# Blog
+# Blog
 
 The blog is self-hosted. Each post is one Markdown file in
 `src/content/posts/`, read at build time by `src/lib/blog/posts.ts` and
@@ -31,7 +31,7 @@ network call: adding a post is adding a file.
    | `date`    | yes      | ISO 8601. Posts are listed newest first.                   |
    | `excerpt` | no       | Falls back to the first paragraph of the body.             |
    | `lead`    | no       | One line under the title.                                  |
-   | `image`   | no       | Cover image, used for social previews and structured data. |
+   | `image`   | no       | Thumbnail on `/blog`, social previews and structured data. |
    | `tags`    | no       | Kept for later; not rendered yet.                          |
    | `medium`  | no       | Original URL when the piece was first published on Medium. |
 
