@@ -47,7 +47,7 @@ export function BlogPostRow({
       )}
       {...props}
     >
-      <p className="w-36 shrink-0 pt-1 font-sans text-[15px] text-faint">
+      <p className="w-44 shrink-0 pt-1 font-sans text-[15px] text-faint">
         <time dateTime={formatDateISO(publishedDate)}>
           {formatDate(publishedDate)}
         </time>
