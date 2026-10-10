@@ -29,8 +29,9 @@ function formatDateISO(date: Date): string {
  *
  * One full post. The header (eyebrow, title, optional lead) and the cover
  * run the full content width. Below them a meta rail (date, read time)
- * sits beside the prose column on wide screens and above it on narrow
- * ones. A hairline footer holds the way back to the list and, when the
+ * sits beside the prose column, which fills the rest of the width so its
+ * right edge lines up with the cover; on narrow screens the rail wraps
+ * above the text. A hairline footer holds the way back to the list and, when the
  * piece was first published elsewhere, a quiet pointer to the original.
  */
 export function PostArticle({
@@ -79,10 +80,10 @@ export function PostArticle({
         </figure>
       )}
 
-      <div className="flex flex-wrap gap-x-20 gap-y-6">
+      <div className="flex flex-wrap gap-x-24 gap-y-6">
         <p
           data-testid="post-meta"
-          className="flex w-44 shrink-0 flex-col gap-1 pt-1 font-sans text-[15px] text-faint"
+          className="flex w-48 shrink-0 flex-col gap-1 pt-1 font-sans text-[15px] text-faint"
         >
           <time dateTime={formatDateISO(publishedDate)}>
             {formatDate(publishedDate)}
@@ -92,7 +93,7 @@ export function PostArticle({
 
         <div
           data-testid="post-body"
-          className="post-body min-w-0 max-w-prose flex-1 basis-[30rem]"
+          className="post-body min-w-0 flex-1 basis-[30rem]"
           dangerouslySetInnerHTML={{ __html: html }}
         />
       </div>
