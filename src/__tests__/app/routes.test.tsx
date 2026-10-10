@@ -7,11 +7,11 @@
 
 import { render, screen } from "@testing-library/react";
 
-jest.mock("next/font/google", () => ({
-  Lora: () => ({ variable: "--font-heading", className: "mock-lora" }),
-  Source_Sans_3: () => ({
-    variable: "--font-body",
-    className: "mock-source-sans",
+jest.mock("next/font/local", () => ({
+  __esModule: true,
+  default: (options: { variable: string }) => ({
+    variable: options.variable,
+    className: `mock-${options.variable.replace("--font-", "")}`,
   }),
 }));
 

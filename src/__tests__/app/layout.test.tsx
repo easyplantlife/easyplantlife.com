@@ -21,22 +21,13 @@
 import { render } from "@testing-library/react";
 import { Metadata } from "next";
 
-// Mock next/font/google - must be hoisted
-jest.mock("next/font/google", () => {
-  const mockLora = jest.fn(() => ({
-    variable: "--font-heading",
-    className: "mock-lora",
+// Mock next/font/local - must be hoisted
+jest.mock("next/font/local", () => {
+  const localFont = jest.fn((options: { variable: string }) => ({
+    variable: options.variable,
+    className: `mock-${options.variable.replace("--font-", "")}`,
   }));
-
-  const mockSourceSans3 = jest.fn(() => ({
-    variable: "--font-body",
-    className: "mock-source-sans",
-  }));
-
-  return {
-    Lora: mockLora,
-    Source_Sans_3: mockSourceSans3,
-  };
+  return { __esModule: true, default: localFont };
 });
 
 // Mock GoogleAnalytics component
@@ -79,21 +70,25 @@ describe("Root Layout (M3-01)", () => {
   });
 
   describe("Font Loading", () => {
-    it("loads fonts with display='swap' to prevent layout shift", () => {
+    it("loads both self-hosted fonts with display='swap' to prevent layout shift", () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Lora, Source_Sans_3 } = require("next/font/google");
+      const localFont = require("next/font/local").default as jest.Mock;
 
-      // Check heading font (Lora) configuration
-      expect(Lora).toHaveBeenCalledWith(
+      // Heading font (Lora)
+      expect(localFont).toHaveBeenCalledWith(
         expect.objectContaining({
+          variable: "--font-heading",
           display: "swap",
+          weight: "400 700",
         })
       );
 
-      // Check body font (Source Sans 3) configuration
-      expect(Source_Sans_3).toHaveBeenCalledWith(
+      // Body font (Source Sans 3)
+      expect(localFont).toHaveBeenCalledWith(
         expect.objectContaining({
+          variable: "--font-body",
           display: "swap",
+          weight: "300 600",
         })
       );
     });
