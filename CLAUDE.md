@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Easy Plant Life is a calm, brand-first landing website (not a web app). Primary purpose:
 
 - Communicate brand philosophy clearly
-- Distribute written content (blog via Medium, books)
+- Distribute written content (self-hosted blog, books)
 - Capture newsletter signups via Resend
 
 This is an author/lifestyle brand site, not a startup product.
@@ -17,7 +17,7 @@ This is an author/lifestyle brand site, not a startup product.
 - **Framework**: Next.js with App Router
 - **Styling**: Tailwind CSS
 - **Email**: Resend (newsletter + contact form)
-- **Blog**: Medium integration (external, site displays excerpts only)
+- **Blog**: Self-hosted Markdown posts in `src/content/posts` (see `docs/blog.md`)
 - **Analytics**: Google Analytics 4 (event-based, minimal)
 - **Testing**: Jest + React Testing Library
 
@@ -41,12 +41,14 @@ src/components/ui       # Primitives (Button, ButtonLink, ArrowLink, Input, Text
                         #   Eyebrow, Heading, Text, Container, Panel, StatusNote, ...)
 src/components/theme    # ThemeProvider, ThemeToggle, ThemeScript (light / dark)
 src/components/home     # Home sections (Hero, IdeaSection, RecentWriting, BooksPreview)
-src/components/blog     # BlogPostRow, BlogPostsList (Medium excerpts)
+src/components/blog     # BlogPostRow, BlogPostsList, PostArticle, PreferEmail
 src/components/books    # BookItem, BooksList
 src/components/forms    # NewsletterForm, ContactForm
 src/lib                 # Utilities (theme.ts, utils.ts)
-src/lib/api             # Service layers (medium, blog feed, email, form clients)
+src/lib/api             # Service layers (email, form clients)
+src/lib/blog            # Markdown post loader (posts.ts) and renderer (markdown.ts)
 src/content             # Static content (books, navigation, site config)
+src/content/posts       # Blog posts as Markdown with front matter
 public                  # Static assets
 ```
 

@@ -11,9 +11,10 @@ easyplantlife.com/
 │   ├── components/       # Reusable UI components
 │   │   └── ui/           # Primitive UI components (Button, Input, etc.)
 │   ├── lib/              # Utility functions and helpers
-│   │   └── api/          # API-related utilities (email, medium)
+│   │   ├── api/          # API service layers (email, forms)
+│   │   └── blog/         # Markdown post loader and renderer
 │   ├── styles/           # Global styles
-│   ├── content/          # Static content (books data, etc.)
+│   ├── content/          # Static content (books, site config, blog posts)
 │   ├── types/            # TypeScript type definitions
 │   └── __tests__/        # Test files
 ├── public/               # Static assets
@@ -28,7 +29,7 @@ easyplantlife.com/
 - **`src/lib`**: Shared utility functions and helpers
 - **`src/lib/api`**: API service layers for external integrations
 - **`src/styles`**: Additional global styles beyond Tailwind
-- **`src/content`**: Static content data (books, metadata)
+- **`src/content`**: Static content data (books, metadata) and the blog posts in `src/content/posts`
 - **`public`**: Static assets served directly (images, fonts)
 
 ## Development

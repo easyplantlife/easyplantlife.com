@@ -162,22 +162,21 @@ The logo should feel natural and timeless, not trendy.
 
 **Purpose:** Content hub
 
-**Source of truth:** Medium
+**Source of truth:** Markdown files in the repository (`src/content/posts`)
 
 **On-site behavior:**
 
-- Display a list of recent posts
+- Display a list of posts, newest first
 - Each item shows:
   - Title
   - Short excerpt
-  - Link to read on Medium
+  - Link to the full post on this site
+- Each post has its own page at `/blog/<slug>`
 
 **Important:**
 
-- The website does not host the full articles
-- Medium remains canonical
-
-Integration approach can evolve, but MVP prioritizes reliability over sophistication.
+- The website is canonical for the writing
+- Posts first published on Medium link back to the original
 
 ---
 
@@ -231,8 +230,8 @@ Integration approach can evolve, but MVP prioritizes reliability over sophistica
 
 ### Blog Platform
 
-- **Medium** (external)
-- Website displays excerpts/snippets only
+- Self-hosted Markdown posts, rendered at build time
+- Medium kept only as the archive of the first posts
 
 ### Analytics
 
