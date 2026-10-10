@@ -28,8 +28,8 @@ function formatDateISO(date: Date): string {
  * BlogPostRow
  *
  * One post in a hairline list: date and read time on the left, title,
- * excerpt and an honest "Read on Medium" link on the right. The row wraps
- * to a single column when it gets narrow.
+ * excerpt and a "Read the post" link on the right. The row wraps to a
+ * single column when it gets narrow.
  */
 export function BlogPostRow({
   post,
@@ -75,9 +75,9 @@ export function BlogPostRow({
         <ArrowLink
           href={url}
           className="text-[15px]"
-          aria-label={`Read "${title}" on Medium`}
+          aria-label={`Read "${title}"`}
         >
-          Read on Medium
+          Read the post
         </ArrowLink>
       </div>
     </article>

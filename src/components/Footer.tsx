@@ -9,8 +9,8 @@ import { siteConfig } from "@/content/site";
 /**
  * Footer
  *
- * Brand and tagline, the site's links, and a pointer to Medium where the
- * writing actually lives.
+ * Brand and tagline, the site's links, and a quiet pointer to Medium,
+ * where the writing was first published.
  */
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -51,7 +51,7 @@ export function Footer() {
             variant="plain"
             className="text-faint transition-colors hover:text-ink"
           >
-            Writing lives on Medium <span aria-hidden="true">↗</span>
+            Also on Medium <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </Container>

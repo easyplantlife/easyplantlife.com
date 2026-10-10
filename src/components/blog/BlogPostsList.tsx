@@ -50,8 +50,7 @@ export function BlogPostsList({
     return (
       <div className={className} {...props}>
         <Text color="secondary">
-          Nothing published yet. New writing appears here as soon as it is on
-          Medium.
+          Nothing published yet. New writing appears here as it is written.
         </Text>
       </div>
     );

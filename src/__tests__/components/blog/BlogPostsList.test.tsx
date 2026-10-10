@@ -10,19 +10,19 @@ const posts: BlogPost[] = [
   {
     title: "First post",
     excerpt: "First excerpt",
-    url: "https://medium.com/@easyplantlife/first",
+    url: "/blog/first",
     publishedDate: new Date("2026-03-01T00:00:00Z"),
   },
   {
     title: "Second post",
     excerpt: "Second excerpt",
-    url: "https://medium.com/@easyplantlife/second",
+    url: "/blog/second",
     publishedDate: new Date("2026-02-01T00:00:00Z"),
   },
   {
     title: "Third post",
     excerpt: "Third excerpt",
-    url: "https://medium.com/@easyplantlife/third",
+    url: "/blog/third",
     publishedDate: new Date("2026-01-01T00:00:00Z"),
   },
 ];
@@ -41,11 +41,11 @@ describe("BlogPostsList", () => {
       expect(screen.getByRole("list").className).toContain("border-b");
     });
 
-    it("renders titles, excerpts and Medium links", () => {
+    it("renders titles, excerpts and read links", () => {
       render(<BlogPostsList posts={posts} />);
       expect(screen.getByText("First excerpt")).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: 'Read "Second post" on Medium' })
+        screen.getByRole("link", { name: 'Read "Second post"' })
       ).toHaveAttribute("href", posts[1].url);
     });
 

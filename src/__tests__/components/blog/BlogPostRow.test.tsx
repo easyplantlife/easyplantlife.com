@@ -9,7 +9,7 @@ jest.mock("@/lib/analytics/events", () => ({
 const post: BlogPost = {
   title: "Default meals that survive a bad week",
   excerpt: "A short note on the meals that hold up when nothing else does.",
-  url: "https://medium.com/@easyplantlife/default-meals",
+  url: "/blog/default-meals",
   publishedDate: new Date("2026-03-14T12:00:00Z"),
   readTime: 4,
 };
@@ -39,12 +39,11 @@ describe("BlogPostRow", () => {
     expect(screen.queryByText(/min read/)).not.toBeInTheDocument();
   });
 
-  it("links the title to the Medium post in a new tab", () => {
+  it("links the title to the post on this site", () => {
     render(<BlogPostRow post={post} />);
     const link = screen.getByRole("link", { name: post.title });
     expect(link).toHaveAttribute("href", post.url);
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link).not.toHaveAttribute("target");
   });
 
   it("renders the excerpt", () => {
@@ -52,14 +51,12 @@ describe("BlogPostRow", () => {
     expect(screen.getByText(post.excerpt)).toBeInTheDocument();
   });
 
-  it("renders an honest Read on Medium link with a descriptive label", () => {
+  it("renders a Read the post link with a descriptive label", () => {
     render(<BlogPostRow post={post} />);
-    const link = screen.getByRole("link", {
-      name: `Read "${post.title}" on Medium`,
-    });
+    const link = screen.getByRole("link", { name: `Read "${post.title}"` });
     expect(link).toHaveAttribute("href", post.url);
-    expect(link).toHaveTextContent("Read on Medium");
-    expect(link.textContent).toContain("↗");
+    expect(link).toHaveTextContent("Read the post");
+    expect(link.textContent).toContain("→");
   });
 
   it("uses an h3 by default and h2 on request", () => {

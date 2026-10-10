@@ -1,11 +1,11 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
-import { fetchMediumPosts } from "@/lib/api/medium";
+import { getAllPosts } from "@/lib/blog/posts";
 import { trackNewsletterSubmit } from "@/lib/analytics/events";
 
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn(),
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn(),
 }));
 
 jest.mock("@/lib/analytics/events", () => ({
@@ -14,14 +14,12 @@ jest.mock("@/lib/analytics/events", () => ({
   trackOutboundClick: jest.fn(),
 }));
 
-const mockFetchPosts = fetchMediumPosts as jest.MockedFunction<
-  typeof fetchMediumPosts
->;
+const mockGetAllPosts = getAllPosts as jest.MockedFunction<typeof getAllPosts>;
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-async function renderHome() {
-  return render(await Home());
+function renderHome() {
+  return render(<Home />);
 }
 
 async function subscribe(email: string) {
@@ -38,13 +36,13 @@ async function subscribe(email: string) {
 describe("Home Page Integration", () => {
   beforeEach(() => {
     mockFetch.mockReset();
-    mockFetchPosts.mockReset();
-    mockFetchPosts.mockResolvedValue([
+    mockGetAllPosts.mockReset();
+    mockGetAllPosts.mockReturnValue([
       {
-        id: "1",
+        slug: "default-meals",
         title: "Default meals",
         excerpt: "Why a boring default is the whole trick.",
-        url: "https://medium.com/@easyplantlife/default-meals",
+        url: "/blog/default-meals",
         publishedDate: new Date("2026-03-01"),
       },
     ]);
@@ -151,12 +149,15 @@ describe("Home Page Integration", () => {
       ).toHaveAttribute("href", "/about");
     });
 
-    it("opens Medium and Amazon in new tabs", async () => {
+    it("keeps posts on the site and opens Amazon in a new tab", async () => {
       await renderHome();
-      const external = [
-        ...screen.getAllByRole("link", { name: /on medium/i }),
-        ...screen.getAllByRole("link", { name: /buy on amazon/i }),
-      ];
+      const readLink = screen.getByRole("link", {
+        name: 'Read "Default meals"',
+      });
+      expect(readLink).toHaveAttribute("href", "/blog/default-meals");
+      expect(readLink).not.toHaveAttribute("target");
+
+      const external = screen.getAllByRole("link", { name: /buy on amazon/i });
       expect(external.length).toBeGreaterThan(0);
       for (const link of external) {
         expect(link).toHaveAttribute("target", "_blank");

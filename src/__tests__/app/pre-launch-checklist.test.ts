@@ -200,7 +200,7 @@ describe("Pre-Launch Checklist (M11-05)", () => {
       expect(content).toContain("NEXT_PUBLIC_GA_MEASUREMENT_ID");
       expect(content).toContain("RESEND_API_KEY");
       expect(content).toContain("RESEND_AUDIENCE_ID");
-      expect(content).toContain("MEDIUM_PUBLICATION_URL");
+      expect(content).not.toContain("MEDIUM_PUBLICATION_URL");
     });
   });
 
@@ -269,14 +269,13 @@ describe("Pre-Launch Manual Verification Checklist", () => {
     it.todo("MANUAL: NEXT_PUBLIC_GA_MEASUREMENT_ID set in production");
     it.todo("MANUAL: RESEND_API_KEY set in production");
     it.todo("MANUAL: RESEND_AUDIENCE_ID set in production");
-    it.todo("MANUAL: MEDIUM_PUBLICATION_URL set in production");
   });
 
   describe("Functional Tests (Manual Verification Required)", () => {
     it.todo("MANUAL: Newsletter signup works with real email");
     it.todo("MANUAL: Contact form sends email to correct recipient");
     it.todo("MANUAL: Google Analytics tracking events in real-time view");
-    it.todo("MANUAL: Blog posts load from Medium RSS feed");
+    it.todo("MANUAL: Blog posts render at /blog and /blog/<slug>");
   });
 
   describe("Social Sharing (Manual Verification Required)", () => {

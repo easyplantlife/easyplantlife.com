@@ -41,9 +41,9 @@ describe("Footer", () => {
     expect(screen.getByText(new RegExp(`© ${year}`))).toBeInTheDocument();
   });
 
-  it("links to Medium in a new tab", () => {
+  it("keeps a quiet link to Medium in a new tab", () => {
     render(<Footer />);
-    const link = screen.getByRole("link", { name: /writing lives on medium/i });
+    const link = screen.getByRole("link", { name: /also on medium/i });
     expect(link).toHaveAttribute("href", siteConfig.mediumUrl);
     expect(link).toHaveAttribute("target", "_blank");
   });

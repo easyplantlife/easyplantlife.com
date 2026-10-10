@@ -1,9 +1,17 @@
 import type { MetadataRoute } from "next";
+import { getAllPosts } from "@/lib/blog/posts";
 
 const BASE_URL = "https://easyplantlife.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date();
+
+  const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
+    url: `${BASE_URL}${post.url}`,
+    lastModified: post.publishedDate,
+    changeFrequency: "yearly",
+    priority: 0.6,
+  }));
 
   return [
     {
@@ -42,5 +50,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.5,
     },
+    ...posts,
   ];
 }

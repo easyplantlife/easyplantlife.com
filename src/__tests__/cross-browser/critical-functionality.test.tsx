@@ -12,7 +12,7 @@
  * - Forms (newsletter, contact) including their success states
  * - Interactive components (theme toggle, buttons)
  * - External links (blog, books)
- * - The home page composes and renders with the Medium feed
+ * - The home page composes and renders with the posts loaded
  */
 
 import { render, screen, within, waitFor } from "@testing-library/react";
@@ -31,7 +31,7 @@ import { Input } from "@/components/ui/Input";
 import { BookItem } from "@/components/books/BookItem";
 import { BlogPostRow } from "@/components/blog/BlogPostRow";
 import { subscribeToNewsletter, sendContactMessage } from "@/lib/api/forms";
-import { fetchMediumPosts } from "@/lib/api/medium";
+import { getAllPosts } from "@/lib/blog/posts";
 
 // Mock next/link
 jest.mock("next/link", () => {
@@ -84,9 +84,9 @@ jest.mock("@/lib/api/forms", () => ({
   sendContactMessage: jest.fn().mockResolvedValue(undefined),
 }));
 
-// The home page reads the Medium feed on the server.
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn().mockResolvedValue([]),
+// The home page reads the Markdown posts on the server.
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn().mockReturnValue([]),
 }));
 
 const mockUsePathname = jest.fn<string | null, []>(() => null);
@@ -99,7 +99,7 @@ beforeEach(() => {
   mockUsePathname.mockReturnValue(null);
   (subscribeToNewsletter as jest.Mock).mockResolvedValue(undefined);
   (sendContactMessage as jest.Mock).mockResolvedValue(undefined);
-  (fetchMediumPosts as jest.Mock).mockResolvedValue([]);
+  (getAllPosts as jest.Mock).mockReturnValue([]);
 });
 
 afterEach(() => {
@@ -475,7 +475,7 @@ describe("Critical Functionality - External Links", () => {
   const mockPost = {
     title: "Test Blog Post",
     excerpt: "This is a test excerpt for the blog post",
-    url: "https://medium.com/@author/test-post",
+    url: "/blog/test-post",
     publishedDate: new Date("2024-01-15"),
   };
 
@@ -512,54 +512,50 @@ describe("Critical Functionality - External Links", () => {
   });
 
   describe("Blog Post Links", () => {
-    it("title and read link both point to the Medium post", () => {
+    it("title and read link both point to the post page", () => {
       render(<BlogPostRow post={mockPost} />);
 
       const links = screen.getAllByRole("link");
       expect(links).toHaveLength(2);
       links.forEach((link) => {
-        expect(link).toHaveAttribute(
-          "href",
-          "https://medium.com/@author/test-post"
-        );
-        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("href", "/blog/test-post");
+        expect(link).not.toHaveAttribute("target");
       });
     });
   });
 });
 
 describe("Critical Functionality - Home Page", () => {
-  it("renders hero, idea, recent writing and books with the feed loaded", async () => {
-    (fetchMediumPosts as jest.Mock).mockResolvedValue([
+  it("renders hero, idea, recent writing and books with the posts loaded", () => {
+    (getAllPosts as jest.Mock).mockReturnValue([
       {
-        id: "1",
+        slug: "first",
         title: "First Post",
         excerpt: "Excerpt",
-        url: "https://medium.com/first",
+        url: "/blog/first",
         publishedDate: new Date("2024-01-01"),
       },
     ]);
 
-    render(await Home());
+    render(<Home />);
 
     expect(screen.getByTestId("hero-section")).toBeInTheDocument();
     expect(screen.getByTestId("idea-section")).toBeInTheDocument();
     expect(screen.getByTestId("recent-writing")).toBeInTheDocument();
     expect(screen.getByTestId("books-preview")).toBeInTheDocument();
     expect(screen.getByText("First Post")).toBeInTheDocument();
-    expect(fetchMediumPosts).toHaveBeenCalledWith(
-      expect.objectContaining({ maxPosts: 3 })
-    );
   });
 
-  it("still renders when the Medium feed fails", async () => {
-    (fetchMediumPosts as jest.Mock).mockRejectedValue(new Error("offline"));
+  it("still renders when nothing is published yet", () => {
+    (getAllPosts as jest.Mock).mockReturnValue([]);
 
-    render(await Home());
+    render(<Home />);
 
     expect(screen.getByTestId("hero-section")).toBeInTheDocument();
     expect(
-      within(screen.getByTestId("recent-writing")).getByRole("alert")
+      within(screen.getByTestId("recent-writing")).getByText(
+        /nothing published yet/i
+      )
     ).toBeInTheDocument();
   });
 });

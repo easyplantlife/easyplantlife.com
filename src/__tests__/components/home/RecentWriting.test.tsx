@@ -13,7 +13,7 @@ function makePosts(count: number): BlogPost[] {
   return Array.from({ length: count }, (_, i) => ({
     title: `Post ${i + 1}`,
     excerpt: `Excerpt ${i + 1}`,
-    url: `https://medium.com/@easyplantlife/post-${i + 1}`,
+    url: `/blog/post-${i + 1}`,
     publishedDate: new Date(2026, 0, i + 1),
   }));
 }

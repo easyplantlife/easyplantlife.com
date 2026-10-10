@@ -15,13 +15,13 @@ jest.mock("next/font/local", () => ({
   }),
 }));
 
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn().mockResolvedValue([
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn().mockReturnValue([
     {
-      id: "test123",
+      slug: "test-post",
       title: "Test Blog Post",
       excerpt: "Test excerpt for blog post.",
-      url: "https://medium.com/@test/test-post",
+      url: "/blog/test-post",
       publishedDate: new Date("2024-01-15"),
     },
   ]),
@@ -31,7 +31,7 @@ const routes = [
   {
     path: "/",
     load: () => import("@/app/page"),
-    async: true,
+    async: false,
     h1: /living vegan without turning it into a project/i,
     title: /easy plant life/i,
   },
@@ -52,7 +52,7 @@ const routes = [
   {
     path: "/blog",
     load: () => import("@/app/blog/page"),
-    async: true,
+    async: false,
     h1: /short pieces/i,
     title: /blog/i,
   },

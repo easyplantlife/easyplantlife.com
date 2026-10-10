@@ -28,8 +28,8 @@ jest.mock("@/lib/analytics/events", () => ({
   trackOutboundClick: jest.fn(),
 }));
 
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn().mockResolvedValue([]),
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn().mockReturnValue([]),
 }));
 
 const mockFetch = jest.fn();
