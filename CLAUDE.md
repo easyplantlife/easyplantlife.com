@@ -32,17 +32,44 @@ npm test -- --watch  # Run tests in watch mode
 npm test -- path/to/test.ts  # Run single test file
 ```
 
-## Project Structure (Planned)
+## Project Structure
 
 ```
-/app                 # Next.js App Router pages
-/components          # Reusable UI components
-/components/ui       # Primitive UI components (Button, Input, etc.)
-/lib                 # Utility functions
-/lib/api             # API service layers (email, medium)
-/content             # Static content (books data)
-/public              # Static assets
+src/app                 # Next.js App Router pages and API routes
+src/components          # Reusable UI components
+src/components/ui       # Primitives (Button, ButtonLink, ArrowLink, Input, Textarea,
+                        #   Eyebrow, Heading, Text, Container, Panel, StatusNote, ...)
+src/components/theme    # ThemeProvider, ThemeToggle, ThemeScript (light / dark)
+src/components/home     # Home sections (Hero, IdeaSection, RecentWriting, BooksPreview)
+src/components/blog     # BlogPostRow, BlogPostsList (Medium excerpts)
+src/components/books    # BookItem, BooksList
+src/components/forms    # NewsletterForm, ContactForm
+src/lib                 # Utilities (theme.ts, utils.ts)
+src/lib/api             # Service layers (medium, blog feed, email, form clients)
+src/content             # Static content (books, navigation, site config)
+public                  # Static assets
 ```
+
+## Design Tokens & Theming
+
+- All colors are semantic CSS variables defined in `src/app/globals.css` and
+  mapped to Tailwind utilities via `@theme inline`: `bg-ground`, `bg-surface`,
+  `bg-tint`, `bg-field`, `border-line`, `border-tint-line`, `text-ink`,
+  `text-ink-soft`, `text-muted`, `text-faint`, `text-accent`, `text-on-accent`,
+  `text-error`. Never use raw hex values or default Tailwind palette colors in
+  components.
+- Light and dark themes switch on `data-theme` on `<html>`. The attribute is
+  set before paint by the inline script from `src/lib/theme.ts`, persisted in
+  localStorage, and toggled with `ThemeToggle`. Use the `dark:` variant only
+  for the rare case a token swap is not enough.
+- Typography: `font-serif` (Lora) for headings, `font-sans` (Source Sans 3)
+  for everything else. Use the `Heading`, `Text` and `Eyebrow` primitives
+  rather than ad-hoc classes.
+- Layout is intrinsic: wrapping flex rows and
+  `grid-cols-[repeat(auto-fit,minmax(min(100%,<min>),1fr))]` grids instead of
+  breakpoint-specific layouts. The header has no hamburger menu; its nav wraps.
+- `tailwind.config.ts` is not loaded by Tailwind v4 (there is no `@config`);
+  it remains as a documented reference of the legacy palette and scale.
 
 ## Key Documents
 
@@ -72,6 +99,8 @@ npm test -- path/to/test.ts  # Run single test file
 ## Brand Guidelines (Critical)
 
 - **Tone**: Calm, honest, non-authoritative. Never preachy or activist
-- **Visual**: Professional UI, white, plant greens, warm neutrals
+- **Visual**: Quiet editorial. Warm off-white ground, one deep green accent,
+  hairlines instead of cards, generous white space. Dark theme keeps the same
+  structure on a green-black ground
 - **Content**: No hype words, no marketing language, no frequency pressure
 - **Complexity**: If it doesn't increase clarity, it doesn't belong in MVP
