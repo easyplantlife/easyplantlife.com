@@ -26,20 +26,9 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Contact Page
- *
- * A minimal contact page with a simple message and contact form.
- *
- * Design principles:
- * - Minimal, focused design
- * - Calm, honest tone per brand guidelines
- * - No social links required
- * - Contact form prominently displayed
- */
 export default function ContactPage() {
   return (
-    <PageLayout title="Contact">
+    <PageLayout>
       <ContactContent />
     </PageLayout>
   );

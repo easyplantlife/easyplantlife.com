@@ -8,11 +8,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Input } from "@/components/ui/Input";
+import { Textarea } from "@/components/ui/Textarea";
 import { Link } from "@/components/ui/Link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { MobileNav } from "@/components/MobileNav";
+import { ThemeProvider, ThemeToggle } from "@/components/theme";
 import { NewsletterForm } from "@/components/forms/NewsletterForm";
 import { ContactForm } from "@/components/forms/ContactForm";
 
@@ -48,10 +51,8 @@ describe("Keyboard Navigation - Button Component", () => {
     const user = userEvent.setup();
     render(<Button>Click me</Button>);
 
-    const button = screen.getByRole("button", { name: "Click me" });
     await user.tab();
-
-    expect(button).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Click me" })).toHaveFocus();
   });
 
   it("should trigger click on Enter key", async () => {
@@ -59,8 +60,7 @@ describe("Keyboard Navigation - Button Component", () => {
     const user = userEvent.setup();
     render(<Button onClick={handleClick}>Click me</Button>);
 
-    const button = screen.getByRole("button", { name: "Click me" });
-    button.focus();
+    screen.getByRole("button", { name: "Click me" }).focus();
     await user.keyboard("{Enter}");
 
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -71,8 +71,7 @@ describe("Keyboard Navigation - Button Component", () => {
     const user = userEvent.setup();
     render(<Button onClick={handleClick}>Click me</Button>);
 
-    const button = screen.getByRole("button", { name: "Click me" });
-    button.focus();
+    screen.getByRole("button", { name: "Click me" }).focus();
     await user.keyboard(" ");
 
     expect(handleClick).toHaveBeenCalledTimes(1);
@@ -96,17 +95,16 @@ describe("Keyboard Navigation - Button Component", () => {
   });
 });
 
-describe("Keyboard Navigation - Input Component", () => {
-  it("should be focusable with Tab key", async () => {
+describe("Keyboard Navigation - Input and Textarea", () => {
+  it("input is focusable with Tab key", async () => {
     const user = userEvent.setup();
     render(<Input label="Email" type="email" />);
 
     await user.tab();
-    const input = screen.getByLabelText("Email");
-    expect(input).toHaveFocus();
+    expect(screen.getByLabelText("Email")).toHaveFocus();
   });
 
-  it("should allow typing when focused", async () => {
+  it("input allows typing when focused", async () => {
     const user = userEvent.setup();
     render(<Input label="Email" type="email" />);
 
@@ -117,7 +115,7 @@ describe("Keyboard Navigation - Input Component", () => {
     expect(input).toHaveValue("test@example.com");
   });
 
-  it("should not be focusable when disabled", async () => {
+  it("disabled input is skipped in the tab order", async () => {
     const user = userEvent.setup();
     render(
       <>
@@ -133,10 +131,22 @@ describe("Keyboard Navigation - Input Component", () => {
     await user.tab();
     expect(screen.getByLabelText("Last")).toHaveFocus();
   });
+
+  it("textarea is focusable and keeps Enter as a newline", async () => {
+    const user = userEvent.setup();
+    render(<Textarea label="Message" />);
+
+    await user.tab();
+    const textarea = screen.getByLabelText("Message");
+    expect(textarea).toHaveFocus();
+
+    await user.keyboard("Line 1{Enter}Line 2");
+    expect(textarea).toHaveValue("Line 1\nLine 2");
+  });
 });
 
-describe("Keyboard Navigation - Link Component", () => {
-  it("should be focusable with Tab key", async () => {
+describe("Keyboard Navigation - Links", () => {
+  it("Link is focusable with Tab key", async () => {
     const user = userEvent.setup();
     render(<Link href="/about">About</Link>);
 
@@ -144,132 +154,149 @@ describe("Keyboard Navigation - Link Component", () => {
     expect(screen.getByRole("link", { name: "About" })).toHaveFocus();
   });
 
-  it("should be activatable with Enter key", () => {
+  it("Link keeps its href for native Enter activation", () => {
     render(<Link href="/about">About</Link>);
 
     const link = screen.getByRole("link", { name: "About" });
     link.focus();
 
-    // Enter on links should follow the link (native behavior)
     expect(link).toHaveFocus();
     expect(link).toHaveAttribute("href", "/about");
+  });
+
+  it("ArrowLink and ButtonLink are focusable", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <ArrowLink href="/blog">Read the blog</ArrowLink>
+        <ButtonLink href="/newsletter">Newsletter</ButtonLink>
+      </>
+    );
+
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Read the blog" })).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Newsletter" })).toHaveFocus();
   });
 });
 
 describe("Keyboard Navigation - Header Component", () => {
-  it("should have all navigation links focusable in order", async () => {
+  function renderHeader() {
+    return render(
+      <ThemeProvider>
+        <Header />
+      </ThemeProvider>
+    );
+  }
+
+  it("tabs through brand, navigation, newsletter and theme toggle in order", async () => {
     const user = userEvent.setup();
-    render(<Header />);
+    renderHeader();
 
-    // Tab through the navigation
-    await user.tab(); // Logo link
-    expect(screen.getByText("Easy Plant Life").closest("a")).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole("link", { name: /easy plant life, home/i })
+    ).toHaveFocus();
 
-    // Continue tabbing through nav links (hidden on mobile, visible on desktop)
-    const navLinks = screen.getAllByRole("link");
-    expect(navLinks.length).toBeGreaterThan(1);
+    for (const name of ["About", "Books", "Blog", "Contact", "Newsletter"]) {
+      await user.tab();
+      expect(screen.getByRole("link", { name })).toHaveFocus();
+    }
+
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: /switch to .* theme/i })
+    ).toHaveFocus();
   });
 
-  it("should have proper focus visible styles", () => {
-    render(<Header />);
-    const logoLink = screen.getByText("Easy Plant Life").closest("a");
+  it("navigation is always in the document (no hidden mobile menu)", () => {
+    renderHeader();
+    expect(
+      screen.queryByRole("button", { name: /menu/i })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "About" })).toBeVisible();
+  });
 
-    expect(logoLink).toHaveClass("focus-visible:ring-2");
-    expect(logoLink).toHaveClass("focus-visible:ring-primary");
+  it("theme toggle can be operated with the keyboard", async () => {
+    const user = userEvent.setup();
+    renderHeader();
+
+    const toggle = screen.getByRole("button", { name: /switch to dark/i });
+    toggle.focus();
+    await user.keyboard("{Enter}");
+
+    expect(
+      screen.getByRole("button", { name: /switch to light/i })
+    ).toBeInTheDocument();
+    document.documentElement.removeAttribute("data-theme");
+    window.localStorage.clear();
+  });
+
+  it("has focus-visible ring styles on the brand link", () => {
+    renderHeader();
+    const brand = screen.getByRole("link", { name: /easy plant life, home/i });
+
+    expect(brand).toHaveClass("focus-visible:ring-2");
+    expect(brand).toHaveClass("focus-visible:ring-accent");
+  });
+
+  it("has focus-visible ring styles on navigation links", () => {
+    renderHeader();
+    const link = screen.getByRole("link", { name: "About" });
+
+    expect(link.className).toContain("focus-visible:ring-accent");
   });
 });
 
 describe("Keyboard Navigation - Footer Component", () => {
-  it("should have all links focusable", async () => {
+  it("first tab focuses the brand link, then the footer navigation", async () => {
     const user = userEvent.setup();
     render(<Footer />);
 
-    const links = screen.getAllByRole("link");
-    expect(links.length).toBeGreaterThan(0);
-
-    // First tab should focus the logo
     await user.tab();
-    expect(screen.getByText("Easy Plant Life").closest("a")).toHaveFocus();
-  });
-});
-
-describe("Keyboard Navigation - MobileNav Component", () => {
-  const mockLinks = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
-
-  it("should open menu with Enter key on hamburger button", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={mockLinks} />);
-
-    const menuButton = screen.getByRole("button", { name: "Menu" });
-    menuButton.focus();
-    await user.keyboard("{Enter}");
-
     expect(
-      screen.getByRole("navigation", { name: "Mobile navigation" })
-    ).toBeInTheDocument();
-  });
-
-  it("should close menu with Escape key", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={mockLinks} />);
-
-    // Open menu
-    const menuButton = screen.getByRole("button", { name: "Menu" });
-    await user.click(menuButton);
-
-    expect(
-      screen.getByRole("navigation", { name: "Mobile navigation" })
-    ).toBeInTheDocument();
-
-    // Press Escape
-    await user.keyboard("{Escape}");
-
-    expect(
-      screen.queryByRole("navigation", { name: "Mobile navigation" })
-    ).not.toBeInTheDocument();
-  });
-
-  it("should trap focus within the menu when open", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={mockLinks} />);
-
-    // Open menu
-    await user.click(screen.getByRole("button", { name: "Menu" }));
-
-    // Focus should be on close button first
-    const closeButton = screen.getByRole("button", { name: "Close menu" });
-    expect(closeButton).toHaveFocus();
-
-    // Tab through menu items
-    await user.tab();
-    expect(screen.getByRole("link", { name: "Home" })).toHaveFocus();
+      screen.getByRole("link", { name: /easy plant life, home/i })
+    ).toHaveFocus();
 
     await user.tab();
     expect(screen.getByRole("link", { name: "About" })).toHaveFocus();
-
-    await user.tab();
-    expect(screen.getByRole("link", { name: "Contact" })).toHaveFocus();
-
-    // Tab should wrap back to close button (focus trap)
-    await user.tab();
-    expect(closeButton).toHaveFocus();
   });
 
-  it("should return focus to menu button when closed", async () => {
+  it("footer links have focus-visible ring styles", () => {
+    render(<Footer />);
+    expect(screen.getByRole("link", { name: "About" }).className).toContain(
+      "focus-visible:ring-accent"
+    );
+  });
+});
+
+describe("Keyboard Navigation - ThemeToggle", () => {
+  afterEach(() => {
+    document.documentElement.removeAttribute("data-theme");
+    window.localStorage.clear();
+  });
+
+  it("toggles with Space and Enter", async () => {
     const user = userEvent.setup();
-    render(<MobileNav links={mockLinks} />);
+    render(
+      <ThemeProvider>
+        <ThemeToggle />
+      </ThemeProvider>
+    );
 
-    const menuButton = screen.getByRole("button", { name: "Menu" });
-    await user.click(menuButton);
+    await user.tab();
+    expect(screen.getByRole("button")).toHaveFocus();
 
-    // Close with close button
-    await user.click(screen.getByRole("button", { name: "Close menu" }));
+    await user.keyboard(" ");
+    expect(screen.getByRole("button")).toHaveAccessibleName(
+      /switch to light theme/i
+    );
 
-    expect(menuButton).toHaveFocus();
+    await user.keyboard("{Enter}");
+    expect(screen.getByRole("button")).toHaveAccessibleName(
+      /switch to dark theme/i
+    );
   });
 });
 
@@ -278,22 +305,30 @@ describe("Keyboard Navigation - NewsletterForm Component", () => {
     const user = userEvent.setup();
     render(<NewsletterForm />);
 
-    // First tab should focus the email input
     await user.tab();
     expect(screen.getByLabelText("Email address")).toHaveFocus();
 
-    // Second tab should focus the submit button
     await user.tab();
     expect(screen.getByRole("button", { name: "Subscribe" })).toHaveFocus();
   });
 
+  it("inline layout keeps the same tab order with a hidden label", async () => {
+    const user = userEvent.setup();
+    render(<NewsletterForm layout="inline" submitLabel="Get the notes" />);
+
+    await user.tab();
+    expect(screen.getByLabelText("Email address")).toHaveFocus();
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Get the notes" })).toHaveFocus();
+  });
+
   it("should submit form with Enter key in input", async () => {
-    const handleSubmit = jest.fn();
+    const handleSubmit = jest.fn().mockResolvedValue(undefined);
     const user = userEvent.setup();
     render(<NewsletterForm onSubmit={handleSubmit} />);
 
-    const emailInput = screen.getByLabelText("Email address");
-    await user.type(emailInput, "test@example.com");
+    await user.type(screen.getByLabelText("Email address"), "test@example.com");
     await user.keyboard("{Enter}");
 
     expect(handleSubmit).toHaveBeenCalledWith("test@example.com");
@@ -301,25 +336,21 @@ describe("Keyboard Navigation - NewsletterForm Component", () => {
 });
 
 describe("Keyboard Navigation - ContactForm Component", () => {
-  it("should have correct tab order", async () => {
+  it("should have correct tab order and skip the honeypot", async () => {
     const user = userEvent.setup();
     render(<ContactForm />);
 
-    // First tab - Name input
     await user.tab();
     expect(screen.getByLabelText("Name")).toHaveFocus();
 
-    // Second tab - Email input
     await user.tab();
     expect(screen.getByLabelText("Email")).toHaveFocus();
 
-    // Third tab - Message textarea
     await user.tab();
     expect(screen.getByLabelText("Message")).toHaveFocus();
 
-    // Fourth tab - Submit button
     await user.tab();
-    expect(screen.getByRole("button", { name: "Send Message" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Send message" })).toHaveFocus();
   });
 
   it("should allow multi-line text input with Enter in textarea", async () => {
@@ -340,7 +371,7 @@ describe("Focus Visible Styles", () => {
     const button = screen.getByRole("button");
 
     expect(button.className).toContain("focus-visible:ring-2");
-    expect(button.className).toContain("focus-visible:ring-primary");
+    expect(button.className).toContain("focus-visible:ring-accent");
   });
 
   it("Input should have focus-visible ring styles", () => {
@@ -348,7 +379,14 @@ describe("Focus Visible Styles", () => {
     const input = screen.getByLabelText("Test");
 
     expect(input.className).toContain("focus-visible:ring-2");
-    expect(input.className).toContain("focus-visible:ring-primary");
+    expect(input.className).toContain("focus-visible:ring-accent");
+  });
+
+  it("Textarea should have focus-visible ring styles", () => {
+    render(<Textarea label="Test" />);
+    expect(screen.getByLabelText("Test").className).toContain(
+      "focus-visible:ring-accent"
+    );
   });
 
   it("Link should have focus-visible ring styles", () => {
@@ -356,6 +394,13 @@ describe("Focus Visible Styles", () => {
     const link = screen.getByRole("link");
 
     expect(link.className).toContain("focus-visible:ring-2");
-    expect(link.className).toContain("focus-visible:ring-primary");
+    expect(link.className).toContain("focus-visible:ring-accent");
+  });
+
+  it("ThemeToggle should have focus-visible ring styles", () => {
+    render(<ThemeToggle />);
+    expect(screen.getByRole("button").className).toContain(
+      "focus-visible:ring-accent"
+    );
   });
 });

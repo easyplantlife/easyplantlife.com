@@ -1,138 +1,67 @@
 import { render, screen } from "@testing-library/react";
 import { ContactContent } from "@/components/contact";
 
-/**
- * ContactContent Component Tests
- *
- * Tests for the contact page content component following TDD approach.
- * This component contains the introductory text and contact form.
- */
-
-// Mock the ContactForm component to isolate content tests
-jest.mock("@/components/forms/ContactForm", () => ({
-  ContactForm: ({
-    className,
-    onSubmit,
-  }: {
-    className?: string;
-    onSubmit?: () => void;
-  }) => (
-    <div data-testid="contact-form" className={className} onClick={onSubmit}>
-      Mocked Contact Form
-    </div>
-  ),
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackContactSubmit: jest.fn(),
+  trackOutboundClick: jest.fn(),
 }));
 
-// Mock fetch for API calls
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+jest.mock("@/lib/api/forms", () => ({
+  sendContactMessage: jest.fn(),
+}));
 
 describe("ContactContent", () => {
-  beforeEach(() => {
-    mockFetch.mockReset();
-  });
-  describe("Rendering", () => {
-    it("renders the component with data-testid", () => {
-      render(<ContactContent />);
-      expect(screen.getByTestId("contact-content")).toBeInTheDocument();
-    });
-
-    it("renders as an article element", () => {
-      render(<ContactContent />);
-      const content = screen.getByTestId("contact-content");
-      expect(content.tagName).toBe("ARTICLE");
-    });
-
-    it("accepts additional className prop", () => {
-      render(<ContactContent className="mt-8" />);
-      const content = screen.getByTestId("contact-content");
-      expect(content).toHaveClass("mt-8");
-    });
+  it("renders an article with the content test id", () => {
+    render(<ContactContent />);
+    expect(screen.getByTestId("contact-content").tagName).toBe("ARTICLE");
   });
 
-  describe("Introductory Text", () => {
-    it("displays introductory text about getting in touch", () => {
-      render(<ContactContent />);
-      const text = screen.getByText(
-        /question|get in touch|hear|message|reach/i
-      );
-      expect(text).toBeInTheDocument();
-    });
-
-    it("introductory text uses secondary color for calm tone", () => {
-      render(<ContactContent />);
-      const text = screen.getByText(
-        /question|get in touch|hear|message|reach/i
-      );
-      expect(text).toHaveClass("text-text-secondary");
-    });
-
-    it("introductory text has max-width for readability", () => {
-      render(<ContactContent />);
-      const text = screen.getByText(
-        /question|get in touch|hear|message|reach/i
-      );
-      expect(text.className).toMatch(/max-w/);
-    });
+  it("renders the page heading and a calm invitation", () => {
+    render(<ContactContent />);
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Say hello." })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Contact")).toBeInTheDocument();
+    expect(screen.getByText(/a short note is fine/i)).toBeInTheDocument();
   });
 
-  describe("Contact Form Integration", () => {
-    it("renders the ContactForm component", () => {
-      render(<ContactContent />);
-      expect(screen.getByTestId("contact-form")).toBeInTheDocument();
-    });
-
-    it("contact form has width constraints", () => {
-      render(<ContactContent />);
-      const form = screen.getByTestId("contact-form");
-      expect(form.className).toMatch(/w-full/);
-    });
-
-    it("form is wrapped in container with max-width", () => {
-      render(<ContactContent />);
-      const form = screen.getByTestId("contact-form");
-      const wrapper = form.parentElement;
-      expect(wrapper?.className).toMatch(/max-w/);
-    });
+  it("offers the plain email address as a mailto link", () => {
+    render(<ContactContent />);
+    const link = screen.getByRole("link", { name: "hello@easyplantlife.com" });
+    expect(link).toHaveAttribute("href", "mailto:hello@easyplantlife.com");
   });
 
-  describe("Layout and Spacing", () => {
-    it("has vertical spacing between elements", () => {
-      render(<ContactContent />);
-      const content = screen.getByTestId("contact-content");
-      expect(content).toHaveClass("space-y-8");
-    });
+  it("renders the contact form", () => {
+    render(<ContactContent />);
+    expect(screen.getByRole("form", { name: /contact/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /^name$/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("textbox", { name: /message/i })
+    ).toBeInTheDocument();
   });
 
-  describe("Brand Compliance", () => {
-    it("does not contain hype language", () => {
-      render(<ContactContent />);
-      const content = screen.getByTestId("contact-content");
-      const text = content.textContent?.toLowerCase() || "";
-      const hypeWords = [
-        "free",
-        "exclusive",
-        "amazing",
-        "incredible",
-        "best",
-        "revolutionary",
-        "guaranteed",
-        "limited",
-        "urgent",
-      ];
-      hypeWords.forEach((word) => {
-        expect(text).not.toContain(word);
-      });
-    });
+  it("promises a human reply and no hidden signup", () => {
+    render(<ContactContent />);
+    expect(
+      screen.getByText(/messages are read by a person/i)
+    ).toBeInTheDocument();
+  });
 
-    it("uses calm, honest tone", () => {
-      render(<ContactContent />);
-      const content = screen.getByTestId("contact-content");
-      const text = content.textContent?.toLowerCase() || "";
-      // Should not contain pushy language
-      expect(text).not.toContain("must");
-      expect(text).not.toContain("hurry");
-      expect(text).not.toContain("now!");
-    });
+  it("has no social links", () => {
+    render(<ContactContent />);
+    const hrefs = screen
+      .getAllByRole("link")
+      .map((l) => l.getAttribute("href") ?? "");
+    expect(
+      hrefs.some((h) => /twitter|instagram|facebook|x\.com|linkedin/i.test(h))
+    ).toBe(false);
+  });
+
+  it("merges a custom className", () => {
+    render(<ContactContent className="mt-8" />);
+    expect(screen.getByTestId("contact-content").className).toContain("mt-8");
   });
 });

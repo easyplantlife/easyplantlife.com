@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
 import {
-  BookImagery,
+  BooksPreview,
   Hero,
-  NewsletterCTA,
-  SecondaryCTAs,
-  WhatYoullFind,
+  IdeaSection,
+  RecentWriting,
+  RECENT_WRITING_LIMIT,
 } from "@/components/home";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
+import { getBlogPosts } from "@/lib/api/blog";
 
 /**
  * Home Page SEO Metadata
- *
- * Configures title, description, Open Graph, and Twitter card metadata
- * for optimal search engine and social media presentation.
  */
 export const metadata: Metadata = {
   title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
@@ -45,44 +43,31 @@ export const metadata: Metadata = {
   },
 };
 
+/** Re-fetch the Medium feed at most once an hour. */
+export const revalidate = 3600;
+
 /**
  * Home Page
  *
- * The main landing page for Easy Plant Life. Designed to communicate
- * the brand in under 30 seconds with a calm, intentional design.
- *
- * Structure:
- * 1. Hero Section - Brand name, tagline, brief explanation
- * 2. Newsletter CTA - Primary conversion goal
- * 3. Secondary CTAs - Links to Blog and Books
- *
- * Design principles:
- * - Single scroll or near single-scroll on desktop
- * - Generous white space
- * - No unnecessary sections
- * - Responsive on all devices
+ * 1. Hero - headline, promise and the newsletter form
+ * 2. The idea - the brand values as one statement
+ * 3. Recent writing - the three newest posts
+ * 4. Books - both books, cover first
  */
-export default function Home() {
+export default async function Home() {
+  const { posts, error } = await getBlogPosts({
+    maxPosts: RECENT_WRITING_LIMIT,
+  });
+
   return (
-    <main className="min-h-full bg-background">
-      {/* JSON-LD Structured Data for SEO */}
+    <main className="min-h-full bg-ground">
       <OrganizationJsonLd />
       <WebSiteJsonLd />
 
-      {/* Hero Section - First impression and brand message */}
       <Hero />
-
-      {/* What You'll Find - Build credibility and set expectations */}
-      <WhatYoullFind />
-
-      {/* Newsletter CTA - Primary conversion goal */}
-      <NewsletterCTA />
-
-      {/* Secondary CTAs - Additional navigation to content */}
-      <SecondaryCTAs />
-
-      {/* Book imagery - below Go Further */}
-      <BookImagery />
+      <IdeaSection />
+      <RecentWriting posts={posts} error={error} />
+      <BooksPreview />
     </main>
   );
 }

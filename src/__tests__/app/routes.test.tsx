@@ -1,31 +1,12 @@
 /**
  * Page Routes Tests
  *
- * Tests for M3-06: Create All Page Route Files
- *
- * Acceptance Criteria:
- * - /app/page.tsx - Home (already exists)
- * - /app/about/page.tsx - About
- * - /app/books/page.tsx - Books
- * - /app/blog/page.tsx - Blog
- * - /app/newsletter/page.tsx - Newsletter
- * - /app/contact/page.tsx - Contact
- * - Each page has basic metadata
- * - Each page renders without error
- *
- * Test Cases:
- * GIVEN I navigate to /about
- * WHEN the page loads
- * THEN I see the About page (placeholder content OK)
- *
- * GIVEN I navigate to /nonexistent
- * WHEN the page loads
- * THEN I see a 404 page
+ * Every public route renders without error, exposes metadata with a title,
+ * and has a single h1.
  */
 
 import { render, screen } from "@testing-library/react";
 
-// Mock next/font/google
 jest.mock("next/font/google", () => ({
   Lora: () => ({ variable: "--font-heading", className: "mock-lora" }),
   Source_Sans_3: () => ({
@@ -34,7 +15,6 @@ jest.mock("next/font/google", () => ({
   }),
 }));
 
-// Mock the Medium service for Blog page
 jest.mock("@/lib/api/medium", () => ({
   fetchMediumPosts: jest.fn().mockResolvedValue([
     {
@@ -47,131 +27,82 @@ jest.mock("@/lib/api/medium", () => ({
   ]),
 }));
 
-describe("Page Routes (M3-06)", () => {
-  describe("About Page (/about)", () => {
-    it("renders without error", async () => {
-      const AboutPage = (await import("@/app/about/page")).default;
-      render(<AboutPage />);
-      expect(
-        screen.getByRole("heading", { name: /about/i, level: 1 })
-      ).toBeInTheDocument();
+const routes = [
+  {
+    path: "/",
+    load: () => import("@/app/page"),
+    async: true,
+    h1: /living vegan without turning it into a project/i,
+    title: /easy plant life/i,
+  },
+  {
+    path: "/about",
+    load: () => import("@/app/about/page"),
+    async: false,
+    h1: /does not need to feel like a project/i,
+    title: /about/i,
+  },
+  {
+    path: "/books",
+    load: () => import("@/app/books/page"),
+    async: false,
+    h1: /two short books/i,
+    title: /books/i,
+  },
+  {
+    path: "/blog",
+    load: () => import("@/app/blog/page"),
+    async: true,
+    h1: /short pieces/i,
+    title: /blog/i,
+  },
+  {
+    path: "/newsletter",
+    load: () => import("@/app/newsletter/page"),
+    async: false,
+    h1: /occasional notes/i,
+    title: /newsletter/i,
+  },
+  {
+    path: "/contact",
+    load: () => import("@/app/contact/page"),
+    async: false,
+    h1: /say hello/i,
+    title: /contact/i,
+  },
+] as const;
+
+describe("Page Routes", () => {
+  describe.each(routes)("$path", (route) => {
+    it("renders without error with a single h1", async () => {
+      const mod = await route.load();
+      const Page = mod.default as () =>
+        React.ReactElement | Promise<React.ReactElement>;
+      const element = route.async ? await Page() : <Page />;
+      render(element);
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]).toHaveTextContent(route.h1);
+      expect(screen.getByRole("main")).toBeInTheDocument();
     });
 
-    it("exports metadata with title", async () => {
-      const { metadata } = await import("@/app/about/page");
+    it("exports metadata with a title", async () => {
+      const { metadata } = await route.load();
       expect(metadata).toBeDefined();
-      expect(metadata.title).toBeDefined();
-      expect(metadata.title).toMatch(/about/i);
-    });
-
-    it("has descriptive placeholder content", async () => {
-      const AboutPage = (await import("@/app/about/page")).default;
-      render(<AboutPage />);
-      expect(document.body.textContent).toBeTruthy();
+      expect(String(metadata.title)).toMatch(route.title);
     });
   });
 
-  describe("Books Page (/books)", () => {
-    it("renders without error", async () => {
-      const BooksPage = (await import("@/app/books/page")).default;
-      render(<BooksPage />);
+  describe("Not found", () => {
+    it("renders the 404 page with a way home", async () => {
+      const NotFound = (await import("@/app/not-found")).default;
+      render(<NotFound />);
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        /nothing here/i
+      );
       expect(
-        screen.getByRole("heading", { name: /books/i, level: 1 })
-      ).toBeInTheDocument();
-    });
-
-    it("exports metadata with title", async () => {
-      const { metadata } = await import("@/app/books/page");
-      expect(metadata).toBeDefined();
-      expect(metadata.title).toBeDefined();
-      expect(metadata.title).toMatch(/books/i);
-    });
-
-    it("has descriptive placeholder content", async () => {
-      const BooksPage = (await import("@/app/books/page")).default;
-      render(<BooksPage />);
-      expect(document.body.textContent).toBeTruthy();
-    });
-  });
-
-  describe("Blog Page (/blog)", () => {
-    it("renders without error", async () => {
-      const BlogPage = (await import("@/app/blog/page")).default;
-      const Page = await BlogPage();
-      render(Page);
-      expect(
-        screen.getByRole("heading", { name: /blog/i, level: 1 })
-      ).toBeInTheDocument();
-    });
-
-    it("exports metadata with title", async () => {
-      const { metadata } = await import("@/app/blog/page");
-      expect(metadata).toBeDefined();
-      expect(metadata.title).toBeDefined();
-      expect(metadata.title).toMatch(/blog/i);
-    });
-
-    it("has descriptive placeholder content", async () => {
-      const BlogPage = (await import("@/app/blog/page")).default;
-      const Page = await BlogPage();
-      render(Page);
-      expect(document.body.textContent).toBeTruthy();
-    });
-  });
-
-  describe("Newsletter Page (/newsletter)", () => {
-    it("renders without error", async () => {
-      const NewsletterPage = (await import("@/app/newsletter/page")).default;
-      render(<NewsletterPage />);
-      expect(
-        screen.getByRole("heading", { name: /newsletter/i, level: 1 })
-      ).toBeInTheDocument();
-    });
-
-    it("exports metadata with title", async () => {
-      const { metadata } = await import("@/app/newsletter/page");
-      expect(metadata).toBeDefined();
-      expect(metadata.title).toBeDefined();
-      expect(metadata.title).toMatch(/newsletter/i);
-    });
-
-    it("has descriptive placeholder content", async () => {
-      const NewsletterPage = (await import("@/app/newsletter/page")).default;
-      render(<NewsletterPage />);
-      expect(document.body.textContent).toBeTruthy();
-    });
-  });
-
-  describe("Contact Page (/contact)", () => {
-    it("renders without error", async () => {
-      const ContactPage = (await import("@/app/contact/page")).default;
-      render(<ContactPage />);
-      expect(
-        screen.getByRole("heading", { name: /contact/i, level: 1 })
-      ).toBeInTheDocument();
-    });
-
-    it("exports metadata with title", async () => {
-      const { metadata } = await import("@/app/contact/page");
-      expect(metadata).toBeDefined();
-      expect(metadata.title).toBeDefined();
-      expect(metadata.title).toMatch(/contact/i);
-    });
-
-    it("has descriptive placeholder content", async () => {
-      const ContactPage = (await import("@/app/contact/page")).default;
-      render(<ContactPage />);
-      expect(document.body.textContent).toBeTruthy();
-    });
-  });
-
-  describe("Home Page (/)", () => {
-    it("renders without error", async () => {
-      const HomePage = (await import("@/app/page")).default;
-      render(<HomePage />);
-      expect(
-        screen.getByRole("heading", { name: /easy plant life/i, level: 1 })
-      ).toBeInTheDocument();
+        screen.getByRole("link", { name: /back to the home page/i })
+      ).toHaveAttribute("href", "/");
     });
   });
 });

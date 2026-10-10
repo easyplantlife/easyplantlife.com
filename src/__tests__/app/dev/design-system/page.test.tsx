@@ -73,31 +73,33 @@ describe("Design System Reference Page", () => {
       ).toBeInTheDocument();
     });
 
-    it("shows primary color palette", () => {
+    it("shows surface tokens", () => {
       render(<DesignSystemPage />);
       expect(
-        screen.getByRole("heading", { name: /primary/i, level: 3 })
+        screen.getByRole("heading", { name: /surfaces/i, level: 3 })
       ).toBeInTheDocument();
-    });
-
-    it("shows neutral color palette", () => {
-      render(<DesignSystemPage />);
-      expect(
-        screen.getByRole("heading", { name: /neutral/i, level: 3 })
-      ).toBeInTheDocument();
-    });
-
-    it("shows background colors", () => {
-      render(<DesignSystemPage />);
-      expect(
-        screen.getByRole("heading", { name: /background/i, level: 3 })
-      ).toBeInTheDocument();
+      expect(screen.getByText("bg-ground")).toBeInTheDocument();
     });
 
     it("shows text colors section", () => {
       render(<DesignSystemPage />);
       expect(
         screen.getByRole("heading", { name: /text colors/i, level: 3 })
+      ).toBeInTheDocument();
+      expect(screen.getByText("text-ink")).toBeInTheDocument();
+    });
+
+    it("shows the accent tokens", () => {
+      render(<DesignSystemPage />);
+      expect(
+        screen.getByRole("heading", { name: /^accent$/i, level: 3 })
+      ).toBeInTheDocument();
+    });
+
+    it("offers a theme toggle so the dark palette can be previewed", () => {
+      render(<DesignSystemPage />);
+      expect(
+        screen.getByRole("button", { name: /switch to .* theme/i })
       ).toBeInTheDocument();
     });
   });
@@ -135,13 +137,15 @@ describe("Design System Reference Page", () => {
 
     it("shows text size examples", () => {
       render(<DesignSystemPage />);
-      // Should show text size scale examples (some may appear multiple times)
-      expect(screen.getAllByText(/text-xs/i).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(/text-sm/i).length).toBeGreaterThanOrEqual(1);
-      expect(screen.getAllByText(/text-base/i).length).toBeGreaterThanOrEqual(
-        1
-      );
-      expect(screen.getAllByText(/text-lg/i).length).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getByRole("heading", { name: /^text$/i, level: 3 })
+      ).toBeInTheDocument();
+      // Should show the text scale from 2xl down to the caption size
+      expect(screen.getByText(/^Text 2xl/)).toBeInTheDocument();
+      expect(screen.getByText(/^Text xl/)).toBeInTheDocument();
+      expect(screen.getByText(/^Text lg/)).toBeInTheDocument();
+      expect(screen.getByText(/^Text base/)).toBeInTheDocument();
+      expect(screen.getByText(/^Text sm/)).toBeInTheDocument();
     });
   });
 
@@ -183,11 +187,17 @@ describe("Design System Reference Page", () => {
       expect(inputs.length).toBeGreaterThanOrEqual(1);
     });
 
-    it("shows Card component examples", () => {
+    it("shows Status note and Panel examples instead of cards", () => {
       render(<DesignSystemPage />);
       expect(
-        screen.getByRole("heading", { name: /^card$/i, level: 3 })
+        screen.getByRole("heading", { name: /^status note$/i, level: 3 })
       ).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: /^panel$/i, level: 3 })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole("heading", { name: /^card$/i, level: 3 })
+      ).not.toBeInTheDocument();
     });
 
     it("shows Container component examples", () => {

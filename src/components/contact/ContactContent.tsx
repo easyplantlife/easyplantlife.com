@@ -1,55 +1,20 @@
-"use client";
-
 import { type HTMLAttributes } from "react";
-import { Text } from "@/components/ui/Text";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { Heading } from "@/components/ui/Heading";
+import { Link } from "@/components/ui/Link";
+import { Text } from "@/components/ui/Text";
+import { siteConfig } from "@/content/site";
+import { cn } from "@/lib/utils";
 
 export interface ContactContentProps extends HTMLAttributes<HTMLElement> {
-  /** Additional CSS classes */
   className?: string;
 }
 
 /**
- * Handles contact form submission by calling the API.
+ * ContactContent
  *
- * @param data - The form data (name, email, message)
- */
-async function handleContactSubmit(data: {
-  name: string;
-  email: string;
-  message: string;
-}): Promise<void> {
-  const response = await fetch("/api/contact", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const result = await response.json();
-    throw new Error(result.error || "Failed to send message");
-  }
-}
-
-/**
- * ContactContent Component
- *
- * The main content structure for the Contact page. Contains a calm
- * introductory message and the contact form.
- *
- * Design principles:
- * - Minimal, focused design
- * - Calm, honest tone per brand guidelines
- * - No social links
- * - Contact form prominently displayed
- *
- * @example
- * ```tsx
- * <ContactContent />
- * <ContactContent className="mt-8" />
- * ```
+ * Two columns: a short invitation with the plain email address, and the form.
  */
 export function ContactContent({
   className = "",
@@ -58,18 +23,38 @@ export function ContactContent({
   return (
     <article
       data-testid="contact-content"
-      className={`space-y-8 ${className}`.trim()}
+      className={cn(
+        "grid grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))] items-start gap-x-[72px] gap-y-12",
+        className
+      )}
       {...props}
     >
-      {/* Introductory text - calm, no hype */}
-      <Text size="lg" color="secondary" className="max-w-2xl">
-        Have a question or want to get in touch? Send us a message below.
-      </Text>
-
-      {/* Contact form - prominent placement */}
-      <div className="max-w-md">
-        <ContactForm className="w-full" onSubmit={handleContactSubmit} />
+      <div className="flex max-w-[440px] flex-col gap-6">
+        <Eyebrow>Contact</Eyebrow>
+        <Heading level={1}>Say hello.</Heading>
+        <Text size="xl" color="secondary">
+          Questions about the books, the writing, or something you would like to
+          see covered. A short note is fine.
+        </Text>
+        <div className="flex flex-col gap-1.5 border-t border-line pt-5">
+          <Text size="sm" color="faint">
+            Prefer your own email app?
+          </Text>
+          <Link
+            href={`mailto:${siteConfig.contactEmail}`}
+            variant="plain"
+            className="font-sans text-lg font-medium text-accent hover:text-accent-hover hover:underline"
+          >
+            {siteConfig.contactEmail}
+          </Link>
+        </div>
+        <Text size="sm" color="faint">
+          Messages are read by a person. There is no newsletter signup hidden in
+          this form.
+        </Text>
       </div>
+
+      <ContactForm />
     </article>
   );
 }

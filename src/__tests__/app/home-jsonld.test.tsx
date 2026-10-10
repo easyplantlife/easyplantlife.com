@@ -8,10 +8,18 @@
 import { render } from "@testing-library/react";
 import Home from "@/app/page";
 
-/**
- * Helper function to extract all JSON-LD data from rendered component
- */
-function getAllJsonLdData(container: HTMLElement): unknown[] {
+jest.mock("@/lib/api/medium", () => ({
+  fetchMediumPosts: jest.fn().mockResolvedValue([]),
+}));
+
+type JsonLd = {
+  "@context"?: string;
+  "@type"?: string;
+  name?: string;
+  url?: string;
+};
+
+function getAllJsonLdData(container: HTMLElement): JsonLd[] {
   const scripts = container.querySelectorAll(
     'script[type="application/ld+json"]'
   );
@@ -20,56 +28,35 @@ function getAllJsonLdData(container: HTMLElement): unknown[] {
   );
 }
 
+async function renderHomeJsonLd() {
+  const { container } = render(await Home());
+  return getAllJsonLdData(container);
+}
+
 describe("Home Page JSON-LD", () => {
-  it("includes Organization JSON-LD", () => {
-    const { container } = render(<Home />);
-    const jsonLdData = getAllJsonLdData(container);
-    const organizationData = jsonLdData.find(
-      (data) => (data as { "@type"?: string })?.["@type"] === "Organization"
-    );
-    expect(organizationData).toBeDefined();
+  it("includes Organization JSON-LD", async () => {
+    const data = await renderHomeJsonLd();
+    expect(data.find((d) => d["@type"] === "Organization")).toBeDefined();
   });
 
-  it("includes WebSite JSON-LD", () => {
-    const { container } = render(<Home />);
-    const jsonLdData = getAllJsonLdData(container);
-    const websiteData = jsonLdData.find(
-      (data) => (data as { "@type"?: string })?.["@type"] === "WebSite"
-    );
-    expect(websiteData).toBeDefined();
+  it("includes WebSite JSON-LD", async () => {
+    const data = await renderHomeJsonLd();
+    expect(data.find((d) => d["@type"] === "WebSite")).toBeDefined();
   });
 
-  it("Organization schema has correct structure", () => {
-    const { container } = render(<Home />);
-    const jsonLdData = getAllJsonLdData(container);
-    const organizationData = jsonLdData.find(
-      (data) => (data as { "@type"?: string })?.["@type"] === "Organization"
-    ) as {
-      "@context"?: string;
-      "@type"?: string;
-      name?: string;
-      url?: string;
-    };
-
-    expect(organizationData?.["@context"]).toBe("https://schema.org");
-    expect(organizationData?.name).toBe("Easy Plant Life");
-    expect(organizationData?.url).toBe("https://easyplantlife.com");
+  it("Organization schema has correct structure", async () => {
+    const data = await renderHomeJsonLd();
+    const org = data.find((d) => d["@type"] === "Organization");
+    expect(org?.["@context"]).toBe("https://schema.org");
+    expect(org?.name).toBe("Easy Plant Life");
+    expect(org?.url).toBe("https://easyplantlife.com");
   });
 
-  it("WebSite schema has correct structure", () => {
-    const { container } = render(<Home />);
-    const jsonLdData = getAllJsonLdData(container);
-    const websiteData = jsonLdData.find(
-      (data) => (data as { "@type"?: string })?.["@type"] === "WebSite"
-    ) as {
-      "@context"?: string;
-      "@type"?: string;
-      name?: string;
-      url?: string;
-    };
-
-    expect(websiteData?.["@context"]).toBe("https://schema.org");
-    expect(websiteData?.name).toBe("Easy Plant Life");
-    expect(websiteData?.url).toBe("https://easyplantlife.com");
+  it("WebSite schema has correct structure", async () => {
+    const data = await renderHomeJsonLd();
+    const site = data.find((d) => d["@type"] === "WebSite");
+    expect(site?.["@context"]).toBe("https://schema.org");
+    expect(site?.name).toBe("Easy Plant Life");
+    expect(site?.url).toBe("https://easyplantlife.com");
   });
 });

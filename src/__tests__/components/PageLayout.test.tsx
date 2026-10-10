@@ -4,15 +4,8 @@ import { PageLayout } from "@/components/PageLayout";
 /**
  * PageLayout Component Tests
  *
- * Tests for the reusable PageLayout component following TDD approach.
- * Verifies consistent structure, spacing, title handling, and hero variant.
- *
- * Acceptance Criteria (Issue #23):
- * - PageLayout component created
- * - Accepts title prop for page heading
- * - Consistent vertical padding
- * - Uses Container component
- * - Optional hero variant for home page
+ * Verifies the main landmark, the shared intro block (eyebrow, title, lead,
+ * action), the Container integration and the narrow variant.
  */
 
 describe("PageLayout Component", () => {
@@ -28,30 +21,71 @@ describe("PageLayout Component", () => {
       expect(layout.tagName).toBe("MAIN");
     });
 
-    it("renders without title when not provided", () => {
+    it("renders without an intro when no title, eyebrow or lead is given", () => {
       render(<PageLayout>Content</PageLayout>);
       expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+      expect(screen.queryByRole("banner")).not.toBeInTheDocument();
     });
   });
 
-  describe("Title Prop", () => {
+  describe("Intro Block", () => {
     it("renders title as h1 heading when provided", () => {
       render(<PageLayout title="Page Title">Content</PageLayout>);
       const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeInTheDocument();
       expect(heading).toHaveTextContent("Page Title");
     });
 
-    it("title uses Heading component styling", () => {
+    it("title uses the serif Heading styling", () => {
       render(<PageLayout title="Page Title">Content</PageLayout>);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("font-heading");
+      expect(screen.getByRole("heading", { level: 1 })).toHaveClass(
+        "font-serif"
+      );
     });
 
-    it("title has appropriate margin below for spacing", () => {
+    it("renders an eyebrow above the title", () => {
+      render(
+        <PageLayout eyebrow="Books" title="Two short books">
+          Content
+        </PageLayout>
+      );
+      const eyebrow = screen.getByText("Books");
+      expect(eyebrow).toHaveClass("uppercase");
+      expect(
+        eyebrow.compareDocumentPosition(
+          screen.getByRole("heading", { level: 1 })
+        )
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it("renders a lead paragraph under the title", () => {
+      render(
+        <PageLayout title="Blog" lead="The writing lives on Medium.">
+          Content
+        </PageLayout>
+      );
+      expect(screen.getByText("The writing lives on Medium.")).toHaveClass(
+        "text-muted"
+      );
+    });
+
+    it("renders an optional action beside the intro", () => {
+      render(
+        <PageLayout
+          title="Blog"
+          action={<a href="https://medium.com">Follow</a>}
+        >
+          Content
+        </PageLayout>
+      );
+      expect(screen.getByRole("link", { name: "Follow" })).toBeInTheDocument();
+    });
+
+    it("wraps the intro in a header with space below it", () => {
       render(<PageLayout title="Page Title">Content</PageLayout>);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("mb-8");
+      const header = screen
+        .getByRole("heading", { level: 1 })
+        .closest("header");
+      expect(header).toHaveClass("mb-12");
     });
   });
 
@@ -59,13 +93,13 @@ describe("PageLayout Component", () => {
     it("has consistent vertical padding", () => {
       render(<PageLayout data-testid="page-layout">Content</PageLayout>);
       const layout = screen.getByTestId("page-layout");
-      expect(layout).toHaveClass("py-12");
+      expect(layout).toHaveClass("pt-20");
+      expect(layout).toHaveClass("pb-24");
     });
 
-    it("has larger vertical padding on larger screens", () => {
+    it("fills the remaining height so the footer stays at the bottom", () => {
       render(<PageLayout data-testid="page-layout">Content</PageLayout>);
-      const layout = screen.getByTestId("page-layout");
-      expect(layout).toHaveClass("md:py-16");
+      expect(screen.getByTestId("page-layout")).toHaveClass("flex-1");
     });
   });
 
@@ -76,9 +110,7 @@ describe("PageLayout Component", () => {
           <div data-testid="child">Content</div>
         </PageLayout>
       );
-      const child = screen.getByTestId("child");
-      // Container has mx-auto class for centering
-      const container = child.parentElement;
+      const container = screen.getByTestId("child").parentElement;
       expect(container).toHaveClass("mx-auto");
     });
 
@@ -88,9 +120,8 @@ describe("PageLayout Component", () => {
           <div data-testid="child">Content</div>
         </PageLayout>
       );
-      const child = screen.getByTestId("child");
-      const container = child.parentElement;
-      expect(container).toHaveClass("max-w-6xl");
+      const container = screen.getByTestId("child").parentElement;
+      expect(container).toHaveClass("max-w-content");
     });
 
     it("Container has responsive horizontal padding", () => {
@@ -99,60 +130,45 @@ describe("PageLayout Component", () => {
           <div data-testid="child">Content</div>
         </PageLayout>
       );
-      const child = screen.getByTestId("child");
-      const container = child.parentElement;
-      expect(container).toHaveClass("px-4");
-      expect(container).toHaveClass("md:px-6");
-      expect(container).toHaveClass("lg:px-8");
+      const container = screen.getByTestId("child").parentElement;
+      expect(container).toHaveClass("px-5");
+      expect(container).toHaveClass("sm:px-8");
+      expect(container).toHaveClass("lg:px-12");
     });
   });
 
-  describe("Hero Variant", () => {
-    it("renders hero variant when variant is hero", () => {
+  describe("Narrow Variant", () => {
+    it("uses the narrow container", () => {
       render(
-        <PageLayout variant="hero" data-testid="page-layout">
+        <PageLayout variant="narrow">
+          <div data-testid="child">Content</div>
+        </PageLayout>
+      );
+      const container = screen.getByTestId("child").parentElement;
+      expect(container).toHaveClass("max-w-narrow");
+    });
+
+    it("centers the intro text", () => {
+      render(
+        <PageLayout variant="narrow" title="Newsletter">
           Content
         </PageLayout>
       );
-      const layout = screen.getByTestId("page-layout");
-      expect(layout).toBeInTheDocument();
+      const header = screen
+        .getByRole("heading", { level: 1 })
+        .closest("header");
+      expect(header).toHaveClass("text-center");
     });
 
-    it("hero variant has increased vertical padding", () => {
+    it("can still render a title", () => {
       render(
-        <PageLayout variant="hero" data-testid="page-layout">
+        <PageLayout variant="narrow" title="Welcome">
           Content
         </PageLayout>
       );
-      const layout = screen.getByTestId("page-layout");
-      expect(layout).toHaveClass("py-16");
-      expect(layout).toHaveClass("md:py-24");
-    });
-
-    it("hero variant can still render title", () => {
-      render(
-        <PageLayout variant="hero" title="Welcome">
-          Content
-        </PageLayout>
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        "Welcome"
       );
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent("Welcome");
-    });
-
-    it("hero variant uses larger title size", () => {
-      render(
-        <PageLayout variant="hero" title="Welcome">
-          Content
-        </PageLayout>
-      );
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("text-5xl");
-    });
-
-    it("default variant uses standard title size", () => {
-      render(<PageLayout title="Page Title">Content</PageLayout>);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("text-4xl");
     });
   });
 
@@ -163,8 +179,7 @@ describe("PageLayout Component", () => {
           Content
         </PageLayout>
       );
-      const layout = screen.getByTestId("page-layout");
-      expect(layout).toHaveClass("custom-class");
+      expect(screen.getByTestId("page-layout")).toHaveClass("custom-class");
     });
 
     it("custom className does not override base vertical padding", () => {
@@ -173,8 +188,7 @@ describe("PageLayout Component", () => {
           Content
         </PageLayout>
       );
-      const layout = screen.getByTestId("page-layout");
-      expect(layout).toHaveClass("py-12");
+      expect(screen.getByTestId("page-layout")).toHaveClass("pt-20");
     });
   });
 
@@ -203,7 +217,6 @@ describe("PageLayout Component", () => {
 
     it("title heading provides document structure", () => {
       render(<PageLayout title="About Us">Content</PageLayout>);
-      // H1 heading is present for screen reader navigation
       expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
     });
   });

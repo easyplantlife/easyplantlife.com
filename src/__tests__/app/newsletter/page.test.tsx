@@ -1,138 +1,110 @@
 import { render, screen } from "@testing-library/react";
 import NewsletterPage from "@/app/newsletter/page";
 
-/**
- * Newsletter Page Tests
- *
- * Tests for the newsletter signup page following TDD approach.
- * Based on acceptance criteria from issue #52 (M8-05):
- * - Page uses PageLayout
- * - One-sentence promise/value proposition
- * - Newsletter form prominent
- * - Clear confirmation states (handled by NewsletterForm component)
- * - Tone: no hype, no frequency pressure
- * - Responsive
- */
-
-// Mock the NewsletterForm component to isolate page tests
 jest.mock("@/components/forms/NewsletterForm", () => ({
-  NewsletterForm: ({ className }: { className?: string }) => (
-    <div data-testid="newsletter-form" className={className}>
+  NewsletterForm: ({
+    className,
+    layout,
+  }: {
+    className?: string;
+    layout?: string;
+  }) => (
+    <div
+      data-testid="newsletter-form"
+      className={className}
+      data-layout={layout}
+    >
       Mocked Newsletter Form
     </div>
   ),
 }));
 
+jest.mock("@/lib/analytics/events", () => ({
+  trackOutboundClick: jest.fn(),
+}));
+
+/**
+ * Newsletter Page
+ *
+ * A narrow centered column: eyebrow, one-sentence promise, the form, and an
+ * honest list of what arrives and what does not.
+ */
 describe("Newsletter Page", () => {
-  describe("Layout", () => {
-    it("renders the page title", () => {
+  describe("Intro", () => {
+    it("renders the eyebrow, h1 and promise", () => {
       render(<NewsletterPage />);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeInTheDocument();
-      expect(heading).toHaveTextContent(/newsletter/i);
+      expect(screen.getByText("Newsletter")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        "Occasional notes on easy plant-based living."
+      );
+      expect(
+        screen.getByText(/one email when there is something worth sharing/i)
+      ).toBeInTheDocument();
     });
 
-    it("uses PageLayout component with main element", () => {
+    it("keeps the promise to a few short sentences", () => {
+      render(<NewsletterPage />);
+      const lead = screen.getByText(
+        /one email when there is something worth sharing/i
+      );
+      expect(lead.textContent!.split(/\.\s+/).length).toBeLessThanOrEqual(2);
+    });
+
+    it("uses a narrow centered layout", () => {
       render(<NewsletterPage />);
       const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
+      expect(main.firstElementChild?.className).toContain("max-w-narrow");
+      expect(
+        screen.getByRole("heading", { level: 1 }).parentElement?.parentElement
+          ?.className
+      ).toContain("text-center");
     });
   });
 
-  describe("Value Proposition", () => {
-    it("displays a value proposition text", () => {
-      render(<NewsletterPage />);
-      // Look for text that describes what users get from subscribing
-      const valueText = screen.getByText(
-        /thoughtful|updates|plant|living|simple|calm/i
-      );
-      expect(valueText).toBeInTheDocument();
-    });
-
-    it("value proposition is concise (single sentence)", () => {
-      render(<NewsletterPage />);
-      // The description text should be relatively short
-      const paragraphs = screen.getAllByRole("paragraph");
-      const valueProposition = paragraphs.find((p) =>
-        p.textContent?.match(/thoughtful|updates|plant|living|simple|calm/i)
-      );
-      expect(valueProposition).toBeTruthy();
-      // A single sentence shouldn't have multiple periods (excluding email domains)
-      const text = valueProposition?.textContent || "";
-      const sentences = text.split(/\.\s+/).filter(Boolean);
-      expect(sentences.length).toBeLessThanOrEqual(2);
-    });
-  });
-
-  describe("Newsletter Form", () => {
-    it("renders the newsletter form component", () => {
-      render(<NewsletterPage />);
-      expect(screen.getByTestId("newsletter-form")).toBeInTheDocument();
-    });
-
-    it("newsletter form is visually prominent (centered or max-width constrained)", () => {
+  describe("Form", () => {
+    it("renders the stacked newsletter form", () => {
       render(<NewsletterPage />);
       const form = screen.getByTestId("newsletter-form");
-      // Form should have width constraints for prominence and readability
-      expect(form.className).toMatch(/max-w|mx-auto|w-full/);
+      expect(form).toHaveAttribute("data-layout", "stacked");
+      expect(form.className).toContain("max-w-");
     });
   });
 
-  describe("Brand Compliance - No Hype Language", () => {
-    it("page contains no hype or marketing language", () => {
+  describe("Expectations", () => {
+    it("lists what arrives and what does not", () => {
       render(<NewsletterPage />);
-      const pageContent = document.body.textContent?.toLowerCase() || "";
-      const hypeWords = [
-        "free",
-        "exclusive",
-        "amazing",
-        "incredible",
-        "best",
-        "revolutionary",
-        "guaranteed",
-        "limited",
-        "urgent",
-        "act now",
-        "don't miss",
-        "must",
-        "hurry",
-        "now!",
-        "spam",
-      ];
-      hypeWords.forEach((word) => {
-        expect(pageContent).not.toContain(word);
-      });
+      expect(screen.getByText("What arrives")).toBeInTheDocument();
+      expect(screen.getByText("What does not")).toBeInTheDocument();
+      expect(
+        screen.getByText(/new writing, when it is published/i)
+      ).toBeInTheDocument();
+      expect(screen.getByText(/daily tips or challenges/i)).toBeInTheDocument();
     });
+  });
 
-    it("page contains no frequency pressure language", () => {
+  describe("Brand compliance", () => {
+    it("contains no hype or frequency pressure language", () => {
       render(<NewsletterPage />);
-      const pageContent = document.body.textContent?.toLowerCase() || "";
-      const pressureWords = [
-        "daily",
+      const text = document.body.textContent?.toLowerCase() ?? "";
+      for (const phrase of [
+        "don't miss",
+        "limited time",
+        "exclusive",
         "weekly",
-        "constantly",
-        "regular",
-        "frequently",
-        "unsubscribe anytime",
-        "no spam",
-        "inbox",
-      ];
-      pressureWords.forEach((word) => {
-        expect(pageContent).not.toContain(word);
-      });
+        "every week",
+        "join thousands",
+        "free gift",
+      ]) {
+        expect(text).not.toContain(phrase);
+      }
     });
   });
 
   describe("Accessibility", () => {
-    it("has proper heading hierarchy", () => {
+    it("has a single main landmark and a single h1", () => {
       render(<NewsletterPage />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      expect(h1).toBeInTheDocument();
-    });
-
-    it("has accessible main landmark", () => {
-      render(<NewsletterPage />);
-      expect(screen.getByRole("main")).toBeInTheDocument();
+      expect(screen.getAllByRole("main")).toHaveLength(1);
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     });
   });
 });

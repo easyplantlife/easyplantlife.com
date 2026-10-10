@@ -16,16 +16,55 @@ describe("Barrel Exports", () => {
   });
 
   describe("components/blog/index.ts", () => {
-    it("exports BlogPostCard component", async () => {
-      const { BlogPostCard } = await import("@/components/blog");
-      expect(BlogPostCard).toBeDefined();
-      expect(typeof BlogPostCard).toBe("function");
+    it("exports BlogPostRow component", async () => {
+      const { BlogPostRow } = await import("@/components/blog");
+      expect(BlogPostRow).toBeDefined();
+      expect(typeof BlogPostRow).toBe("function");
+    });
+
+    it("no longer exports the removed BlogPostCard", async () => {
+      const blog = (await import("@/components/blog")) as Record<
+        string,
+        unknown
+      >;
+      expect(blog.BlogPostCard).toBeUndefined();
     });
 
     it("exports BlogPostsList component", async () => {
       const { BlogPostsList } = await import("@/components/blog");
       expect(BlogPostsList).toBeDefined();
       expect(typeof BlogPostsList).toBe("function");
+    });
+  });
+
+  describe("components/books/index.ts", () => {
+    it("exports BookItem and BooksList components", async () => {
+      const { BookItem, BooksList } = await import("@/components/books");
+      expect(typeof BookItem).toBe("function");
+      expect(typeof BooksList).toBe("function");
+    });
+  });
+
+  describe("components/theme/index.ts", () => {
+    it("exports the theme provider, toggle and script", async () => {
+      const { ThemeProvider, ThemeToggle, ThemeScript, useTheme } =
+        await import("@/components/theme");
+      expect(typeof ThemeProvider).toBe("function");
+      expect(typeof ThemeToggle).toBe("function");
+      expect(typeof ThemeScript).toBe("function");
+      expect(typeof useTheme).toBe("function");
+    });
+  });
+
+  describe("content/index.ts", () => {
+    it("exports books, site config and navigation", async () => {
+      const content = await import("@/content");
+      expect(Array.isArray(content.books)).toBe(true);
+      expect(typeof content.getBookStatusLabel).toBe("function");
+      expect(content.siteConfig.name).toBe("Easy Plant Life");
+      expect(Array.isArray(content.mainNavigation)).toBe(true);
+      expect(Array.isArray(content.footerNavigation)).toBe(true);
+      expect(content.newsletterNavItem.href).toBe("/newsletter");
     });
   });
 
@@ -66,6 +105,18 @@ describe("Barrel Exports", () => {
       const { fetchMediumPosts } = await import("@/lib/api");
       expect(fetchMediumPosts).toBeDefined();
       expect(typeof fetchMediumPosts).toBe("function");
+    });
+
+    it("exports getBlogPosts function", async () => {
+      const { getBlogPosts } = await import("@/lib/api");
+      expect(typeof getBlogPosts).toBe("function");
+    });
+
+    it("exports the browser form callers", async () => {
+      const { subscribeToNewsletter, sendContactMessage } =
+        await import("@/lib/api");
+      expect(typeof subscribeToNewsletter).toBe("function");
+      expect(typeof sendContactMessage).toBe("function");
     });
 
     it("exports getResendClient function", async () => {
