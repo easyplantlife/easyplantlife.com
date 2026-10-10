@@ -1,95 +1,71 @@
 "use client";
 
 import NextLink from "next/link";
-import Image from "next/image";
-import { MobileNav } from "./MobileNav";
+import { usePathname } from "next/navigation";
+import { Brand } from "@/components/Brand";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Container } from "@/components/ui/Container";
+import { mainNavigation, newsletterNavItem } from "@/content/navigation";
+import { cn, isActivePath } from "@/lib/utils";
 
 /**
- * Navigation link configuration
- */
-interface NavLink {
-  name: string;
-  href: string;
-}
-
-const navLinks: NavLink[] = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Books", href: "/books" },
-  { name: "Blog", href: "/blog" },
-  { name: "Newsletter", href: "/newsletter" },
-  { name: "Contact", href: "/contact" },
-];
-
-/**
- * Header Component
+ * Header
  *
- * Site header with logo and navigation for Easy Plant Life.
- * Features responsive design with mobile menu and desktop navigation.
- * Uses mark logo on mobile and lockup logo on desktop.
- *
- * @example
- * ```tsx
- * <Header />
- * ```
+ * Brand on the left, navigation on the right. There is no hamburger menu:
+ * the navigation row wraps beneath the brand when the viewport is narrow, so
+ * every link stays one tap away at any width.
  */
 export function Header() {
-  return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <NextLink
-            href="/"
-            aria-label="Easy Plant Life"
-            className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm"
-          >
-            {/* Mark logo + text for mobile */}
-            <div className="md:hidden flex items-center gap-2">
-              <Image
-                src="/images/mark-logo.png"
-                alt=""
-                width={40}
-                height={40}
-                priority
-                aria-hidden="true"
-              />
-              <span className="font-heading text-lg font-semibold text-text">
-                Easy Plant Life
-              </span>
-            </div>
-            {/* Lockup logo for desktop */}
-            <Image
-              src="/images/lockup-logo.png"
-              alt=""
-              width={180}
-              height={60}
-              className="hidden md:block mt-4"
-              priority
-              aria-hidden="true"
-            />
-          </NextLink>
+  const pathname = usePathname();
 
-          {/* Desktop Navigation */}
-          <nav
-            aria-label="Main navigation"
-            className="hidden md:flex items-center space-x-8"
-          >
-            {navLinks.map((link) => (
-              <NextLink
-                key={link.href}
-                href={link.href}
-                className="text-neutral-700 font-medium hover:text-primary-600 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-sm relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-primary-500 hover:after:w-full after:transition-all after:duration-300"
-              >
-                {link.name}
-              </NextLink>
-            ))}
+  return (
+    <header className="border-b border-line bg-ground dark:border-tint-line dark:bg-surface">
+      <Container className="flex min-h-[4.5rem] flex-wrap items-center justify-between gap-x-6 gap-y-3 py-3">
+        <Brand />
+
+        <div className="ml-auto flex flex-wrap items-center gap-x-5 gap-y-2">
+          <nav aria-label="Main navigation">
+            <ul className="flex flex-wrap items-center gap-x-7 gap-y-2">
+              {mainNavigation.map((item) => {
+                const active = isActivePath(pathname, item.href);
+                return (
+                  <li key={item.href}>
+                    <NextLink
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      className={cn(
+                        "inline-block border-b-2 py-2 font-sans font-medium transition-colors",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ground rounded-sm",
+                        active
+                          ? "border-accent text-ink"
+                          : "border-transparent text-muted hover:text-ink dark:text-ink dark:hover:text-accent"
+                      )}
+                    >
+                      {item.label}
+                    </NextLink>
+                  </li>
+                );
+              })}
+            </ul>
           </nav>
 
-          {/* Mobile Navigation */}
-          <MobileNav links={navLinks} />
+          <ButtonLink
+            href={newsletterNavItem.href}
+            variant="secondary"
+            size="sm"
+            aria-current={
+              isActivePath(pathname, newsletterNavItem.href)
+                ? "page"
+                : undefined
+            }
+          >
+            {newsletterNavItem.label}
+          </ButtonLink>
+
+          <ThemeToggle />
         </div>
-      </div>
+      </Container>
     </header>
   );
 }
