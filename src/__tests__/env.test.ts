@@ -11,7 +11,6 @@ describe("Environment Variables Configuration", () => {
       const envVars: (keyof NodeJS.ProcessEnv)[] = [
         "NEXT_PUBLIC_GA_MEASUREMENT_ID",
         "RESEND_API_KEY",
-        "MEDIUM_PUBLICATION_URL",
       ];
 
       // Verify that we can reference these without TypeScript errors
@@ -65,7 +64,7 @@ describe("Environment Variables Configuration", () => {
 
     it("should validate that server-only variables do NOT use NEXT_PUBLIC_ prefix", () => {
       // Server-only env vars should NOT start with NEXT_PUBLIC_
-      const serverVars = ["RESEND_API_KEY", "MEDIUM_PUBLICATION_URL"];
+      const serverVars = ["RESEND_API_KEY", "RESEND_AUDIENCE_ID"];
 
       serverVars.forEach((varName) => {
         expect(varName.startsWith("NEXT_PUBLIC_")).toBe(false);

@@ -244,7 +244,7 @@ describe("NewsletterForm", () => {
       await submitSuccessfully(
         <NewsletterForm
           onSubmit={jest.fn().mockResolvedValue(undefined)}
-          successActions={<a href="/blog">Read something now</a>}
+          successActions={<a href="/books">Read something now</a>}
         />
       );
       expect(

@@ -7,7 +7,7 @@ import {
   RECENT_WRITING_LIMIT,
 } from "@/components/home";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
-import { getBlogPosts } from "@/lib/api/blog";
+import { getAllPosts } from "@/lib/blog/posts";
 
 /**
  * Home Page SEO Metadata
@@ -43,9 +43,6 @@ export const metadata: Metadata = {
   },
 };
 
-/** Re-fetch the Medium feed at most once an hour. */
-export const revalidate = 3600;
-
 /**
  * Home Page
  *
@@ -54,10 +51,8 @@ export const revalidate = 3600;
  * 3. Recent writing - the three newest posts
  * 4. Books - both books, cover first
  */
-export default async function Home() {
-  const { posts, error } = await getBlogPosts({
-    maxPosts: RECENT_WRITING_LIMIT,
-  });
+export default function Home() {
+  const posts = getAllPosts().slice(0, RECENT_WRITING_LIMIT);
 
   return (
     <main className="min-h-full bg-ground">
@@ -66,7 +61,7 @@ export default async function Home() {
 
       <Hero />
       <IdeaSection />
-      <RecentWriting posts={posts} error={error} />
+      <RecentWriting posts={posts} />
       <BooksPreview />
     </main>
   );

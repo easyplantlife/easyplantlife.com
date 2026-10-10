@@ -19,7 +19,7 @@ describe("SectionHeader", () => {
 
   it("renders an optional action", () => {
     render(
-      <SectionHeader title="Recent writing" action={<a href="/blog">All</a>} />
+      <SectionHeader title="Recent writing" action={<a href="/books">All</a>} />
     );
     expect(screen.getByRole("link", { name: "All" })).toBeInTheDocument();
   });

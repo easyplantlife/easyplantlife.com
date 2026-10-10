@@ -8,7 +8,7 @@ export const siteConfig = {
   tagline:
     "A quiet place on the internet for plant-based living that fits real life.",
   url: "https://easyplantlife.com",
-  /** Medium is the canonical home of the writing; the site only lists it. */
+  /** Where the writing was first published; the posts now live on this site. */
   mediumUsername: "easyplantlife",
   mediumUrl: "https://medium.com/@easyplantlife",
   contactEmail: "hello@easyplantlife.com",

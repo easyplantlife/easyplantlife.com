@@ -25,13 +25,5 @@ declare namespace NodeJS {
      * Used for: Sending newsletter signups and contact form emails
      */
     RESEND_API_KEY?: string;
-
-    /**
-     * Medium Publication URL
-     * Format: https://medium.com/@publication or https://publication.medium.com
-     * Context: Server-only
-     * Used for: Fetching blog excerpts via RSS
-     */
-    MEDIUM_PUBLICATION_URL?: string;
   }
 }

@@ -8,8 +8,8 @@
 import { render } from "@testing-library/react";
 import Home from "@/app/page";
 
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn().mockResolvedValue([]),
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn().mockReturnValue([]),
 }));
 
 type JsonLd = {

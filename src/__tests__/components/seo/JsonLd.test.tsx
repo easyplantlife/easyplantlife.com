@@ -10,7 +10,7 @@
  * - [ ] Book schema on books page (for each book)
  * - [ ] Article schema for blog posts (if rendered on-site)
  *
- * Note: Blog posts are rendered on Medium, not on-site, so Article schema is not needed.
+ * Note: BlogPosting schema for self-hosted posts is covered in BlogPostingJsonLd.test.tsx.
  * Note: Site does not have search functionality, so WebSite schema omits search action.
  */
 

@@ -1,10 +1,11 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
-import { fetchMediumPosts } from "@/lib/api/medium";
+import { getAllPosts } from "@/lib/blog/posts";
+import type { BlogPostEntry } from "@/lib/types/blog";
 
-jest.mock("@/lib/api/medium", () => ({
-  fetchMediumPosts: jest.fn(),
+jest.mock("@/lib/blog/posts", () => ({
+  getAllPosts: jest.fn(),
 }));
 
 jest.mock("@/lib/analytics/events", () => ({
@@ -13,32 +14,30 @@ jest.mock("@/lib/analytics/events", () => ({
   trackOutboundClick: jest.fn(),
 }));
 
-const mockFetchPosts = fetchMediumPosts as jest.MockedFunction<
-  typeof fetchMediumPosts
->;
+const mockGetAllPosts = getAllPosts as jest.MockedFunction<typeof getAllPosts>;
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-const posts = [
+const posts: BlogPostEntry[] = [
   {
-    id: "1",
+    slug: "default-meals",
     title: "Default meals",
     excerpt: "Why having a boring default is the whole trick.",
-    url: "https://medium.com/@easyplantlife/default-meals",
+    url: "/blog/default-meals",
     publishedDate: new Date("2026-03-01"),
   },
   {
-    id: "2",
+    slug: "good-enough",
     title: "Good enough",
     excerpt: "On giving up perfection.",
-    url: "https://medium.com/@easyplantlife/good-enough",
+    url: "/blog/good-enough",
     publishedDate: new Date("2026-02-01"),
   },
 ];
 
-async function renderHome() {
-  return render(await Home());
+function renderHome() {
+  return render(<Home />);
 }
 
 /**
@@ -50,8 +49,8 @@ async function renderHome() {
 describe("Home Page", () => {
   beforeEach(() => {
     mockFetch.mockReset();
-    mockFetchPosts.mockReset();
-    mockFetchPosts.mockResolvedValue(posts);
+    mockGetAllPosts.mockReset();
+    mockGetAllPosts.mockReturnValue(posts);
   });
 
   describe("Page Structure", () => {
@@ -147,7 +146,7 @@ describe("Home Page", () => {
   });
 
   describe("Recent writing", () => {
-    it("lists the latest posts with links to Medium", async () => {
+    it("lists the latest posts with links to their pages", async () => {
       await renderHome();
       const section = screen.getByTestId("recent-writing");
       expect(
@@ -157,27 +156,34 @@ describe("Home Page", () => {
         })
       ).toBeInTheDocument();
       const readLinks = within(section).getAllByRole("link", {
-        name: /read ".*" on medium/i,
+        name: /^read ".*"$/i,
       });
       expect(readLinks).toHaveLength(posts.length);
-      expect(readLinks[0]).toHaveAttribute("target", "_blank");
+      expect(readLinks[0]).toHaveAttribute("href", "/blog/default-meals");
+      expect(readLinks[0]).not.toHaveAttribute("target");
     });
 
-    it("asks the feed for only a few posts", async () => {
-      await renderHome();
-      expect(mockFetchPosts).toHaveBeenCalledWith(
-        expect.objectContaining({ maxPosts: 3 })
+    it("shows only the three newest posts", async () => {
+      mockGetAllPosts.mockReturnValue(
+        Array.from({ length: 5 }, (_, i) => ({
+          ...posts[0],
+          slug: `post-${i}`,
+          title: `Post ${i}`,
+          url: `/blog/post-${i}`,
+        }))
       );
-    });
-
-    it("degrades calmly when the feed fails", async () => {
-      mockFetchPosts.mockRejectedValue(new Error("down"));
       await renderHome();
       const section = screen.getByTestId("recent-writing");
-      expect(within(section).getByRole("alert")).toHaveTextContent(
-        /could not be loaded/i
-      );
-      expect(screen.getByTestId("hero-section")).toBeInTheDocument();
+      expect(within(section).getAllByRole("listitem")).toHaveLength(3);
+    });
+
+    it("shows a calm empty state when nothing is published", async () => {
+      mockGetAllPosts.mockReturnValue([]);
+      await renderHome();
+      const section = screen.getByTestId("recent-writing");
+      expect(
+        within(section).getByText(/nothing published yet/i)
+      ).toBeInTheDocument();
       expect(screen.getByTestId("books-preview")).toBeInTheDocument();
     });
   });

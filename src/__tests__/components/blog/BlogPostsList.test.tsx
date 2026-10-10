@@ -10,19 +10,19 @@ const posts: BlogPost[] = [
   {
     title: "First post",
     excerpt: "First excerpt",
-    url: "https://medium.com/@easyplantlife/first",
+    url: "/blog/first",
     publishedDate: new Date("2026-03-01T00:00:00Z"),
   },
   {
     title: "Second post",
     excerpt: "Second excerpt",
-    url: "https://medium.com/@easyplantlife/second",
+    url: "/blog/second",
     publishedDate: new Date("2026-02-01T00:00:00Z"),
   },
   {
     title: "Third post",
     excerpt: "Third excerpt",
-    url: "https://medium.com/@easyplantlife/third",
+    url: "/blog/third",
     publishedDate: new Date("2026-01-01T00:00:00Z"),
   },
 ];
@@ -36,16 +36,27 @@ describe("BlogPostsList", () => {
       expect(within(list).getAllByRole("article")).toHaveLength(3);
     });
 
+    it("shows thumbnails only when asked", () => {
+      const withCover = [
+        { ...posts[0], thumbnail: "/images/blog/first/01.jpeg" },
+      ];
+      const { unmount } = render(<BlogPostsList posts={withCover} />);
+      expect(screen.queryByTestId("post-thumbnail")).not.toBeInTheDocument();
+      unmount();
+      render(<BlogPostsList posts={withCover} showThumbnails />);
+      expect(screen.getByTestId("post-thumbnail")).toBeInTheDocument();
+    });
+
     it("closes the hairline list with a bottom border", () => {
       render(<BlogPostsList posts={posts} />);
       expect(screen.getByRole("list").className).toContain("border-b");
     });
 
-    it("renders titles, excerpts and Medium links", () => {
+    it("renders titles, excerpts and read links", () => {
       render(<BlogPostsList posts={posts} />);
       expect(screen.getByText("First excerpt")).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: 'Read "Second post" on Medium' })
+        screen.getByRole("link", { name: 'Read "Second post"' })
       ).toHaveAttribute("href", posts[1].url);
     });
 

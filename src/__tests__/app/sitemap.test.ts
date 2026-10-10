@@ -10,6 +10,7 @@
  */
 
 import type { MetadataRoute } from "next";
+import { getAllPosts } from "@/lib/blog/posts";
 
 describe("Sitemap Generation", () => {
   let sitemap: MetadataRoute.Sitemap;
@@ -60,6 +61,20 @@ describe("Sitemap Generation", () => {
         const found = sitemap.some((entry) => entry.url === expectedUrl);
         expect(found).toBe(true);
       });
+    });
+  });
+
+  describe("Blog Posts Included", () => {
+    it("includes every published post with its publication date", () => {
+      const posts = getAllPosts();
+      expect(posts.length).toBeGreaterThan(0);
+      for (const post of posts) {
+        const entry = sitemap.find(
+          (item) => item.url === `https://easyplantlife.com${post.url}`
+        );
+        expect(entry).toBeDefined();
+        expect(entry?.lastModified).toEqual(post.publishedDate);
+      }
     });
   });
 

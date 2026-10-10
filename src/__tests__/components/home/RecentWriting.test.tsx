@@ -13,7 +13,7 @@ function makePosts(count: number): BlogPost[] {
   return Array.from({ length: count }, (_, i) => ({
     title: `Post ${i + 1}`,
     excerpt: `Excerpt ${i + 1}`,
-    url: `https://medium.com/@easyplantlife/post-${i + 1}`,
+    url: `/blog/post-${i + 1}`,
     publishedDate: new Date(2026, 0, i + 1),
   }));
 }
@@ -77,5 +77,22 @@ describe("RecentWriting", () => {
   it("shows an empty message when there are no posts", () => {
     render(<RecentWriting posts={[]} />);
     expect(screen.getByText(/nothing published yet/i)).toBeInTheDocument();
+  });
+
+  it("keeps the list text-only even when posts have covers", () => {
+    render(
+      <RecentWriting
+        posts={[
+          {
+            title: "With a cover",
+            excerpt: "An excerpt.",
+            url: "/blog/with-a-cover",
+            publishedDate: new Date("2026-01-01T00:00:00Z"),
+            thumbnail: "/images/blog/with-a-cover/01.jpeg",
+          },
+        ]}
+      />
+    );
+    expect(screen.queryByTestId("post-thumbnail")).not.toBeInTheDocument();
   });
 });

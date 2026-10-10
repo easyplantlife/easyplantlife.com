@@ -12,6 +12,8 @@ export interface BlogPostsListProps extends HTMLAttributes<HTMLElement> {
   /** Show at most this many posts. */
   limit?: number;
   headingLevel?: 2 | 3;
+  /** Show each post's cover as a thumbnail on wide screens. */
+  showThumbnails?: boolean;
 }
 
 /**
@@ -25,6 +27,7 @@ export function BlogPostsList({
   error,
   limit,
   headingLevel = 2,
+  showThumbnails = false,
   className = "",
   ...props
 }: BlogPostsListProps) {
@@ -50,8 +53,7 @@ export function BlogPostsList({
     return (
       <div className={className} {...props}>
         <Text color="secondary">
-          Nothing published yet. New writing appears here as soon as it is on
-          Medium.
+          Nothing published yet. New writing appears here as it is written.
         </Text>
       </div>
     );
@@ -65,7 +67,11 @@ export function BlogPostsList({
     >
       {visible.map((post) => (
         <li key={post.url}>
-          <BlogPostRow post={post} headingLevel={headingLevel} />
+          <BlogPostRow
+            post={post}
+            headingLevel={headingLevel}
+            showThumbnail={showThumbnails}
+          />
         </li>
       ))}
     </ul>

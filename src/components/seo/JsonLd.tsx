@@ -7,6 +7,7 @@
  */
 
 import type { Book } from "@/content/books";
+import type { BlogPostEntry } from "@/lib/types/blog";
 
 const BASE_URL = "https://easyplantlife.com";
 const SITE_NAME = "Easy Plant Life";
@@ -96,6 +97,49 @@ export function BookJsonLd({ book }: BookJsonLdProps) {
       url: link.url,
       availability: "https://schema.org/InStock",
     }));
+  }
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+interface BlogPostingJsonLdProps {
+  post: BlogPostEntry;
+}
+
+/**
+ * BlogPosting JSON-LD Component
+ *
+ * Renders schema.org BlogPosting structured data for one self-hosted post.
+ *
+ * @param post - The post to describe
+ */
+export function BlogPostingJsonLd({ post }: BlogPostingJsonLdProps) {
+  const url = `${BASE_URL}${post.url}`;
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    url,
+    mainEntityOfPage: url,
+    datePublished: post.publishedDate.toISOString(),
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+  };
+
+  if (post.thumbnail) {
+    schema.image = `${BASE_URL}${post.thumbnail}`;
   }
 
   return (
