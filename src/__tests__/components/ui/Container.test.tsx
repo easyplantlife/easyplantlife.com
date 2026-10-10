@@ -56,8 +56,8 @@ describe("Container Component", () => {
     it("renders with default variant by default", () => {
       render(<Container data-testid="container">Content</Container>);
       const container = screen.getByTestId("container");
-      // Default variant should have standard max-width
-      expect(container).toHaveClass("max-w-6xl");
+      // Default variant is the 1120px content width
+      expect(container).toHaveClass("max-w-content");
     });
 
     it("renders with prose variant for reading-optimized width", () => {
@@ -67,8 +67,17 @@ describe("Container Component", () => {
         </Container>
       );
       const container = screen.getByTestId("container");
-      // Prose variant should have narrower max-width optimized for reading (~65ch)
+      // Prose variant is the 680px reading width
       expect(container).toHaveClass("max-w-prose");
+    });
+
+    it("renders with narrow variant for a single centered column", () => {
+      render(
+        <Container variant="narrow" data-testid="container">
+          Content
+        </Container>
+      );
+      expect(screen.getByTestId("container")).toHaveClass("max-w-narrow");
     });
 
     it("renders with wide variant for full layouts", () => {
@@ -78,8 +87,8 @@ describe("Container Component", () => {
         </Container>
       );
       const container = screen.getByTestId("container");
-      // Wide variant should have larger max-width
-      expect(container).toHaveClass("max-w-7xl");
+      // Wide variant is the 1280px width used by dev tooling
+      expect(container).toHaveClass("max-w-wide");
     });
 
     it("renders with full variant for edge-to-edge content", () => {
@@ -90,9 +99,7 @@ describe("Container Component", () => {
       );
       const container = screen.getByTestId("container");
       // Full variant should have no max-width restriction
-      expect(container).not.toHaveClass("max-w-6xl");
-      expect(container).not.toHaveClass("max-w-prose");
-      expect(container).not.toHaveClass("max-w-7xl");
+      expect(container.className).not.toMatch(/max-w-/);
     });
   });
 
@@ -125,15 +132,15 @@ describe("Container Component", () => {
       render(<Container data-testid="container">Content</Container>);
       const container = screen.getByTestId("container");
       // Should have base horizontal padding
-      expect(container).toHaveClass("px-4");
+      expect(container).toHaveClass("px-5");
     });
 
     it("has larger horizontal padding for larger viewports", () => {
       render(<Container data-testid="container">Content</Container>);
       const container = screen.getByTestId("container");
       // Should have responsive padding classes
-      expect(container).toHaveClass("md:px-6");
-      expect(container).toHaveClass("lg:px-8");
+      expect(container).toHaveClass("sm:px-8");
+      expect(container).toHaveClass("lg:px-12");
     });
 
     it("full variant still has horizontal padding", () => {
@@ -143,20 +150,20 @@ describe("Container Component", () => {
         </Container>
       );
       const container = screen.getByTestId("container");
-      expect(container).toHaveClass("px-4");
+      expect(container).toHaveClass("px-5");
     });
   });
 
   describe("Custom Styling", () => {
     it("accepts and applies custom className", () => {
       render(
-        <Container className="custom-class bg-primary" data-testid="container">
+        <Container className="custom-class bg-surface" data-testid="container">
           Content
         </Container>
       );
       const container = screen.getByTestId("container");
       expect(container).toHaveClass("custom-class");
-      expect(container).toHaveClass("bg-primary");
+      expect(container).toHaveClass("bg-surface");
     });
 
     it("custom className does not override base styles", () => {
@@ -168,7 +175,7 @@ describe("Container Component", () => {
       const container = screen.getByTestId("container");
       // Should still have base classes
       expect(container).toHaveClass("mx-auto");
-      expect(container).toHaveClass("px-4");
+      expect(container).toHaveClass("px-5");
     });
   });
 

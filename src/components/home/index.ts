@@ -1,9 +1,8 @@
-export { BookImagery } from "./BookImagery";
-export type { BookImageryProps } from "./BookImagery";
 export { Hero } from "./Hero";
-export { NewsletterCTA, handleNewsletterSubmit } from "./NewsletterCTA";
-export type { NewsletterCTAProps } from "./NewsletterCTA";
-export { SecondaryCTAs } from "./SecondaryCTAs";
-export type { SecondaryCTAsProps } from "./SecondaryCTAs";
-export { WhatYoullFind } from "./WhatYoullFind";
-export type { WhatYoullFindProps } from "./WhatYoullFind";
+export type { HeroProps } from "./Hero";
+export { IdeaSection } from "./IdeaSection";
+export type { IdeaSectionProps } from "./IdeaSection";
+export { RecentWriting, RECENT_WRITING_LIMIT } from "./RecentWriting";
+export type { RecentWritingProps } from "./RecentWriting";
+export { BooksPreview } from "./BooksPreview";
+export type { BooksPreviewProps } from "./BooksPreview";

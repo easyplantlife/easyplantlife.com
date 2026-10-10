@@ -31,12 +31,26 @@ describe("Cross-Browser CSS Compatibility", () => {
   });
 
   describe("CSS Custom Properties", () => {
-    it("uses CSS variables with fallback-safe patterns", () => {
-      // CSS variables are defined in :root
+    it("defines the design tokens as CSS variables on :root", () => {
       expect(globalsCss).toContain(":root");
-      expect(globalsCss).toContain("--background");
-      expect(globalsCss).toContain("--foreground");
-      expect(globalsCss).toContain("--primary");
+      for (const token of ["--ground", "--surface", "--ink", "--accent"]) {
+        expect(globalsCss).toContain(`${token}:`);
+      }
+    });
+
+    it("overrides the same tokens for the dark theme", () => {
+      expect(globalsCss).toContain('[data-theme="dark"]');
+      // The rule block (not the @custom-variant selector) starts with " {"
+      const darkBlock = globalsCss.split('[data-theme="dark"] {')[1];
+      expect(darkBlock).toBeDefined();
+      for (const token of ["--ground", "--surface", "--ink", "--accent"]) {
+        expect(darkBlock).toContain(`${token}:`);
+      }
+    });
+
+    it("declares color-scheme for native form controls in both themes", () => {
+      expect(globalsCss).toContain("color-scheme: light");
+      expect(globalsCss).toContain("color-scheme: dark");
     });
 
     it("defines CSS variables with valid color values", () => {
@@ -77,11 +91,11 @@ describe("Cross-Browser CSS Compatibility", () => {
   describe("Line Height Units", () => {
     it("uses unitless line-height values for headings (best practice)", () => {
       // Unitless line-height is preferred for scalability
-      expect(globalsCss).toContain("line-height: 1.25");
+      expect(globalsCss).toContain("line-height: 1.2");
     });
 
     it("uses unitless line-height for body text", () => {
-      expect(globalsCss).toContain("line-height: 1.75");
+      expect(globalsCss).toContain("line-height: 1.6");
     });
   });
 
@@ -131,6 +145,32 @@ describe("Cross-Browser CSS Compatibility", () => {
     it("uses @theme inline for CSS variable mapping", () => {
       // Tailwind v4 uses @theme for CSS variable integration
       expect(globalsCss).toContain("@theme inline");
+    });
+
+    it("maps every token to a semantic color utility", () => {
+      for (const name of [
+        "ground",
+        "surface",
+        "tint",
+        "line",
+        "ink",
+        "muted",
+        "faint",
+        "accent",
+        "on-accent",
+        "error",
+      ]) {
+        expect(globalsCss).toContain(`--color-${name}: var(--${name})`);
+      }
+    });
+
+    it("registers the dark variant on the data-theme attribute", () => {
+      expect(globalsCss).toMatch(/@custom-variant dark .*data-theme="dark"/);
+    });
+
+    it("keeps the dark theme off prefers-color-scheme media queries", () => {
+      // The attribute, set by the init script, is the single source of truth
+      expect(globalsCss).not.toContain("prefers-color-scheme");
     });
   });
 });
@@ -238,7 +278,7 @@ describe("Browser-Safe CSS Patterns in Components", () => {
         const content = fs.readFileSync(file, "utf-8");
         // If shadows are used, they should use Tailwind classes
         if (content.includes("shadow")) {
-          expect(content).toMatch(/shadow(-sm|-md|-lg|-xl|-2xl)?/);
+          expect(content).toMatch(/shadow(-sm|-md|-lg|-xl|-2xl|-cover)?/);
         }
       }
     });

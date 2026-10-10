@@ -129,37 +129,46 @@ describe("Site Performance (M11-02)", () => {
   });
 
   describe("Font Optimization", () => {
+    const fontsPath = path.join(process.cwd(), "src", "app", "fonts.ts");
+
     it("fonts use display='swap' to prevent layout shift", () => {
-      const layoutPath = path.join(process.cwd(), "src", "app", "layout.tsx");
-      const layoutContent = fs.readFileSync(layoutPath, "utf-8");
-
-      // Should use display: 'swap' for both fonts
-      expect(layoutContent).toContain('display: "swap"');
+      const fontsContent = fs.readFileSync(fontsPath, "utf-8");
+      expect(fontsContent.match(/display: "swap"/g)).toHaveLength(2);
     });
 
-    it("fonts use latin subset only for smaller bundle", () => {
-      const layoutPath = path.join(process.cwd(), "src", "app", "layout.tsx");
-      const layoutContent = fs.readFileSync(layoutPath, "utf-8");
+    it("fonts are self-hosted via next/font/local so builds never fetch from Google", () => {
+      const fontsContent = fs.readFileSync(fontsPath, "utf-8");
+      expect(fontsContent).toContain('from "next/font/local"');
+      expect(fontsContent).not.toMatch(/from "next\/font\/google"/);
 
-      // Should specify latin subset
-      expect(layoutContent).toContain('subsets: ["latin"]');
+      const layoutContent = fs.readFileSync(
+        path.join(process.cwd(), "src", "app", "layout.tsx"),
+        "utf-8"
+      );
+      expect(layoutContent).not.toMatch(/from "next\/font\/google"/);
+      expect(layoutContent).toContain('from "./fonts"');
     });
 
-    it("fonts are loaded via next/font/google for automatic optimization", () => {
-      const layoutPath = path.join(process.cwd(), "src", "app", "layout.tsx");
-      const layoutContent = fs.readFileSync(layoutPath, "utf-8");
-
-      // Should import from next/font/google
-      expect(layoutContent).toContain('from "next/font/google"');
+    it("ships variable latin-subset woff2 files for both families", () => {
+      const fontsDir = path.join(process.cwd(), "src", "fonts");
+      for (const file of [
+        "lora-latin-wght.woff2",
+        "source-sans-3-latin-wght.woff2",
+      ]) {
+        const fullPath = path.join(fontsDir, file);
+        expect(fs.existsSync(fullPath)).toBe(true);
+        // woff2 magic number
+        expect(fs.readFileSync(fullPath).subarray(0, 4).toString()).toBe(
+          "wOF2"
+        );
+        // keep the payload small: variable latin subsets are well under 100 KB
+        expect(fs.statSync(fullPath).size).toBeLessThan(100 * 1024);
+      }
     });
 
     it("fonts have adjustFontFallback enabled for reduced CLS", () => {
-      const layoutPath = path.join(process.cwd(), "src", "app", "layout.tsx");
-      const layoutContent = fs.readFileSync(layoutPath, "utf-8");
-
-      // adjustFontFallback should not be set to false
-      // (default is true for Google fonts)
-      expect(layoutContent).not.toContain("adjustFontFallback: false");
+      const fontsContent = fs.readFileSync(fontsPath, "utf-8");
+      expect(fontsContent).not.toContain("adjustFontFallback: false");
     });
   });
 

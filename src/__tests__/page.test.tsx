@@ -1,342 +1,210 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
+import { fetchMediumPosts } from "@/lib/api/medium";
 
-/**
- * Home Page Tests
- *
- * Tests for the complete home page assembly following TDD approach.
- * Based on acceptance criteria from issue #29 (M4-04):
- * - Hero section renders
- * - Newsletter CTA renders
- * - Secondary CTAs render
- * - Page is single-scroll or near single-scroll
- * - No unnecessary sections
- * - Responsive on all devices
- *
- * Additional tests for issue #53 (M8-06):
- * - Home page newsletter form submits to API
- * - Success/error states work correctly
- */
+jest.mock("@/lib/api/medium", () => ({
+  fetchMediumPosts: jest.fn(),
+}));
 
-// Mock fetch for API calls
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackNewsletterSubmit: jest.fn(),
+  trackOutboundClick: jest.fn(),
+}));
+
+const mockFetchPosts = fetchMediumPosts as jest.MockedFunction<
+  typeof fetchMediumPosts
+>;
+
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
+const posts = [
+  {
+    id: "1",
+    title: "Default meals",
+    excerpt: "Why having a boring default is the whole trick.",
+    url: "https://medium.com/@easyplantlife/default-meals",
+    publishedDate: new Date("2026-03-01"),
+  },
+  {
+    id: "2",
+    title: "Good enough",
+    excerpt: "On giving up perfection.",
+    url: "https://medium.com/@easyplantlife/good-enough",
+    publishedDate: new Date("2026-02-01"),
+  },
+];
+
+async function renderHome() {
+  return render(await Home());
+}
+
+/**
+ * Home Page
+ *
+ * Hero → The idea → Recent writing → Books. One main landmark, one h1,
+ * one newsletter form, no feature grid and no card decks.
+ */
 describe("Home Page", () => {
   beforeEach(() => {
     mockFetch.mockReset();
+    mockFetchPosts.mockReset();
+    mockFetchPosts.mockResolvedValue(posts);
   });
-  describe("Page Structure", () => {
-    it("renders a main element as the page container", () => {
-      render(<Home />);
-      const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
-    });
 
-    it("has proper page structure for accessibility", () => {
-      render(<Home />);
-      // Should have exactly one main element
+  describe("Page Structure", () => {
+    it("renders exactly one main landmark", async () => {
+      await renderHome();
       expect(screen.getAllByRole("main")).toHaveLength(1);
     });
-  });
 
-  describe("Hero Section", () => {
-    it("renders the hero section", () => {
-      render(<Home />);
-      const hero = screen.getByTestId("hero-section");
-      expect(hero).toBeInTheDocument();
+    it("renders the sections in order", async () => {
+      await renderHome();
+      const ids = [
+        "hero-section",
+        "idea-section",
+        "recent-writing",
+        "books-preview",
+      ];
+      const nodes = ids.map((id) => screen.getByTestId(id));
+      for (let i = 1; i < nodes.length; i++) {
+        expect(
+          nodes[i - 1].compareDocumentPosition(nodes[i]) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy();
+      }
     });
 
-    it("renders the main heading (brand name)", () => {
-      render(<Home />);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeInTheDocument();
-      expect(heading).toHaveTextContent("Easy Plant Life");
-    });
-
-    it("renders the tagline", () => {
-      render(<Home />);
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeInTheDocument();
-    });
-
-    it("renders the brand explanation", () => {
-      render(<Home />);
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(explanation).toBeInTheDocument();
-    });
-  });
-
-  describe("Newsletter CTA Section", () => {
-    it("renders the newsletter CTA section", () => {
-      render(<Home />);
-      const newsletter = screen.getByTestId("newsletter-cta");
-      expect(newsletter).toBeInTheDocument();
-    });
-
-    it("renders newsletter signup form", () => {
-      render(<Home />);
-      const form = screen.getByRole("form", { name: /newsletter/i });
-      expect(form).toBeInTheDocument();
-    });
-
-    it("renders email input field", () => {
-      render(<Home />);
-      const emailInput = screen.getByRole("textbox", { name: /email/i });
-      expect(emailInput).toBeInTheDocument();
-    });
-
-    it("renders subscribe button", () => {
-      render(<Home />);
-      const button = screen.getByRole("button", {
-        name: /subscribe|sign up|join/i,
-      });
-      expect(button).toBeInTheDocument();
-    });
-  });
-
-  describe("Secondary CTAs Section", () => {
-    it("renders the secondary CTAs section", () => {
-      render(<Home />);
-      const secondaryCtas = screen.getByTestId("secondary-ctas");
-      expect(secondaryCtas).toBeInTheDocument();
-    });
-
-    it("renders link to Blog page", () => {
-      render(<Home />);
-      const blogLink = screen.getByRole("link", { name: /blog/i });
-      expect(blogLink).toBeInTheDocument();
-      expect(blogLink).toHaveAttribute("href", "/blog");
-    });
-
-    it("renders link to Books page", () => {
-      render(<Home />);
-      const secondaryCTAs = screen.getByTestId("secondary-ctas");
-      const booksLink = within(secondaryCTAs).getByRole("link", {
-        name: /book/i,
-      });
-      expect(booksLink).toBeInTheDocument();
-      expect(booksLink).toHaveAttribute("href", "/books");
-    });
-  });
-
-  describe("Section Order and Flow", () => {
-    it("renders sections in correct order (Hero → Newsletter → Secondary → Book imagery)", () => {
-      render(<Home />);
-      const hero = screen.getByTestId("hero-section");
-      const newsletter = screen.getByTestId("newsletter-cta");
-      const secondary = screen.getByTestId("secondary-ctas");
-      const bookImagery = screen.getByTestId("book-imagery");
-
-      // Get the positions in the DOM
-      const heroPosition = hero.compareDocumentPosition(newsletter);
-      const newsletterPosition = newsletter.compareDocumentPosition(secondary);
-      const secondaryPosition = secondary.compareDocumentPosition(bookImagery);
-
-      // Node.DOCUMENT_POSITION_FOLLOWING = 4
-      expect(heroPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
-      );
-      expect(newsletterPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
-      );
-      expect(secondaryPosition & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
-        Node.DOCUMENT_POSITION_FOLLOWING
+    it("has a single h1", async () => {
+      await renderHome();
+      const h1s = screen.getAllByRole("heading", { level: 1 });
+      expect(h1s).toHaveLength(1);
+      expect(h1s[0]).toHaveTextContent(
+        /living vegan without turning it into a project/i
       );
     });
 
-    it("has no unnecessary sections", () => {
-      render(<Home />);
-      const sections = screen.getAllByRole("region");
-      // Hero, What You'll Find, Newsletter, Secondary CTAs, Book imagery
-      expect(sections).toHaveLength(5);
+    it("keeps the heading hierarchy sequential", async () => {
+      await renderHome();
+      const levels = screen
+        .getAllByRole("heading")
+        .map((h) => Number(h.tagName.slice(1)));
+      for (let i = 1; i < levels.length; i++) {
+        expect(levels[i] - levels[i - 1]).toBeLessThanOrEqual(1);
+      }
+    });
+
+    it("does not render the old feature grid or card decks", async () => {
+      await renderHome();
+      expect(screen.queryByText(/what you'll find/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/go further/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/stay in the loop/i)).not.toBeInTheDocument();
     });
   });
 
-  describe("Visual Design - Single Scroll", () => {
-    it("uses appropriate section spacing", () => {
-      render(<Home />);
-      const hero = screen.getByTestId("hero-section");
-      const newsletter = screen.getByTestId("newsletter-cta");
-      const secondary = screen.getByTestId("secondary-ctas");
-
-      // All sections should have vertical padding
-      expect(hero.className).toMatch(/py-/);
-      expect(newsletter.className).toMatch(/py-/);
-      expect(secondary.className).toMatch(/py-/);
+  describe("Newsletter", () => {
+    it("renders exactly one newsletter form, in the hero", async () => {
+      await renderHome();
+      const forms = screen.getAllByRole("form", { name: /newsletter/i });
+      expect(forms).toHaveLength(1);
+      expect(screen.getByTestId("hero-section")).toContainElement(forms[0]);
     });
 
-    it("has consistent page background", () => {
-      render(<Home />);
-      const main = screen.getByRole("main");
-      expect(main.className).toMatch(/bg-/);
-    });
-  });
-
-  describe("Brand Message Completeness", () => {
-    /**
-     * GIVEN the home page on desktop
-     * WHEN I view without scrolling
-     * THEN I see the complete brand message
-     */
-    it("displays complete brand message", () => {
-      render(<Home />);
-
-      // Logo/brand name visible
-      expect(screen.getByText("Easy Plant Life")).toBeVisible();
-
-      // Tagline visible
-      expect(screen.getByTestId("hero-tagline")).toBeVisible();
-
-      // Value proposition visible
-      expect(
-        screen.getByTestId("newsletter-value-proposition")
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("Accessibility", () => {
-    it("has proper heading hierarchy starting with h1", () => {
-      render(<Home />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      expect(h1).toBeInTheDocument();
-    });
-
-    it("all sections have aria-labels", () => {
-      render(<Home />);
-      const sections = screen.getAllByRole("region");
-      sections.forEach((section) => {
-        expect(section).toHaveAttribute("aria-label");
-      });
-    });
-
-    it("page has skip to main content capability (main element present)", () => {
-      render(<Home />);
-      expect(screen.getByRole("main")).toBeInTheDocument();
-    });
-  });
-
-  describe("Responsive Design", () => {
-    /**
-     * GIVEN the home page on mobile
-     * WHEN I scroll through
-     * THEN all sections are accessible and readable
-     *
-     * Note: Visual responsiveness is tested via responsive classes
-     */
-    it("sections use responsive padding classes", () => {
-      render(<Home />);
-      const hero = screen.getByTestId("hero-section");
-
-      // Should have mobile and desktop responsive classes
-      expect(hero.className).toMatch(/py-\d+/);
-      expect(hero.className).toMatch(/md:py-|lg:py-/);
-    });
-
-    it("content is constrained for readability", () => {
-      render(<Home />);
-      const hero = screen.getByTestId("hero-section");
-
-      // Hero content should be constrained with max-width
-      const contentContainer = hero.querySelector('[class*="max-w-"]');
-      expect(contentContainer).not.toBeNull();
-    });
-  });
-
-  describe("Newsletter API Integration (M8-06)", () => {
-    /**
-     * GIVEN the home page newsletter form
-     * WHEN I submit a valid email
-     * THEN it should call the newsletter API
-     */
-    it("newsletter form submits to the API", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
+    it("submits to the newsletter API and shows the success state", async () => {
       const user = userEvent.setup();
-      render(<Home />);
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+      await renderHome();
 
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "home@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: "home@example.com" }),
-        });
-      });
-    });
-
-    it("shows success message after successful submission", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-      const user = userEvent.setup();
-      render(<Home />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "home@example.com");
-      await user.click(button);
+      await user.type(screen.getByLabelText("Email address"), "jo@example.com");
+      await user.click(screen.getByRole("button", { name: "Get the notes" }));
 
       await waitFor(() => {
         expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
       });
+      expect(mockFetch).toHaveBeenCalledWith(
+        "/api/newsletter",
+        expect.objectContaining({ method: "POST" })
+      );
     });
 
-    it("shows error message when API fails", async () => {
-      mockFetch.mockResolvedValueOnce({
+    it("shows the API error state", async () => {
+      const user = userEvent.setup();
+      mockFetch.mockResolvedValue({
         ok: false,
-        json: async () => ({ error: "Server error" }),
+        json: async () => ({ error: "Nope" }),
       });
+      await renderHome();
 
-      const user = userEvent.setup();
-      render(<Home />);
+      await user.type(screen.getByLabelText("Email address"), "jo@example.com");
+      await user.click(screen.getByRole("button", { name: "Get the notes" }));
 
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
+      expect(await screen.findByTestId("newsletter-error")).toHaveTextContent(
+        /something went wrong/i
+      );
+    });
+  });
 
-      await user.type(input, "home@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
+  describe("Recent writing", () => {
+    it("lists the latest posts with links to Medium", async () => {
+      await renderHome();
+      const section = screen.getByTestId("recent-writing");
+      expect(
+        within(section).getByRole("heading", {
+          level: 3,
+          name: "Default meals",
+        })
+      ).toBeInTheDocument();
+      const readLinks = within(section).getAllByRole("link", {
+        name: /read ".*" on medium/i,
       });
+      expect(readLinks).toHaveLength(posts.length);
+      expect(readLinks[0]).toHaveAttribute("target", "_blank");
     });
 
-    it("form behavior matches dedicated newsletter page", async () => {
-      // Same behavior as dedicated newsletter page - form resets to success state after submission
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
+    it("asks the feed for only a few posts", async () => {
+      await renderHome();
+      expect(mockFetchPosts).toHaveBeenCalledWith(
+        expect.objectContaining({ maxPosts: 3 })
+      );
+    });
+
+    it("degrades calmly when the feed fails", async () => {
+      mockFetchPosts.mockRejectedValue(new Error("down"));
+      await renderHome();
+      const section = screen.getByTestId("recent-writing");
+      expect(within(section).getByRole("alert")).toHaveTextContent(
+        /could not be loaded/i
+      );
+      expect(screen.getByTestId("hero-section")).toBeInTheDocument();
+      expect(screen.getByTestId("books-preview")).toBeInTheDocument();
+    });
+  });
+
+  describe("Books", () => {
+    it("shows both books with external purchase links", async () => {
+      await renderHome();
+      const section = screen.getByTestId("books-preview");
+      expect(
+        within(section).getByRole("heading", {
+          level: 3,
+          name: "The Everyday Vegan Playbook",
+        })
+      ).toBeInTheDocument();
+      expect(
+        within(section).getByRole("heading", {
+          level: 3,
+          name: "The Normal Vegan",
+        })
+      ).toBeInTheDocument();
+      const buy = within(section).getAllByRole("link", {
+        name: /buy on amazon/i,
       });
-
-      const user = userEvent.setup();
-      render(<Home />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "home@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        // Form should be replaced with success message (same as newsletter page)
-        expect(screen.queryByRole("form")).not.toBeInTheDocument();
-        expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
-      });
+      expect(buy).toHaveLength(2);
+      for (const link of buy) {
+        expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      }
     });
   });
 });

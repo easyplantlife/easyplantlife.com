@@ -1,39 +1,19 @@
 import { type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-/**
- * Text element options
- * - p: Paragraph (default)
- * - span: Inline text
- */
-export type TextElement = "p" | "span";
+export type TextElement = "p" | "span" | "div";
 
-/**
- * Text size options
- * Maps to the typography scale in tailwind.config.ts
- */
 export type TextSize = "xs" | "sm" | "base" | "lg" | "xl" | "2xl";
 
-/**
- * Color variants for text
- * - default: Main text color
- * - secondary: Muted/secondary text
- * - accent: Brand green accent
- * - inverse: White text for dark backgrounds
- */
-export type TextColor = "default" | "secondary" | "accent" | "inverse";
+export type TextColor =
+  "default" | "soft" | "secondary" | "faint" | "accent" | "inverse";
 
 export interface TextProps extends HTMLAttributes<HTMLParagraphElement> {
-  /** HTML element to render (p or span) */
   as?: TextElement;
-  /** Size variant */
   size?: TextSize;
-  /** Color variant */
   color?: TextColor;
 }
 
-/**
- * Size styles mapping
- */
 const sizeStyles: Record<TextSize, string> = {
   xs: "text-xs",
   sm: "text-sm",
@@ -43,57 +23,39 @@ const sizeStyles: Record<TextSize, string> = {
   "2xl": "text-2xl",
 };
 
-/**
- * Color styles mapping
- */
 const colorStyles: Record<TextColor, string> = {
-  default: "text-text",
-  secondary: "text-text-secondary",
-  accent: "text-text-accent",
-  inverse: "text-text-inverse",
+  default: "text-ink",
+  soft: "text-ink-soft",
+  secondary: "text-muted",
+  faint: "text-faint",
+  accent: "text-accent",
+  inverse: "text-on-accent",
 };
 
 /**
- * Text Component
+ * Text
  *
- * A reusable text component for body content that enforces the typography
- * scale and prevents one-off styling. Uses semantic HTML tags (p, span)
- * and the brand body font (Source Sans 3).
- *
- * @example
- * ```tsx
- * // Default paragraph
- * <Text>This is body text.</Text>
- *
- * // Large text
- * <Text size="lg">Large body text for emphasis.</Text>
- *
- * // Inline span with accent color
- * <Text as="span" color="accent">highlighted text</Text>
- *
- * // Small muted text
- * <Text size="sm" color="secondary">Posted on January 30, 2026</Text>
- * ```
+ * Body copy. "soft" is for long-form prose, "secondary" for leads and
+ * excerpts, "faint" for captions and helper text.
  */
 export function Text({
-  as = "p",
+  as: Tag = "p",
   size = "base",
   color = "default",
   className = "",
   children,
   ...props
 }: TextProps) {
-  const Tag = as;
-
-  const baseStyles = [
-    "font-body",
-    "leading-relaxed",
-    sizeStyles[size],
-    colorStyles[color],
-  ].join(" ");
-
   return (
-    <Tag className={`${baseStyles} ${className}`.trim()} {...props}>
+    <Tag
+      className={cn(
+        "font-sans leading-relaxed",
+        sizeStyles[size],
+        colorStyles[color],
+        className
+      )}
+      {...props}
+    >
       {children}
     </Tag>
   );

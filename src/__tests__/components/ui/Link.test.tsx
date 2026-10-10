@@ -93,22 +93,35 @@ describe("Link Component", () => {
     it("has text accent color for links", () => {
       render(<Link href="/about">About</Link>);
       const link = screen.getByRole("link");
-      expect(link).toHaveClass("text-text-accent");
+      expect(link).toHaveClass("text-accent");
     });
 
     it("has subtle underline styling", () => {
       render(<Link href="/about">About</Link>);
       const link = screen.getByRole("link");
-      // Using underline-offset for subtle appearance
+      // Thin underline, offset so it does not touch descenders
       expect(link).toHaveClass("underline");
-      expect(link).toHaveClass("underline-offset-2");
+      expect(link).toHaveClass("decoration-1");
+      expect(link).toHaveClass("underline-offset-[3px]");
     });
 
     it("has hover state defined", () => {
       render(<Link href="/about">About</Link>);
       const link = screen.getByRole("link");
-      // Hover changes to darker green
-      expect(link).toHaveClass("hover:text-primary-dark");
+      // Hover changes to the darker accent
+      expect(link).toHaveClass("hover:text-accent-hover");
+    });
+
+    it("plain variant keeps only the focus ring", () => {
+      render(
+        <Link href="/about" variant="plain">
+          About
+        </Link>
+      );
+      const link = screen.getByRole("link");
+      expect(link).not.toHaveClass("underline");
+      expect(link).not.toHaveClass("text-accent");
+      expect(link).toHaveClass("focus-visible:ring-2");
     });
 
     it("has transition for smooth hover effect", () => {

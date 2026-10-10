@@ -14,14 +14,16 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { Hero } from "@/components/home/Hero";
-import { NewsletterCTA } from "@/components/home/NewsletterCTA";
-import { SecondaryCTAs } from "@/components/home/SecondaryCTAs";
+import { IdeaSection } from "@/components/home/IdeaSection";
+import { RecentWriting } from "@/components/home/RecentWriting";
+import { BooksPreview } from "@/components/home/BooksPreview";
 import { AboutContent } from "@/components/about/AboutContent";
 import { NewsletterContent } from "@/components/newsletter/NewsletterContent";
 import { ContactContent } from "@/components/contact/ContactContent";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import NotFound from "@/app/not-found";
+import NewsletterPage from "@/app/newsletter/page";
 import { books } from "@/content/books";
 
 // Placeholder text patterns to detect
@@ -42,7 +44,7 @@ const PLACEHOLDER_PATTERNS = [
 const TONE_VIOLATIONS = [
   /\bmust\b/i, // Too prescriptive
   /\bshould\b(?! feel| be in touch)/i, // Prescriptive (except "should feel")
-  /\bnever\b(?! existed| feel preachy)/i, // Absolutist
+  /\bnever\b(?! existed| feel preachy| shared)/i, // Absolutist (except the privacy promise)
   /\balways\b/i, // Absolutist
   /\bamazing\b/i, // Hype
   /\bincredible\b/i, // Hype
@@ -78,6 +80,15 @@ const COMMON_TYPOS = [
   /\bplant-based(?!\s)/i, // Should have space after (unless end of sentence)
 ];
 
+const VALID_INTERNAL_PATHS = [
+  "/",
+  "/about",
+  "/books",
+  "/blog",
+  "/newsletter",
+  "/contact",
+];
+
 /**
  * Helper to extract all text content from a rendered component
  */
@@ -102,227 +113,127 @@ function findViolations(
   return violations;
 }
 
+/** Every rendered surface with authored copy. */
+const COPY_SURFACES: [string, () => React.ReactElement][] = [
+  ["Hero", () => <Hero />],
+  ["IdeaSection", () => <IdeaSection />],
+  ["RecentWriting (empty feed)", () => <RecentWriting posts={[]} />],
+  ["BooksPreview", () => <BooksPreview />],
+  ["AboutContent", () => <AboutContent />],
+  ["NewsletterContent", () => <NewsletterContent />],
+  ["NewsletterPage", () => <NewsletterPage />],
+  ["ContactContent", () => <ContactContent />],
+  ["Header", () => <Header />],
+  ["Footer", () => <Footer />],
+  ["NotFound", () => <NotFound />],
+];
+
+function expectNoViolationsIn(ui: React.ReactElement, patterns: RegExp[]) {
+  const { container, unmount } = render(ui);
+  const violations = findViolations(extractTextContent(container), patterns);
+  unmount();
+  expect(violations).toEqual([]);
+}
+
 describe("Content Quality: No Placeholder Text", () => {
-  it("Hero component has no placeholder text", () => {
-    const { container } = render(<Hero />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NewsletterCTA has no placeholder text", () => {
-    const { container } = render(<NewsletterCTA />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("SecondaryCTAs has no placeholder text", () => {
-    const { container } = render(<SecondaryCTAs />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("AboutContent has no placeholder text", () => {
-    const { container } = render(<AboutContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NewsletterContent has no placeholder text", () => {
-    const { container } = render(<NewsletterContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("ContactContent has no placeholder text", () => {
-    const { container } = render(<ContactContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("Header has no placeholder text", () => {
-    const { container } = render(<Header />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("Footer has no placeholder text", () => {
-    const { container } = render(<Footer />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NotFound page has no placeholder text", () => {
-    const { container } = render(<NotFound />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-    expect(violations).toHaveLength(0);
+  it.each(COPY_SURFACES)("%s has no placeholder text", (_name, make) => {
+    expectNoViolationsIn(make(), PLACEHOLDER_PATTERNS);
   });
 
   it("Books content has no placeholder text", () => {
     for (const book of books) {
-      const text = `${book.title} ${book.description}`;
-      const violations = findViolations(text, PLACEHOLDER_PATTERNS);
-      expect(violations).toHaveLength(0);
+      const text = `${book.title} ${book.tagline} ${book.description}`;
+      expect(findViolations(text, PLACEHOLDER_PATTERNS)).toEqual([]);
+    }
+  });
+
+  it("Books have real page counts, not placeholders", () => {
+    for (const book of books) {
+      expect(book.pages).toBeGreaterThan(0);
     }
   });
 });
 
 describe("Content Quality: Brand Tone Compliance", () => {
-  it("Hero content follows brand tone guidelines", () => {
-    const { container } = render(<Hero />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, TONE_VIOLATIONS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NewsletterCTA follows brand tone guidelines", () => {
-    const { container } = render(<NewsletterCTA />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, TONE_VIOLATIONS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("AboutContent follows brand tone guidelines", () => {
-    const { container } = render(<AboutContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, TONE_VIOLATIONS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NewsletterContent follows brand tone guidelines", () => {
-    const { container } = render(<NewsletterContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, TONE_VIOLATIONS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("ContactContent follows brand tone guidelines", () => {
-    const { container } = render(<ContactContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, TONE_VIOLATIONS);
-    expect(violations).toHaveLength(0);
+  it.each(COPY_SURFACES)("%s follows brand tone guidelines", (_name, make) => {
+    expectNoViolationsIn(make(), TONE_VIOLATIONS);
   });
 
   it("Books content follows brand tone guidelines", () => {
     for (const book of books) {
-      const text = `${book.title} ${book.description}`;
-      const violations = findViolations(text, TONE_VIOLATIONS);
-      expect(violations).toHaveLength(0);
+      const text = `${book.title} ${book.tagline} ${book.description}`;
+      expect(findViolations(text, TONE_VIOLATIONS)).toEqual([]);
     }
   });
 });
 
 describe("Content Quality: No Typos", () => {
-  it("Hero content has no common typos", () => {
-    const { container } = render(<Hero />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, COMMON_TYPOS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("AboutContent has no common typos", () => {
-    const { container } = render(<AboutContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, COMMON_TYPOS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("NewsletterContent has no common typos", () => {
-    const { container } = render(<NewsletterContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, COMMON_TYPOS);
-    expect(violations).toHaveLength(0);
-  });
-
-  it("ContactContent has no common typos", () => {
-    const { container } = render(<ContactContent />);
-    const text = extractTextContent(container);
-    const violations = findViolations(text, COMMON_TYPOS);
-    expect(violations).toHaveLength(0);
+  it.each(COPY_SURFACES)("%s has no common typos", (_name, make) => {
+    expectNoViolationsIn(make(), COMMON_TYPOS);
   });
 
   it("Books content has no common typos", () => {
     for (const book of books) {
-      const text = `${book.title} ${book.description}`;
-      const violations = findViolations(text, COMMON_TYPOS);
-      expect(violations).toHaveLength(0);
+      const text = `${book.title} ${book.tagline} ${book.description}`;
+      expect(findViolations(text, COMMON_TYPOS)).toEqual([]);
     }
   });
 });
 
 describe("Content Quality: Internal Links", () => {
-  it("Header navigation links use valid internal paths", () => {
-    render(<Header />);
-    const links = screen.getAllByRole("link");
-    const validPaths = [
-      "/",
-      "/about",
-      "/books",
-      "/blog",
-      "/newsletter",
-      "/contact",
-    ];
-
-    links.forEach((link) => {
+  function expectInternalLinksValid() {
+    screen.getAllByRole("link").forEach((link) => {
       const href = link.getAttribute("href");
-      if (href && !href.startsWith("http")) {
-        expect(validPaths).toContain(href);
+      if (href && !/^(https?:|mailto:|tel:|#)/.test(href)) {
+        expect(VALID_INTERNAL_PATHS).toContain(href);
       }
     });
+  }
+
+  it("Header navigation links use valid internal paths", () => {
+    render(<Header />);
+    expectInternalLinksValid();
+    for (const name of ["About", "Books", "Blog", "Contact", "Newsletter"]) {
+      expect(screen.getByRole("link", { name })).toBeInTheDocument();
+    }
   });
 
   it("Footer navigation links use valid internal paths", () => {
     render(<Footer />);
-    const links = screen.getAllByRole("link");
-    const validPaths = [
-      "/",
-      "/about",
-      "/books",
-      "/blog",
-      "/newsletter",
-      "/contact",
-    ];
-
-    links.forEach((link) => {
-      const href = link.getAttribute("href");
-      if (href && !href.startsWith("http")) {
-        expect(validPaths).toContain(href);
-      }
-    });
+    expectInternalLinksValid();
+    for (const name of ["About", "Books", "Blog", "Newsletter", "Contact"]) {
+      expect(screen.getByRole("link", { name })).toBeInTheDocument();
+    }
   });
 
-  it("SecondaryCTAs links use valid internal paths", () => {
-    render(<SecondaryCTAs />);
-    const links = screen.getAllByRole("link");
-    const validPaths = [
-      "/",
-      "/about",
-      "/books",
-      "/blog",
-      "/newsletter",
-      "/contact",
-    ];
+  it("Home page sections link onward to valid internal paths", () => {
+    render(
+      <>
+        <Hero />
+        <IdeaSection />
+        <RecentWriting posts={[]} />
+        <BooksPreview />
+      </>
+    );
+    expectInternalLinksValid();
+  });
 
-    links.forEach((link) => {
-      const href = link.getAttribute("href");
-      if (href && !href.startsWith("http")) {
-        expect(validPaths).toContain(href);
-      }
-    });
+  it("About page anchors point at chapters that exist", () => {
+    const { container } = render(<AboutContent />);
+    screen
+      .getAllByRole("link")
+      .map((link) => link.getAttribute("href") ?? "")
+      .filter((href) => href.startsWith("#"))
+      .forEach((href) => {
+        expect(container.querySelector(href)).not.toBeNull();
+      });
   });
 
   it("NotFound page has valid home link", () => {
     render(<NotFound />);
-    const homeLink = screen.getByRole("link", { name: /return home/i });
-    expect(homeLink.getAttribute("href")).toBe("/");
+    expect(
+      screen.getByRole("link", { name: /back to the home page/i })
+    ).toHaveAttribute("href", "/");
   });
 });
 
@@ -331,6 +242,7 @@ describe("Content Quality: Book Data Integrity", () => {
     for (const book of books) {
       expect(book.id).toBeTruthy();
       expect(book.title).toBeTruthy();
+      expect(book.tagline).toBeTruthy();
       expect(book.description).toBeTruthy();
       expect(book.coverImage).toBeTruthy();
       expect(["available", "coming-soon"]).toContain(book.status);
@@ -340,7 +252,6 @@ describe("Content Quality: Book Data Integrity", () => {
 
   it("Book cover images have valid paths", () => {
     for (const book of books) {
-      // Cover image should start with / and have a valid extension
       expect(book.coverImage).toMatch(/^\/.*\.(jpg|jpeg|png|webp|svg)$/i);
     }
   });
@@ -350,7 +261,6 @@ describe("Content Quality: Book Data Integrity", () => {
       if (book.status === "available") {
         expect(book.purchaseLinks.length).toBeGreaterThan(0);
       }
-      // coming-soon books don't need links
     }
   });
 });
@@ -369,31 +279,38 @@ describe("Content Quality: Form Labels and Accessibility", () => {
   });
 
   it("Forms have submit buttons with clear text", () => {
-    render(<NewsletterContent />);
+    const { unmount } = render(<NewsletterContent />);
     expect(
       screen.getByRole("button", { name: /subscribe/i })
     ).toBeInTheDocument();
+    unmount();
 
-    const { unmount } = render(<ContactContent />);
+    render(<ContactContent />);
     expect(
       screen.getByRole("button", { name: /send message/i })
     ).toBeInTheDocument();
-    unmount();
+  });
+
+  it("Links that leave the site say so", () => {
+    render(<Footer />);
+    const medium = screen.getByRole("link", { name: /medium/i });
+    expect(medium).toHaveAttribute("target", "_blank");
+    expect(medium.textContent).toContain("↗");
   });
 });
 
 describe("Content Quality: Page Sections Have Proper Structure", () => {
-  it("Hero has brand name, tagline, and explanation", () => {
+  it("Hero has brand name, a short headline and a brief explanation", () => {
     render(<Hero />);
 
-    // Brand name
+    // Brand name as the eyebrow
     expect(screen.getByText("Easy Plant Life")).toBeInTheDocument();
 
-    // Tagline (2-4 words)
-    const tagline = screen.getByTestId("hero-tagline");
-    const taglineWords = tagline.textContent?.trim().split(/\s+/) || [];
-    expect(taglineWords.length).toBeGreaterThanOrEqual(2);
-    expect(taglineWords.length).toBeLessThanOrEqual(5); // Allow a bit of flexibility
+    // Headline: one sentence, at most twelve words
+    const headline = screen.getByRole("heading", { level: 1 });
+    const words = headline.textContent?.trim().split(/\s+/) ?? [];
+    expect(words.length).toBeGreaterThanOrEqual(3);
+    expect(words.length).toBeLessThanOrEqual(12);
 
     // Explanation (max 3 sentences)
     const explanation = screen.getByTestId("hero-explanation");
@@ -402,20 +319,36 @@ describe("Content Quality: Page Sections Have Proper Structure", () => {
     expect(sentences.length).toBeLessThanOrEqual(3);
   });
 
-  it("About page has three required sections", () => {
+  it("Hero asks for one thing only: the newsletter", () => {
+    render(<Hero />);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(
+      screen.getByRole("button", { name: /get the notes/i })
+    ).toBeInTheDocument();
+  });
+
+  it("About page has its four chapters", () => {
     render(<AboutContent />);
 
     expect(screen.getByTestId("about-why-section")).toBeInTheDocument();
-    expect(screen.getByTestId("about-beliefs-section")).toBeInTheDocument();
+    expect(screen.getByTestId("about-believe-section")).toBeInTheDocument();
     expect(screen.getByTestId("about-not-section")).toBeInTheDocument();
+    expect(screen.getByTestId("about-who-section")).toBeInTheDocument();
   });
 
-  it("Newsletter value proposition is concise (one sentence)", () => {
-    render(<NewsletterContent />);
+  it("Newsletter promise is concise (one or two sentences)", () => {
+    render(<NewsletterPage />);
 
-    const content = screen.getByTestId("newsletter-content");
-    const textContent = content.querySelector("p")?.textContent || "";
-    const sentences = textContent.split(/[.!?]+/).filter(Boolean);
-    expect(sentences.length).toBeLessThanOrEqual(2); // Allow some flexibility
+    const h1 = screen.getByRole("heading", { level: 1 });
+    const lead = h1.nextElementSibling?.textContent ?? "";
+    const sentences = lead.split(/[.!?]+/).filter(Boolean);
+    expect(sentences.length).toBeGreaterThanOrEqual(1);
+    expect(sentences.length).toBeLessThanOrEqual(2);
+  });
+
+  it("Newsletter page says what arrives and what does not", () => {
+    render(<NewsletterContent />);
+    expect(screen.getByText("What arrives")).toBeInTheDocument();
+    expect(screen.getByText("What does not")).toBeInTheDocument();
   });
 });

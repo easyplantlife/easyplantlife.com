@@ -1,442 +1,166 @@
-/**
- * Blog Page Tests
- *
- * Tests for the complete Blog page assembly following TDD approach.
- * Based on acceptance criteria from Issue #46 (M7-06):
- *
- * - [ ] Page uses PageLayout
- * - [ ] Fetches posts on load (SSR or SSG)
- * - [ ] Displays posts list
- * - [ ] Clear indication posts link to Medium
- * - [ ] Error handling for failed fetches
- * - [ ] Responsive
- */
-
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import BlogPage from "@/app/blog/page";
-import * as mediumService from "@/lib/api/medium";
-import type { MediumPost } from "@/lib/api/medium";
+import { BLOG_FEED_ERROR } from "@/lib/api/blog";
+import { fetchMediumPosts, type MediumPost } from "@/lib/api/medium";
+import { siteConfig } from "@/content/site";
 
-// Mock the Medium service
 jest.mock("@/lib/api/medium", () => ({
   fetchMediumPosts: jest.fn(),
 }));
 
+jest.mock("@/lib/analytics/events", () => ({
+  trackOutboundClick: jest.fn(),
+}));
+
+const mockFetchPosts = fetchMediumPosts as jest.MockedFunction<
+  typeof fetchMediumPosts
+>;
+
 const mockPosts: MediumPost[] = [
   {
     id: "abc123",
-    title: "Finding Peace Through Plant Care",
-    excerpt:
-      "A short guide on how caring for plants can bring calm to your daily routine.",
-    url: "https://medium.com/@easyplantlife/finding-peace-through-plant-care",
-    publishedDate: new Date("2024-01-15"),
+    title: "Default meals",
+    excerpt: "Why a boring default is the whole trick.",
+    url: "https://medium.com/@easyplantlife/default-meals",
+    publishedDate: new Date("2026-01-15"),
   },
   {
     id: "def456",
-    title: "The Art of Slow Growth",
-    excerpt:
-      "Why patience is the most important skill in gardening and in life.",
-    url: "https://medium.com/@easyplantlife/the-art-of-slow-growth",
-    publishedDate: new Date("2024-02-20"),
-    thumbnail: "https://example.com/slow-growth.jpg",
+    title: "Good enough",
+    excerpt: "On giving up perfection.",
+    url: "https://medium.com/@easyplantlife/good-enough",
+    publishedDate: new Date("2026-02-20"),
+    thumbnail: "https://example.com/good-enough.jpg",
   },
 ];
 
+async function renderBlog() {
+  return render(await BlogPage());
+}
+
+/**
+ * Blog Page
+ *
+ * Fetches the Medium feed on the server, lists posts as hairline rows with
+ * honest "Read on Medium" links, degrades calmly when the feed fails.
+ */
 describe("Blog Page", () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockFetchPosts.mockReset();
+    mockFetchPosts.mockResolvedValue(mockPosts);
     process.env = { ...originalEnv };
     delete process.env.MEDIUM_PUBLICATION_URL;
-    (mediumService.fetchMediumPosts as jest.Mock).mockResolvedValue(mockPosts);
   });
 
   afterAll(() => {
     process.env = originalEnv;
   });
 
-  /**
-   * Acceptance Criteria Tests (Issue #46 - M7-06)
-   */
-  describe("Acceptance Criteria (M7-06)", () => {
-    it("uses PageLayout component with title 'Blog'", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // PageLayout renders a main element
-      const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
-
-      // Title is rendered as h1
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent(/blog/i);
-    });
-
-    it("fetches posts on load and displays them", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // Verify posts are displayed
-      expect(
-        screen.getByText("Finding Peace Through Plant Care")
-      ).toBeInTheDocument();
-      expect(screen.getByText("The Art of Slow Growth")).toBeInTheDocument();
-
-      // Verify fetchMediumPosts was called
-      expect(mediumService.fetchMediumPosts).toHaveBeenCalled();
-    });
-
-    it("displays posts in BlogPostsList component", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // BlogPostsList uses ul with role="list" and aria-label
-      const list = screen.getByRole("list", { name: /blog posts/i });
-      expect(list).toBeInTheDocument();
-
-      // Each post renders as a clickable link (Card with href)
-      const postLinks = screen
-        .getAllByRole("link")
-        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
-      expect(postLinks).toHaveLength(2);
-    });
-
-    it("clearly indicates posts link to Medium with external link icons", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // All post links should open in new tab (external Medium links)
-      const links = screen.getAllByRole("link");
-      const externalLinks = links.filter((link) =>
-        link.getAttribute("href")?.includes("medium.com")
+  describe("Intro", () => {
+    it("renders the eyebrow, h1 and lead", async () => {
+      await renderBlog();
+      expect(screen.getByText("Blog")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+        "Short pieces on easy plant-based living."
       );
-
-      externalLinks.forEach((link) => {
-        expect(link).toHaveAttribute("target", "_blank");
-        expect(link).toHaveAttribute("rel", "noopener noreferrer");
-      });
-
-      // Should have accessible screen reader text for external links
-      const srTexts = screen.getAllByText(/opens in new tab/i);
-      expect(srTexts.length).toBeGreaterThan(0);
+      expect(screen.getByText(/published on medium/i)).toBeInTheDocument();
     });
 
-    it("handles errors gracefully when fetch fails", async () => {
-      (mediumService.fetchMediumPosts as jest.Mock).mockRejectedValue(
-        new Error("Network error")
-      );
-
-      const Page = await BlogPage();
-      render(Page);
-
-      // Should display error message
-      expect(
-        screen.getByText(/unable to load blog posts/i)
-      ).toBeInTheDocument();
+    it("offers a Follow on Medium action", async () => {
+      await renderBlog();
+      const link = screen.getByRole("link", { name: /follow on medium/i });
+      expect(link).toHaveAttribute("href", siteConfig.mediumUrl);
+      expect(link).toHaveAttribute("target", "_blank");
     });
 
-    it("uses responsive layout styles", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      const main = screen.getByRole("main");
-      // PageLayout default variant: py-12 md:py-16
-      expect(main).toHaveClass("py-12");
-      expect(main).toHaveClass("md:py-16");
-    });
-  });
-
-  describe("Page Structure", () => {
-    it("renders a main element as the page container (via PageLayout)", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
-    });
-
-    it("has exactly one main element for accessibility", async () => {
-      const Page = await BlogPage();
-      render(Page);
+    it("renders a single h1 inside a single main", async () => {
+      await renderBlog();
+      expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
       expect(screen.getAllByRole("main")).toHaveLength(1);
     });
-
-    it("renders the page title as h1 heading", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeInTheDocument();
-      expect(heading).toHaveTextContent(/blog/i);
-    });
   });
 
-  describe("PageLayout Integration", () => {
-    it("uses PageLayout component with title prop", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
-
-      // Title is rendered as h1 with font-heading class
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("font-heading");
-    });
-
-    it("has consistent vertical padding from PageLayout", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const main = screen.getByRole("main");
-      expect(main).toHaveClass("py-12");
-      expect(main).toHaveClass("md:py-16");
-    });
-
-    it("content is wrapped in Container for max-width constraint", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const list = screen.getByRole("list", { name: /blog posts/i });
-      // Container has mx-auto and max-w-6xl
-      const container = list.closest("[class*='mx-auto'][class*='max-w-']");
-      expect(container).toBeInTheDocument();
-    });
-  });
-
-  describe("Intro Section", () => {
-    it("renders intro text explaining the blog section", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      expect(intro).toBeInTheDocument();
-      // Intro should contain meaningful text about blog/Medium
-      expect(intro.textContent?.length).toBeGreaterThan(20);
-    });
-
-    it("intro appears before the posts list", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      const postsList = screen.getByRole("list", { name: /blog posts/i });
-
-      expect(
-        intro.compareDocumentPosition(postsList) &
-          Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    });
-
-    it("intro uses appropriate typography styles", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      expect(intro).toHaveClass("text-text-secondary");
-    });
-
-    it("intro mentions Medium to indicate external content", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      expect(intro.textContent?.toLowerCase()).toMatch(/medium/i);
-    });
-  });
-
-  describe("BlogPostsList Integration", () => {
-    it("renders the BlogPostsList component", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const list = screen.getByRole("list", { name: /blog posts/i });
-      expect(list).toBeInTheDocument();
-    });
-
-    it("renders post cards within the list", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      // Post cards render as links (Card with href)
-      const postLinks = screen
-        .getAllByRole("link")
-        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
-      expect(postLinks.length).toBeGreaterThan(0);
-    });
-
-    it("converts MediumPost to BlogPost format", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // Verify post data is correctly transformed and displayed
-      expect(
-        screen.getByText("Finding Peace Through Plant Care")
-      ).toBeInTheDocument();
-      // Date displayed in localized format (may vary by timezone)
-      expect(screen.getByText(/jan 1\d, 2024/i)).toBeInTheDocument();
-    });
-  });
-
-  describe("Empty State", () => {
-    it("displays empty state when no posts are available", async () => {
-      (mediumService.fetchMediumPosts as jest.Mock).mockResolvedValue([]);
-
-      const Page = await BlogPage();
-      render(Page);
-
-      expect(screen.getByText(/no posts/i)).toBeInTheDocument();
-    });
-  });
-
-  describe("Content Flow", () => {
-    it("title appears before intro", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const title = screen.getByRole("heading", { level: 1 });
-      const intro = screen.getByTestId("blog-intro");
-
-      expect(
-        title.compareDocumentPosition(intro) & Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    });
-
-    it("intro appears before posts list", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      const postsList = screen.getByRole("list", { name: /blog posts/i });
-
-      expect(
-        intro.compareDocumentPosition(postsList) &
-          Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    });
-  });
-
-  describe("Responsive Design", () => {
-    it("uses responsive vertical padding", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const main = screen.getByRole("main");
-      expect(main).toHaveClass("py-12");
-      expect(main).toHaveClass("md:py-16");
-    });
-
-    it("uses responsive horizontal padding via Container", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const list = screen.getByRole("list", { name: /blog posts/i });
-      const container = list.closest("[class*='px-4']");
-      expect(container).toHaveClass("px-4");
-      expect(container).toHaveClass("md:px-6");
-      expect(container).toHaveClass("lg:px-8");
-    });
-  });
-
-  describe("Accessibility", () => {
-    it("has proper landmark with main element", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      expect(screen.getByRole("main")).toBeInTheDocument();
-    });
-
-    it("post cards render as accessible links", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      // Post cards render as links with proper accessibility
-      const postLinks = screen
-        .getAllByRole("link")
-        .filter((link) => link.getAttribute("href")?.includes("medium.com"));
-      expect(postLinks.length).toBeGreaterThan(0);
-    });
-
-    it("external links have accessible indication", async () => {
-      const Page = await BlogPage();
-      render(Page);
-
-      // Screen reader text for external links
-      const srTexts = screen.getAllByText(/opens in new tab/i);
-      srTexts.forEach((text) => {
-        expect(text).toHaveClass("sr-only");
-      });
-    });
-
-    it("error state has alert role", async () => {
-      (mediumService.fetchMediumPosts as jest.Mock).mockRejectedValue(
-        new Error("Network error")
+  describe("Feed", () => {
+    it("fetches posts on load with the default account", async () => {
+      await renderBlog();
+      expect(mockFetchPosts).toHaveBeenCalledWith(
+        expect.objectContaining({
+          username: siteConfig.mediumUsername,
+          maxPosts: 10,
+        })
       );
+    });
 
-      const Page = await BlogPage();
-      render(Page);
+    it("uses MEDIUM_PUBLICATION_URL when set", async () => {
+      process.env.MEDIUM_PUBLICATION_URL = "https://medium.com/@someone";
+      await renderBlog();
+      expect(mockFetchPosts).toHaveBeenCalledWith(
+        expect.objectContaining({ username: "someone" })
+      );
+    });
 
-      const errorElement = screen.getByRole("alert");
-      expect(errorElement).toBeInTheDocument();
+    it("lists posts with h2 titles, newest first label and Medium links", async () => {
+      await renderBlog();
+      expect(screen.getByTestId("blog-intro")).toHaveTextContent(
+        "Newest first"
+      );
+      const list = screen.getByTestId("blog-posts-list");
+      expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+      expect(
+        within(list).getByRole("heading", { level: 2, name: "Default meals" })
+      ).toBeInTheDocument();
+      const readLinks = within(list).getAllByRole("link", {
+        name: /read ".*" on medium/i,
+      });
+      expect(readLinks).toHaveLength(2);
+      for (const link of readLinks) {
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", "noopener noreferrer");
+        expect(link.textContent).toContain("↗");
+      }
+    });
+
+    it("shows excerpts and dates", async () => {
+      await renderBlog();
+      expect(
+        screen.getByText("Why a boring default is the whole trick.")
+      ).toBeInTheDocument();
+      expect(document.querySelectorAll("time")).toHaveLength(2);
+    });
+
+    it("links to older posts on Medium", async () => {
+      await renderBlog();
+      expect(
+        screen.getByRole("link", { name: /older posts on medium/i })
+      ).toHaveAttribute("href", siteConfig.mediumUrl);
+    });
+
+    it("shows the empty state when the feed has nothing", async () => {
+      mockFetchPosts.mockResolvedValue([]);
+      await renderBlog();
+      expect(screen.getByText(/nothing published yet/i)).toBeInTheDocument();
+    });
+
+    it("degrades calmly when the fetch fails", async () => {
+      mockFetchPosts.mockRejectedValue(new Error("Network error"));
+      await renderBlog();
+      expect(screen.getByRole("alert")).toHaveTextContent(BLOG_FEED_ERROR);
+      expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+      expect(
+        screen.queryByRole("list", { name: /blog posts/i })
+      ).not.toBeInTheDocument();
     });
   });
 
-  describe("Username Extraction from Environment", () => {
-    it("uses default username when MEDIUM_PUBLICATION_URL is not set", async () => {
-      delete process.env.MEDIUM_PUBLICATION_URL;
-
-      const Page = await BlogPage();
-      render(Page);
-
-      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
-        username: "easyplantlife",
-        maxPosts: 10,
-      });
-    });
-
-    it("extracts username from @username format", async () => {
-      process.env.MEDIUM_PUBLICATION_URL = "https://medium.com/@testuser";
-
-      const Page = await BlogPage();
-      render(Page);
-
-      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
-        username: "testuser",
-        maxPosts: 10,
-      });
-    });
-
-    it("extracts username from subdomain format", async () => {
-      process.env.MEDIUM_PUBLICATION_URL = "https://mycompany.medium.com";
-
-      const Page = await BlogPage();
-      render(Page);
-
-      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
-        username: "mycompany",
-        maxPosts: 10,
-      });
-    });
-
-    it("uses URL as-is when format is unrecognized", async () => {
-      process.env.MEDIUM_PUBLICATION_URL = "some-random-username";
-
-      const Page = await BlogPage();
-      render(Page);
-
-      expect(mediumService.fetchMediumPosts).toHaveBeenCalledWith({
-        username: "some-random-username",
-        maxPosts: 10,
-      });
-    });
-  });
-
-  describe("Visual Design - Brand Compliance", () => {
-    it("page title uses brand heading font", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const title = screen.getByRole("heading", { level: 1 });
-      expect(title).toHaveClass("font-heading");
-    });
-
-    it("intro text uses appropriate secondary color", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      expect(intro).toHaveClass("text-text-secondary");
-    });
-
-    it("has generous spacing between intro and posts list", async () => {
-      const Page = await BlogPage();
-      render(Page);
-      const intro = screen.getByTestId("blog-intro");
-      // Should have margin-bottom for spacing
-      expect(intro).toHaveClass("mb-12");
+  describe("Prefer email", () => {
+    it("points to the newsletter after the list", async () => {
+      await renderBlog();
+      expect(screen.getByText("Prefer email?")).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Get the notes" })
+      ).toHaveAttribute("href", "/newsletter");
     });
   });
 });

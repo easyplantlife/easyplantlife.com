@@ -1,23 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Lora, Source_Sans_3 } from "next/font/google";
 import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ThemeProvider, ThemeScript } from "@/components/theme";
+import { bodyFont, headingFont } from "./fonts";
 import "./globals.css";
-
-const headingFont = Lora({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
-
-const bodyFont = Source_Sans_3({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["300", "400", "500", "600"],
-});
 
 /**
  * Site-wide default metadata configuration
@@ -102,14 +89,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // suppressHydrationWarning: the theme init script sets data-theme on
+    // <html> before hydration, which React would otherwise flag as a mismatch.
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${headingFont.variable} ${bodyFont.variable} flex min-h-screen flex-col antialiased`}
       >
+        <ThemeScript />
         <GoogleAnalytics />
-        <Header />
-        <div className="flex flex-1 flex-col">{children}</div>
-        <Footer />
+        <ThemeProvider>
+          <Header />
+          <div className="flex flex-1 flex-col">{children}</div>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

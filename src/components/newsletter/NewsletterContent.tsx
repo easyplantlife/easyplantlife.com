@@ -1,51 +1,30 @@
-"use client";
-
 import { type HTMLAttributes } from "react";
-import { Text } from "@/components/ui/Text";
 import { NewsletterForm } from "@/components/forms/NewsletterForm";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { cn } from "@/lib/utils";
 
 export interface NewsletterContentProps extends HTMLAttributes<HTMLElement> {
-  /** Additional CSS classes */
   className?: string;
 }
 
-/**
- * Handles newsletter form submission by calling the API.
- *
- * @param email - The email address to subscribe
- */
-async function handleNewsletterSubmit(email: string): Promise<void> {
-  const response = await fetch("/api/newsletter", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email }),
-  });
+const arrives = [
+  "Short notes on default meals and small systems",
+  "New writing, when it is published",
+  "A line when a book is out",
+];
 
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || "Failed to subscribe");
-  }
-}
+const doesNot = [
+  "Daily tips or challenges",
+  "Recipes you need to plan around",
+  "Anything you have to keep up with",
+];
 
 /**
- * NewsletterContent Component
+ * NewsletterContent
  *
- * The main content structure for the Newsletter page. Contains a calm
- * value proposition and the newsletter signup form.
- *
- * Design principles:
- * - One-sentence value proposition
- * - Prominent newsletter form
- * - No hype or frequency pressure
- * - Calm, honest tone per brand guidelines
- *
- * @example
- * ```tsx
- * <NewsletterContent />
- * <NewsletterContent className="mt-8" />
- * ```
+ * The signup form followed by an honest list of what arrives and what does
+ * not. The page intro (eyebrow, title, promise) is rendered by PageLayout.
  */
 export function NewsletterContent({
   className = "",
@@ -54,22 +33,36 @@ export function NewsletterContent({
   return (
     <article
       data-testid="newsletter-content"
-      className={`space-y-8 ${className}`.trim()}
+      className={cn("flex flex-col gap-10", className)}
       {...props}
     >
-      {/* Value proposition - calm, no hype */}
-      <div className="max-w-2xl space-y-4">
-        <Text size="lg" className="text-neutral-700">
-          Thoughtful notes on easy plant-based living.
-        </Text>
-        <Text size="base" className="text-neutral-500">
-          We only send when we have something worth sharing.
-        </Text>
-      </div>
+      <NewsletterForm
+        layout="stacked"
+        className="w-full max-w-[560px] text-left"
+        successActions={
+          <ArrowLink href="/blog" className="text-[15px]">
+            Read something now
+          </ArrowLink>
+        }
+      />
 
-      {/* Newsletter signup form - prominent placement */}
-      <div className="max-w-md">
-        <NewsletterForm className="w-full" onSubmit={handleNewsletterSubmit} />
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,15rem),1fr))] gap-8 border-t border-line pt-10 text-left">
+        <div className="flex flex-col gap-2.5">
+          <Eyebrow>What arrives</Eyebrow>
+          <ul className="list-disc space-y-1 pl-[18px] font-sans text-ink-soft">
+            {arrives.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex flex-col gap-2.5">
+          <Eyebrow tone="muted">What does not</Eyebrow>
+          <ul className="list-disc space-y-1 pl-[18px] font-sans text-muted">
+            {doesNot.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </article>
   );

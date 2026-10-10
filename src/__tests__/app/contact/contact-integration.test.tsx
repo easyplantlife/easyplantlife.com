@@ -165,7 +165,7 @@ describe("Contact Page Integration Tests", () => {
 
       await waitFor(() => {
         const success = screen.getByTestId("contact-success");
-        expect(success.textContent).toMatch(/thank you/i);
+        expect(success.textContent).toMatch(/thanks for writing/i);
       });
     });
 
@@ -499,7 +499,7 @@ describe("Contact Page Integration Tests", () => {
 
       const h1 = screen.getByRole("heading", { level: 1 });
       expect(h1).toBeInTheDocument();
-      expect(h1).toHaveTextContent(/contact/i);
+      expect(h1).toHaveTextContent(/say hello/i);
     });
 
     it("form has accessible name", () => {
@@ -526,6 +526,12 @@ describe("Contact Page Integration Tests", () => {
     it("form is keyboard navigable", async () => {
       const user = userEvent.setup();
       render(<ContactPage />);
+
+      // The plain email address comes first in the left column.
+      await user.tab();
+      expect(
+        screen.getByRole("link", { name: /hello@easyplantlife.com/i })
+      ).toHaveFocus();
 
       await user.tab();
       expect(screen.getByRole("textbox", { name: /name/i })).toHaveFocus();

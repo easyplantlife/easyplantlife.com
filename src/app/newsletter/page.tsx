@@ -26,21 +26,14 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Newsletter Page
- *
- * A dedicated newsletter signup page with a calm value proposition
- * and prominent signup form.
- *
- * Design principles:
- * - One-sentence value proposition (no hype)
- * - Prominent newsletter form
- * - No frequency pressure
- * - Calm, honest tone per brand guidelines
- */
 export default function NewsletterPage() {
   return (
-    <PageLayout title="Newsletter">
+    <PageLayout
+      variant="narrow"
+      eyebrow="Newsletter"
+      title="Occasional notes on easy plant-based living."
+      lead="One email when there is something worth sharing. No schedule, no series, no sales funnel."
+    >
       <NewsletterContent />
     </PageLayout>
   );

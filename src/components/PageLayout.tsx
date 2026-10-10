@@ -1,82 +1,76 @@
 import { type HTMLAttributes, type ReactNode } from "react";
-import { Container } from "@/components/ui/Container";
+import { Container, type ContainerVariant } from "@/components/ui/Container";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Heading } from "@/components/ui/Heading";
+import { Text } from "@/components/ui/Text";
+import { cn } from "@/lib/utils";
 
-/**
- * PageLayout variant options
- * - default: Standard page layout with consistent vertical spacing
- * - hero: Larger vertical spacing for hero sections (home page)
- */
-export type PageLayoutVariant = "default" | "hero";
+export type PageLayoutVariant = "default" | "narrow";
 
 export interface PageLayoutProps extends HTMLAttributes<HTMLElement> {
-  /** Page content */
   children: ReactNode;
-  /** Page title displayed as h1 heading */
+  /** Page title, rendered as the h1. */
   title?: string;
-  /** Layout variant */
+  /** Small label above the title (usually the section name). */
+  eyebrow?: string;
+  /** One or two sentences under the title. */
+  lead?: string;
+  /** Optional element aligned opposite the intro, e.g. an external link. */
+  action?: ReactNode;
+  /** "narrow" centers a single column, for the newsletter page. */
   variant?: PageLayoutVariant;
 }
 
-/**
- * Vertical padding styles for each variant
- */
-const variantStyles: Record<PageLayoutVariant, string> = {
-  default: "py-12 md:py-16",
-  hero: "py-16 md:py-24",
+const containerVariant: Record<PageLayoutVariant, ContainerVariant> = {
+  default: "default",
+  narrow: "narrow",
 };
 
 /**
- * Title size styles for each variant
- */
-const titleStyles: Record<PageLayoutVariant, string> = {
-  default: "text-4xl",
-  hero: "text-5xl",
-};
-
-/**
- * PageLayout Component
+ * PageLayout
  *
- * A reusable layout component that provides consistent structure for all pages.
- * Includes proper spacing, max-width constraints via Container, and optional
- * page title handling with semantic heading hierarchy.
- *
- * @example
- * ```tsx
- * // Standard page layout
- * <PageLayout title="About Us">
- *   <p>Page content goes here...</p>
- * </PageLayout>
- *
- * // Hero variant for home page
- * <PageLayout variant="hero" title="Welcome">
- *   <p>Hero content...</p>
- * </PageLayout>
- *
- * // Layout without title
- * <PageLayout>
- *   <CustomHero />
- *   <ContentSection />
- * </PageLayout>
- * ```
+ * The main landmark for inner pages, with an optional intro block
+ * (eyebrow, title, lead) that every page shares.
  */
 export function PageLayout({
   children,
   title,
+  eyebrow,
+  lead,
+  action,
   variant = "default",
   className = "",
   ...props
 }: PageLayoutProps) {
+  const hasIntro = Boolean(title || eyebrow || lead);
+  const isNarrow = variant === "narrow";
+
   return (
-    <main
-      className={`${variantStyles[variant]} ${className}`.trim()}
-      {...props}
-    >
-      <Container>
-        {title && (
-          <Heading level={1} className={`${titleStyles[variant]} mb-8`}>
-            {title}
-          </Heading>
+    <main className={cn("flex-1 pb-24 pt-20", className)} {...props}>
+      <Container variant={containerVariant[variant]}>
+        {hasIntro && (
+          <header
+            className={cn(
+              "mb-12 flex flex-wrap items-end justify-between gap-6",
+              isNarrow && "justify-center text-center"
+            )}
+          >
+            <div
+              className={cn(
+                "flex max-w-3xl flex-col gap-5",
+                isNarrow && "items-center"
+              )}
+            >
+              {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+              {title && <Heading level={1}>{title}</Heading>}
+              {lead && (
+                <Text size="xl" color="secondary" className="max-w-[54ch]">
+                  {lead}
+                </Text>
+              )}
+            </div>
+            {action}
+          </header>
         )}
         {children}
       </Container>

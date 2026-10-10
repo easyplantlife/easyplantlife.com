@@ -1,39 +1,39 @@
 /**
  * Responsive Design Tests
  *
- * Tests that verify the site works correctly across different viewport sizes
- * and devices (mobile, tablet, desktop).
+ * The redesign is intrinsically responsive: rows wrap, grids use
+ * auto-fit columns and the header navigation wraps beneath the brand
+ * instead of collapsing into a hamburger. These tests assert that
+ * shape through class checks and component rendering.
  *
  * Acceptance Criteria:
  * - Mobile Safari (iOS) tested
  * - Chrome Mobile (Android) tested
  * - Layout is correct on all viewports
- *
- * Note: These tests verify responsive behavior through class assertions
- * and component rendering at different logical viewport states.
  */
 
 import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 // Layout Components
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { MobileNav } from "@/components/MobileNav";
 import { PageLayout } from "@/components/PageLayout";
 
 // UI Components
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Panel } from "@/components/ui/Panel";
 
 // Page Components
 import { Hero } from "@/components/home/Hero";
-import { SecondaryCTAs } from "@/components/home/SecondaryCTAs";
-import { NewsletterCTA } from "@/components/home/NewsletterCTA";
+import { IdeaSection } from "@/components/home/IdeaSection";
+import { BooksPreview } from "@/components/home/BooksPreview";
 import { AboutContent } from "@/components/about/AboutContent";
+import { BookItem } from "@/components/books/BookItem";
 import { BooksList } from "@/components/books/BooksList";
+import { BlogPostRow } from "@/components/blog/BlogPostRow";
 import { BlogPostsList } from "@/components/blog/BlogPostsList";
+import { NewsletterForm } from "@/components/forms/NewsletterForm";
 import { NewsletterContent } from "@/components/newsletter/NewsletterContent";
 import { ContactContent } from "@/components/contact/ContactContent";
 
@@ -66,7 +66,6 @@ jest.mock("next/image", () => ({
     fill?: boolean;
     [key: string]: unknown;
   }) {
-    // Filter out Next.js-specific props that aren't valid HTML attributes
     const { priority, fill, ...htmlProps } = props;
     void priority;
     void fill;
@@ -83,210 +82,202 @@ jest.mock("@/lib/analytics/events", () => ({
   trackContactSubmit: jest.fn(),
 }));
 
+const AUTO_FIT_GRID = /grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,/;
+
+const mockBook = {
+  id: "test-book",
+  title: "Test Book",
+  tagline: "The practical one",
+  description: "Test description",
+  coverImage: "/test-cover.jpg",
+  status: "available" as const,
+  purchaseLinks: [{ label: "Buy", url: "https://example.com" }],
+};
+
+const mockPost = {
+  title: "Test Post",
+  excerpt: "Test excerpt",
+  url: "https://medium.com/test",
+  publishedDate: new Date("2024-01-01"),
+};
+
 describe("Responsive Design - Header Navigation", () => {
-  describe("Mobile Navigation Visibility", () => {
-    it("mobile nav button has md:hidden class (hidden on desktop)", () => {
-      render(<Header />);
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      expect(menuButton).toHaveClass("md:hidden");
-    });
+  it("has no hamburger menu: every link is always rendered", () => {
+    render(<Header />);
+    expect(
+      screen.queryByRole("button", { name: /menu/i })
+    ).not.toBeInTheDocument();
 
-    it("desktop nav has hidden md:flex classes (hidden on mobile, visible on desktop)", () => {
-      render(<Header />);
-      const desktopNav = screen.getByRole("navigation", {
-        name: /main navigation/i,
-      });
-      expect(desktopNav).toHaveClass("hidden");
-      expect(desktopNav).toHaveClass("md:flex");
-    });
-
-    it("provides all navigation links in both mobile and desktop views", () => {
-      render(<Header />);
-      // Desktop nav links
-      const desktopNav = screen.getByRole("navigation", {
-        name: /main navigation/i,
-      });
-      const desktopLinks = within(desktopNav).getAllByRole("link");
-      expect(desktopLinks.length).toBeGreaterThanOrEqual(6);
-    });
+    const nav = screen.getByRole("navigation", { name: /main navigation/i });
+    expect(within(nav).getAllByRole("link")).toHaveLength(4);
+    expect(
+      screen.getByRole("link", { name: "Newsletter" })
+    ).toBeInTheDocument();
   });
 
-  describe("Header Layout", () => {
-    it("uses max-w-7xl for consistent max width", () => {
-      const { container } = render(<Header />);
-      const innerDiv = container.querySelector(".max-w-7xl");
-      expect(innerDiv).toBeInTheDocument();
-    });
+  it("navigation is never hidden behind a breakpoint", () => {
+    render(<Header />);
+    const nav = screen.getByRole("navigation", { name: /main navigation/i });
+    expect(nav.className).not.toMatch(/\bhidden\b/);
+    expect(nav.className).not.toContain("md:flex");
+  });
 
-    it("uses responsive padding (px-4 sm:px-6 lg:px-8)", () => {
-      const { container } = render(<Header />);
-      const paddedDiv = container.querySelector(".px-4");
-      expect(paddedDiv).toBeInTheDocument();
-      expect(paddedDiv).toHaveClass("sm:px-6");
-      expect(paddedDiv).toHaveClass("lg:px-8");
-    });
+  it("header row and navigation list wrap when space runs out", () => {
+    render(<Header />);
+    const banner = screen.getByRole("banner");
+    const row = banner.firstElementChild as HTMLElement;
+    expect(row.className).toContain("flex-wrap");
+    expect(row.className).toContain("items-center");
+    expect(row.className).toContain("justify-between");
 
-    it("uses flexbox for alignment", () => {
-      const { container } = render(<Header />);
-      const flexDiv = container.querySelector(".flex");
-      expect(flexDiv).toBeInTheDocument();
-      expect(flexDiv).toHaveClass("items-center");
-      expect(flexDiv).toHaveClass("justify-between");
-    });
+    const list = screen
+      .getByRole("navigation", { name: /main navigation/i })
+      .querySelector("ul");
+    expect(list?.className).toContain("flex-wrap");
+  });
+
+  it("uses the shared Container width and gutters", () => {
+    render(<Header />);
+    const row = screen.getByRole("banner").firstElementChild as HTMLElement;
+    expect(row.className).toContain("max-w-content");
+    expect(row.className).toContain("px-5");
+    expect(row.className).toContain("sm:px-8");
+    expect(row.className).toContain("lg:px-12");
   });
 });
 
 describe("Responsive Design - Footer", () => {
-  it("renders with responsive container", () => {
-    const { container } = render(<Footer />);
-    const maxWidthContainer = container.querySelector(".max-w-7xl");
-    expect(maxWidthContainer).toBeInTheDocument();
+  it("renders with the shared container", () => {
+    render(<Footer />);
+    const inner = screen.getByRole("contentinfo")
+      .firstElementChild as HTMLElement;
+    expect(inner.className).toContain("max-w-content");
+    expect(inner.className).toContain("px-5");
   });
 
-  it("uses responsive padding", () => {
-    const { container } = render(<Footer />);
-    const paddedElement = container.querySelector("[class*='px-']");
-    expect(paddedElement).toBeInTheDocument();
+  it("brand row and link list wrap", () => {
+    render(<Footer />);
+    const nav = screen.getByRole("navigation", { name: /footer/i });
+    expect(nav.querySelector("ul")?.className).toContain("flex-wrap");
+    expect((nav.parentElement as HTMLElement).className).toContain("flex-wrap");
   });
 
   it("all footer links are accessible", () => {
     render(<Footer />);
     const links = screen.getAllByRole("link");
     expect(links.length).toBeGreaterThan(0);
-
-    links.forEach((link) => {
-      expect(link).toHaveAttribute("href");
-    });
-  });
-});
-
-describe("Responsive Design - Mobile Nav", () => {
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
-
-  it("menu panel positions correctly (right-0 for slide-in effect)", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={navLinks} />);
-
-    await user.click(screen.getByRole("button", { name: /menu/i }));
-
-    const panel = screen.getByTestId("mobile-nav-panel");
-    expect(panel).toHaveClass("right-0");
-  });
-
-  it("overlay covers full viewport", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={navLinks} />);
-
-    await user.click(screen.getByRole("button", { name: /menu/i }));
-
-    const overlay = screen.getByTestId("mobile-nav-overlay");
-    expect(overlay).toHaveClass("fixed");
-    expect(overlay).toHaveClass("inset-0");
-  });
-
-  it("menu panel is fixed position for consistent behavior", async () => {
-    const user = userEvent.setup();
-    render(<MobileNav links={navLinks} />);
-
-    await user.click(screen.getByRole("button", { name: /menu/i }));
-
-    const panel = screen.getByTestId("mobile-nav-panel");
-    expect(panel).toHaveClass("fixed");
+    links.forEach((link) => expect(link).toHaveAttribute("href"));
   });
 });
 
 describe("Responsive Design - Container Component", () => {
-  it("applies responsive max-width", () => {
+  function renderContainer(props = {}) {
     const { container } = render(
-      <Container>
+      <Container {...props}>
         <p>Content</p>
       </Container>
     );
-    const containerEl = container.firstChild;
-    expect(containerEl).toHaveClass("max-w-6xl");
+    return container.firstChild as HTMLElement;
+  }
+
+  it("applies a max-width rather than a fixed width", () => {
+    const el = renderContainer();
+    expect(el).toHaveClass("max-w-content");
+    expect(el.className).not.toMatch(/\bw-\d+px/);
   });
 
   it("centers content with mx-auto", () => {
-    const { container } = render(
-      <Container>
-        <p>Content</p>
-      </Container>
-    );
-    const containerEl = container.firstChild;
-    expect(containerEl).toHaveClass("mx-auto");
+    expect(renderContainer()).toHaveClass("mx-auto");
   });
 
-  it("applies horizontal padding", () => {
-    const { container } = render(
-      <Container>
-        <p>Content</p>
-      </Container>
-    );
-    const containerEl = container.firstChild;
-    expect(containerEl).toHaveClass("px-4");
+  it("gutters grow with the viewport (px-5 sm:px-8 lg:px-12)", () => {
+    const el = renderContainer();
+    expect(el).toHaveClass("px-5");
+    expect(el).toHaveClass("sm:px-8");
+    expect(el).toHaveClass("lg:px-12");
+  });
+
+  it("narrow and prose variants still have gutters", () => {
+    expect(renderContainer({ variant: "narrow" })).toHaveClass("px-5");
+    expect(renderContainer({ variant: "prose" })).toHaveClass("px-5");
   });
 });
 
 describe("Responsive Design - Home Page Components", () => {
-  describe("Hero Component", () => {
-    it("renders with responsive text sizing", () => {
+  describe("Hero", () => {
+    it("uses an auto-fit grid so the photo stacks under the copy on phones", () => {
       render(<Hero />);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toBeInTheDocument();
+      const grid = screen.getByTestId("hero-section")
+        .firstElementChild as HTMLElement;
+      expect(grid.className).toMatch(AUTO_FIT_GRID);
     });
 
-    it("renders hero section with tagline", () => {
+    it("uses fluid heading sizing", () => {
       render(<Hero />);
-      expect(screen.getByTestId("hero-tagline")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { level: 1 }).className).toContain(
+        "clamp("
+      );
+    });
+
+    it("inline newsletter row wraps", () => {
+      render(<NewsletterForm layout="inline" />);
+      const row = screen.getByRole("form").firstElementChild as HTMLElement;
+      expect(row.className).toContain("flex-wrap");
     });
   });
 
-  describe("SecondaryCTAs Component", () => {
-    it("renders navigation links", () => {
-      render(<SecondaryCTAs />);
-      // Should have links to blog and books
-      const links = screen.getAllByRole("link");
-      expect(links.length).toBeGreaterThan(0);
+  describe("IdeaSection", () => {
+    it("uses an auto-fit grid for its two columns", () => {
+      render(<IdeaSection />);
+      const grid = screen.getByTestId("idea-section")
+        .firstElementChild as HTMLElement;
+      expect(grid.className).toMatch(AUTO_FIT_GRID);
     });
   });
 
-  describe("NewsletterCTA Component", () => {
-    it("renders newsletter form", () => {
-      render(<NewsletterCTA />);
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /subscribe/i })
-      ).toBeInTheDocument();
+  describe("BooksPreview", () => {
+    it("lays the books out in an auto-fit grid", () => {
+      render(<BooksPreview />);
+      const section = screen.getByTestId("books-preview");
+      const grid = section.querySelector(".grid") as HTMLElement;
+      expect(grid.className).toMatch(AUTO_FIT_GRID);
     });
   });
 });
 
 describe("Responsive Design - Page Content Components", () => {
   describe("AboutContent", () => {
-    it("renders content article", () => {
+    it("index and chapters sit in an auto-fit grid", () => {
       render(<AboutContent />);
-      expect(screen.getByTestId("about-content")).toBeInTheDocument();
+      expect(screen.getByTestId("about-content").className).toMatch(
+        AUTO_FIT_GRID
+      );
     });
 
     it("renders section headings", () => {
       render(<AboutContent />);
-      const headings = screen.getAllByRole("heading", { level: 2 });
-      expect(headings.length).toBeGreaterThan(0);
+      expect(screen.getAllByRole("heading", { level: 2 }).length).toBe(4);
     });
   });
 
   describe("NewsletterContent", () => {
-    it("renders newsletter form for mobile and desktop", () => {
+    it("renders the form and wraps the expectation lists", () => {
       render(<NewsletterContent />);
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      const lists = screen.getByTestId("newsletter-content")
+        .lastElementChild as HTMLElement;
+      expect(lists.className).toMatch(AUTO_FIT_GRID);
     });
   });
 
   describe("ContactContent", () => {
+    it("two columns collapse via auto-fit grid", () => {
+      render(<ContactContent />);
+      expect(screen.getByTestId("contact-content").className).toMatch(
+        AUTO_FIT_GRID
+      );
+    });
+
     it("renders contact form with all fields", () => {
       render(<ContactContent />);
       expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
@@ -296,23 +287,24 @@ describe("Responsive Design - Page Content Components", () => {
   });
 });
 
-describe("Responsive Design - Cards and Lists", () => {
-  const mockBook = {
-    id: "test-book",
-    title: "Test Book",
-    description: "Test description",
-    coverImage: "/test-cover.jpg",
-    status: "available" as const,
-    purchaseLinks: [{ label: "Buy", url: "https://example.com" }],
-  };
+describe("Responsive Design - Rows and Lists", () => {
+  describe("BookItem", () => {
+    it("full row uses an auto-fit grid", () => {
+      const { container } = render(<BookItem book={mockBook} />);
+      expect((container.firstChild as HTMLElement).className).toMatch(
+        AUTO_FIT_GRID
+      );
+    });
 
-  const mockPost = {
-    title: "Test Post",
-    excerpt: "Test excerpt",
-    url: "https://medium.com/test",
-    publishedDate: new Date("2024-01-01"),
-    thumbnail: "/test.jpg",
-  };
+    it("compact row wraps", () => {
+      const { container } = render(
+        <BookItem book={mockBook} variant="compact" />
+      );
+      expect((container.firstChild as HTMLElement).className).toContain(
+        "flex-wrap"
+      );
+    });
+  });
 
   describe("BooksList", () => {
     it("renders list of books", () => {
@@ -320,12 +312,18 @@ describe("Responsive Design - Cards and Lists", () => {
       expect(screen.getByText("Test Book")).toBeInTheDocument();
     });
 
-    it("renders empty grid gracefully when no books", () => {
+    it("renders an empty list gracefully when no books", () => {
       const { container } = render(<BooksList books={[]} />);
-      // BooksList renders an empty grid when there are no books
-      const grid = container.querySelector(".grid");
-      expect(grid).toBeInTheDocument();
-      expect(grid?.children.length).toBe(0);
+      expect(container.firstChild?.childNodes.length).toBe(0);
+    });
+  });
+
+  describe("BlogPostRow", () => {
+    it("meta column wraps under the body on narrow screens", () => {
+      const { container } = render(<BlogPostRow post={mockPost} />);
+      expect((container.firstChild as HTMLElement).className).toContain(
+        "flex-wrap"
+      );
     });
   });
 
@@ -337,47 +335,37 @@ describe("Responsive Design - Cards and Lists", () => {
 
     it("handles empty list gracefully", () => {
       render(<BlogPostsList posts={[]} />);
-      expect(screen.getByText(/no posts/i)).toBeInTheDocument();
+      expect(screen.getByText(/nothing published yet/i)).toBeInTheDocument();
     });
   });
 
-  describe("Card Component", () => {
-    it("applies proper padding", () => {
-      const { container } = render(
-        <Card>
-          <p>Card content</p>
-        </Card>
+  describe("Panel", () => {
+    it("columns collapse via auto-fit grid", () => {
+      render(
+        <Panel columns data-testid="panel">
+          <p>a</p>
+          <p>b</p>
+        </Panel>
       );
-      const card = container.firstChild;
-      expect(card).toHaveClass("p-6");
-    });
-
-    it("has rounded corners", () => {
-      const { container } = render(
-        <Card>
-          <p>Card content</p>
-        </Card>
-      );
-      const card = container.firstChild;
-      expect(card).toHaveClass("rounded-2xl");
+      expect(screen.getByTestId("panel").className).toMatch(AUTO_FIT_GRID);
     });
   });
 });
 
 describe("Responsive Design - Button Component", () => {
-  it("buttons are touch-friendly (sufficient padding)", () => {
+  it("buttons meet the 44px touch target (48px tall)", () => {
     render(<Button size="md">Touch Target</Button>);
-    const button = screen.getByRole("button");
-    // Medium size should have good touch target padding
-    expect(button).toHaveClass("py-3");
-    expect(button).toHaveClass("px-4");
+    expect(screen.getByRole("button")).toHaveClass("h-12");
   });
 
-  it("large buttons have even larger touch targets", () => {
+  it("large buttons are taller still", () => {
     render(<Button size="lg">Large Button</Button>);
-    const button = screen.getByRole("button");
-    expect(button).toHaveClass("py-3");
-    expect(button).toHaveClass("px-6");
+    expect(screen.getByRole("button")).toHaveClass("h-14");
+  });
+
+  it("small buttons stay at 40px, used only beside other controls", () => {
+    render(<Button size="sm">Small</Button>);
+    expect(screen.getByRole("button")).toHaveClass("h-10");
   });
 });
 
@@ -391,74 +379,52 @@ describe("Responsive Design - PageLayout", () => {
     expect(screen.getByRole("main")).toBeInTheDocument();
   });
 
-  it("applies responsive vertical padding", () => {
+  it("applies vertical padding", () => {
     render(
       <PageLayout>
         <p>Page content</p>
       </PageLayout>
     );
     const main = screen.getByRole("main");
-    expect(main).toHaveClass("py-12");
-    expect(main).toHaveClass("md:py-16");
+    expect(main).toHaveClass("pt-20");
+    expect(main).toHaveClass("pb-24");
   });
 
-  it("wraps content in Container with responsive padding", () => {
-    const { container } = render(
+  it("wraps content in Container with responsive gutters", () => {
+    render(
       <PageLayout>
         <p>Page content</p>
       </PageLayout>
     );
-    const innerContainer = container.querySelector(".mx-auto.px-4");
-    expect(innerContainer).toBeInTheDocument();
-  });
-});
-
-describe("Touch Interaction Compatibility", () => {
-  it("interactive elements have appropriate touch target sizes", () => {
-    render(<Button>Click Me</Button>);
-    const button = screen.getByRole("button");
-    // Button should have minimum touch target through padding
-    const classes = button.className;
-    expect(classes).toMatch(/p[xy]?-\d/);
+    const inner = screen.getByRole("main").firstElementChild as HTMLElement;
+    expect(inner).toHaveClass("mx-auto");
+    expect(inner).toHaveClass("px-5");
   });
 
-  it("links in navigation are spaced appropriately", async () => {
-    const user = userEvent.setup();
-    const navLinks = [
-      { name: "Home", href: "/" },
-      { name: "About", href: "/about" },
-    ];
-    render(<MobileNav links={navLinks} />);
-
-    await user.click(screen.getByRole("button", { name: /menu/i }));
-
-    const nav = screen.getByRole("navigation", { name: /mobile/i });
-    const links = within(nav).getAllByRole("link");
-
-    // Each link should be a separate touchable element
-    expect(links.length).toBe(2);
-    links.forEach((link) => {
-      expect(link.tagName).toBe("A");
-    });
+  it("intro header wraps title and action", () => {
+    render(
+      <PageLayout title="Blog" action={<a href="/x">Action</a>}>
+        <p>Page content</p>
+      </PageLayout>
+    );
+    const header = screen.getByRole("heading", { level: 1 }).closest("header");
+    expect(header?.className).toContain("flex-wrap");
   });
 });
 
 describe("Viewport Meta and Zoom", () => {
   it("layout components do not set fixed widths that prevent responsive behavior", () => {
     const { container } = render(<Header />);
-    const html = container.innerHTML;
-    // Should not have hardcoded pixel widths
-    expect(html).not.toMatch(/width:\s*\d+px/);
+    expect(container.innerHTML).not.toMatch(/width:\s*\d+px/);
   });
 
-  it("container uses max-width rather than fixed width", () => {
+  it("no component relies on breakpoint-hidden navigation", () => {
     const { container } = render(
-      <Container>
-        <p>Test</p>
-      </Container>
+      <>
+        <Header />
+        <Footer />
+      </>
     );
-    const containerEl = container.firstChild as HTMLElement;
-    expect(containerEl.className).toContain("max-w-");
-    expect(containerEl.className).not.toMatch(/w-\d+px/);
+    expect(container.innerHTML).not.toContain("md:hidden");
   });
 });

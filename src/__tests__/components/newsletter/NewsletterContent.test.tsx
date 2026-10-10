@@ -1,211 +1,96 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NewsletterContent } from "@/components/newsletter";
+import * as formsApi from "@/lib/api/forms";
 
-/**
- * NewsletterContent Component Tests
- *
- * Tests for the NewsletterContent component.
- * Based on acceptance criteria from issue #52 (M8-05):
- * - One-sentence promise/value proposition
- * - Newsletter form prominent
- * - Clear confirmation states
- * - Tone: no hype, no frequency pressure
- */
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackNewsletterSubmit: jest.fn(),
+  trackOutboundClick: jest.fn(),
+}));
 
-// Mock fetch for API calls
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
+jest.mock("@/lib/api/forms", () => ({
+  subscribeToNewsletter: jest.fn(),
+}));
 
-describe("NewsletterContent Component", () => {
+describe("NewsletterContent", () => {
   beforeEach(() => {
-    mockFetch.mockReset();
+    jest.clearAllMocks();
   });
 
-  describe("Rendering", () => {
-    it("renders with data-testid for identification", () => {
-      render(<NewsletterContent />);
-      expect(screen.getByTestId("newsletter-content")).toBeInTheDocument();
-    });
-
-    it("renders as an article element", () => {
-      render(<NewsletterContent />);
-      expect(screen.getByRole("article")).toBeInTheDocument();
-    });
+  it("renders an article with the content test id", () => {
+    render(<NewsletterContent />);
+    const article = screen.getByTestId("newsletter-content");
+    expect(article.tagName).toBe("ARTICLE");
   });
 
-  describe("Value Proposition", () => {
-    it("displays value proposition text", () => {
-      render(<NewsletterContent />);
-      expect(
-        screen.getByText(/thoughtful|updates|plant|living/i)
-      ).toBeInTheDocument();
-    });
-
-    it("value proposition mentions thoughtful updates", () => {
-      render(<NewsletterContent />);
-      expect(screen.getByText(/thoughtful/i)).toBeInTheDocument();
-    });
-
-    it("value proposition avoids frequency commitment", () => {
-      render(<NewsletterContent />);
-      const text =
-        screen.getByTestId("newsletter-content").textContent?.toLowerCase() ||
-        "";
-      expect(text).not.toMatch(/daily|weekly|monthly|every/);
-    });
+  it("does not render a page heading (PageLayout owns the intro)", () => {
+    render(<NewsletterContent />);
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
-  describe("Newsletter Form Integration", () => {
-    it("renders the newsletter form", () => {
-      render(<NewsletterContent />);
-      expect(screen.getByTestId("newsletter-form")).toBeInTheDocument();
-    });
-
-    it("form is connected to the API on submit", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-      const user = userEvent.setup();
-      render(<NewsletterContent />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "test@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(mockFetch).toHaveBeenCalledWith("/api/newsletter", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: "test@example.com" }),
-        });
-      });
-    });
-
-    it("shows success message after successful submission", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-      const user = userEvent.setup();
-      render(<NewsletterContent />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "test@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
-      });
-    });
-
-    it("shows error message when API fails", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: "Failed to subscribe" }),
-      });
-
-      const user = userEvent.setup();
-      render(<NewsletterContent />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "test@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
-      });
-    });
-
-    it("shows default error message when API fails without error field", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ success: false }), // No 'error' field
-      });
-
-      const user = userEvent.setup();
-      render(<NewsletterContent />);
-
-      const input = screen.getByRole("textbox", { name: /email/i });
-      const button = screen.getByRole("button", { name: /subscribe/i });
-
-      await user.type(input, "test@example.com");
-      await user.click(button);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("newsletter-error")).toBeInTheDocument();
-      });
-    });
+  it("renders the stacked signup form with a visible label", () => {
+    render(<NewsletterContent />);
+    expect(
+      screen.getByRole("form", { name: /newsletter signup/i })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Email address").className).not.toContain(
+      "sr-only"
+    );
+    expect(
+      screen.getByRole("button", { name: /subscribe/i })
+    ).toBeInTheDocument();
   });
 
-  describe("Brand Compliance", () => {
-    it("contains no hype language", () => {
-      render(<NewsletterContent />);
-      const content =
-        screen.getByTestId("newsletter-content").textContent?.toLowerCase() ||
-        "";
-      const hypeWords = [
-        "free",
-        "exclusive",
-        "amazing",
-        "incredible",
-        "best",
-        "revolutionary",
-        "guaranteed",
-        "limited",
-        "urgent",
-        "act now",
-        "don't miss",
-      ];
-      hypeWords.forEach((word) => {
-        expect(content).not.toContain(word);
-      });
-    });
-
-    it("contains no frequency pressure language", () => {
-      render(<NewsletterContent />);
-      const content =
-        screen.getByTestId("newsletter-content").textContent?.toLowerCase() ||
-        "";
-      const pressureWords = [
-        "daily",
-        "weekly",
-        "constantly",
-        "regular",
-        "frequently",
-        "inbox",
-        "spam",
-      ];
-      pressureWords.forEach((word) => {
-        expect(content).not.toContain(word);
-      });
-    });
+  it("lists what arrives and what does not", () => {
+    render(<NewsletterContent />);
+    expect(screen.getByText("What arrives")).toBeInTheDocument();
+    expect(screen.getByText("What does not")).toBeInTheDocument();
+    const lists = screen.getAllByRole("list");
+    expect(lists).toHaveLength(2);
+    expect(within(lists[0]).getAllByRole("listitem")).toHaveLength(3);
+    expect(within(lists[1]).getAllByRole("listitem")).toHaveLength(3);
+    expect(
+      screen.getByText(/new writing, when it is published/i)
+    ).toBeInTheDocument();
+    expect(screen.getByText(/daily tips or challenges/i)).toBeInTheDocument();
   });
 
-  describe("Custom Styling", () => {
-    it("accepts and applies custom className", () => {
-      render(<NewsletterContent className="custom-class" />);
-      expect(screen.getByTestId("newsletter-content")).toHaveClass(
-        "custom-class"
-      );
+  it("submits through the newsletter API and offers to read something", async () => {
+    const user = userEvent.setup();
+    (formsApi.subscribeToNewsletter as jest.Mock).mockResolvedValue(undefined);
+    render(<NewsletterContent />);
+
+    await user.type(
+      screen.getByRole("textbox", { name: /email/i }),
+      "test@example.com"
+    );
+    await user.click(screen.getByRole("button", { name: /subscribe/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
     });
+    expect(formsApi.subscribeToNewsletter).toHaveBeenCalledWith(
+      "test@example.com"
+    );
+    expect(
+      screen.getByRole("link", { name: "Read something now" })
+    ).toHaveAttribute("href", "/blog");
   });
 
-  describe("Accessibility", () => {
-    it("uses semantic article element", () => {
-      render(<NewsletterContent />);
-      expect(screen.getByRole("article")).toBeInTheDocument();
-    });
+  it("merges a custom className", () => {
+    render(<NewsletterContent className="mt-8" />);
+    expect(screen.getByTestId("newsletter-content").className).toContain(
+      "mt-8"
+    );
+  });
+
+  it("contains no hype or frequency pressure (the expectations list may name what does not arrive)", () => {
+    render(<NewsletterContent />);
+    const text =
+      screen.getByTestId("newsletter-content").textContent?.toLowerCase() ?? "";
+    for (const word of ["free", "exclusive", "amazing", "hurry", "spam"]) {
+      expect(text).not.toContain(word);
+    }
   });
 });

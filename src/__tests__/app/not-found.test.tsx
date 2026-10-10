@@ -18,12 +18,12 @@
 
 import { render, screen } from "@testing-library/react";
 
-// Mock next/font/google
-jest.mock("next/font/google", () => ({
-  Lora: () => ({ variable: "--font-heading", className: "mock-lora" }),
-  Source_Sans_3: () => ({
-    variable: "--font-body",
-    className: "mock-source-sans",
+// Mock next/font/local
+jest.mock("next/font/local", () => ({
+  __esModule: true,
+  default: (options: { variable: string }) => ({
+    variable: options.variable,
+    className: `mock-${options.variable.replace("--font-", "")}`,
   }),
 }));
 
@@ -69,6 +69,7 @@ describe("404 Not Found Page (M3-07)", () => {
       // Should not contain technical jargon
       expect(heading.textContent?.toLowerCase()).not.toContain("error");
       expect(heading.textContent?.toLowerCase()).not.toContain("404");
+      expect(heading).toHaveTextContent("Nothing here.");
     });
 
     it("displays a descriptive message that is calm and helpful", async () => {
@@ -80,6 +81,16 @@ describe("404 Not Found Page (M3-07)", () => {
       // Should not contain technical jargon
       expect(textContent?.toLowerCase()).not.toContain("error 404");
       expect(textContent?.toLowerCase()).not.toContain("not found");
+      expect(
+        screen.getByText("This page does not exist. No worries.")
+      ).toBeInTheDocument();
+    });
+
+    it("shows the status code only as a quiet eyebrow label", async () => {
+      const NotFoundPage = (await import("@/app/not-found")).default;
+      render(<NotFoundPage />);
+      const eyebrow = screen.getByText("404");
+      expect(eyebrow).toHaveClass("uppercase");
     });
   });
 
@@ -91,6 +102,15 @@ describe("404 Not Found Page (M3-07)", () => {
       expect(homeLink).toBeInTheDocument();
       expect(homeLink).toHaveAttribute("href", "/");
     });
+
+    it("is a quiet arrow link, not a button", async () => {
+      const NotFoundPage = (await import("@/app/not-found")).default;
+      render(<NotFoundPage />);
+      const homeLink = screen.getByRole("link", {
+        name: /back to the home page/i,
+      });
+      expect(homeLink.textContent).toContain("→");
+    });
   });
 
   describe("Brand Styling", () => {
@@ -98,7 +118,7 @@ describe("404 Not Found Page (M3-07)", () => {
       const NotFoundPage = (await import("@/app/not-found")).default;
       render(<NotFoundPage />);
       const main = screen.getByRole("main");
-      expect(main).toHaveClass("py-12");
+      expect(main).toHaveClass("py-24");
     });
 
     it("uses Container component for consistent max-width and padding", async () => {
@@ -107,22 +127,22 @@ describe("404 Not Found Page (M3-07)", () => {
       const main = screen.getByRole("main");
       const container = main.firstElementChild;
       expect(container).toHaveClass("mx-auto");
-      expect(container).toHaveClass("max-w-6xl");
+      expect(container).toHaveClass("max-w-narrow");
     });
 
     it("uses brand font for heading", async () => {
       const NotFoundPage = (await import("@/app/not-found")).default;
       render(<NotFoundPage />);
       const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveClass("font-heading");
+      expect(heading).toHaveClass("font-serif");
     });
 
     it("centers content for a calm, focused experience", async () => {
       const NotFoundPage = (await import("@/app/not-found")).default;
       render(<NotFoundPage />);
-      const main = screen.getByRole("main");
+      const container = screen.getByRole("main").firstElementChild;
       // Content should be centered
-      expect(main).toHaveClass("text-center");
+      expect(container).toHaveClass("text-center");
     });
   });
 

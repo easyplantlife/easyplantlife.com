@@ -1,70 +1,70 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-/**
- * Button variant options
- * - primary: Main CTA button with brand green background
- * - secondary: Outlined button for secondary actions
- * - ghost: Minimal button for tertiary actions
- */
 export type ButtonVariant = "primary" | "secondary" | "ghost";
 
-/**
- * Button size options
- * - sm: Compact size for inline actions
- * - md: Default size for most buttons
- * - lg: Large size for prominent CTAs
- */
 export type ButtonSize = "sm" | "md" | "lg";
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual style variant */
+export interface ButtonStyleOptions {
   variant?: ButtonVariant;
-  /** Size of the button */
+  size?: ButtonSize;
+  disabled?: boolean;
+  className?: string;
+}
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
   size?: ButtonSize;
 }
 
-/**
- * Variant styles mapping
- * Primary: Vibrant green gradient with white text
- * Secondary: Outlined with green border
- * Ghost: Fully transparent, text only
- */
+const baseStyles = [
+  "inline-flex items-center justify-center gap-2",
+  "whitespace-nowrap rounded-pill border border-transparent",
+  "font-sans font-semibold",
+  "transition-colors duration-200",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-ground",
+].join(" ");
+
 const variantStyles: Record<ButtonVariant, string> = {
-  primary:
-    "bg-primary text-white hover:bg-primary-dark active:bg-primary-dark transition-colors",
+  /** Filled: the one primary action per view. */
+  primary: "bg-accent text-on-accent hover:bg-accent-hover",
+  /** Outlined: secondary actions such as the header's Newsletter link. */
   secondary:
-    "bg-transparent border border-neutral-300 text-neutral-700 hover:bg-neutral-50 hover:border-neutral-400 active:bg-neutral-100",
-  ghost:
-    "bg-transparent text-neutral-700 hover:bg-neutral-100 active:bg-neutral-200",
+    "bg-transparent border-tint-line text-accent hover:bg-tint hover:text-accent-hover dark:border-accent",
+  /** Text only: tertiary actions inside dense areas. */
+  ghost: "bg-transparent text-accent hover:bg-tint hover:text-accent-hover",
 };
 
-/**
- * Size styles mapping
- * Defines padding and text size for each size option
- */
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-3 text-base",
-  lg: "px-6 py-3 text-lg",
+  sm: "h-10 px-[18px] text-[15px]",
+  md: "h-12 px-[22px] text-base",
+  lg: "h-14 px-7 text-lg",
 };
 
 /**
- * Button Component
+ * Builds the button class list. Shared with ButtonLink so an <a> styled as a
+ * button is visually identical to a <button>.
+ */
+export function buttonClassName({
+  variant = "primary",
+  size = "md",
+  disabled = false,
+  className = "",
+}: ButtonStyleOptions = {}): string {
+  return cn(
+    baseStyles,
+    variantStyles[variant],
+    sizeStyles[size],
+    disabled && "cursor-not-allowed opacity-60",
+    className
+  );
+}
+
+/**
+ * Button
  *
- * A reusable button component following the Easy Plant Life design system.
- * Supports multiple variants, sizes, and includes proper accessibility features.
- *
- * @example
- * ```tsx
- * // Primary CTA
- * <Button variant="primary" size="lg">Subscribe</Button>
- *
- * // Secondary action
- * <Button variant="secondary">Learn More</Button>
- *
- * // Ghost/text button
- * <Button variant="ghost" size="sm">Cancel</Button>
- * ```
+ * Pill-shaped action. Defaults to type="button" so it never submits a form
+ * by accident; pass type="submit" inside forms.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   function Button(
@@ -79,26 +79,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) {
-    const baseStyles = [
-      // Base styling
-      "inline-flex items-center justify-center",
-      "font-body font-medium",
-      "rounded-md",
-      "transition-colors duration-200",
-      // Focus styles for accessibility
-      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-      // Disabled styles
-      disabled && "opacity-50 cursor-not-allowed",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
     return (
       <button
         ref={ref}
         type={type}
         disabled={disabled}
-        className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`.trim()}
+        className={buttonClassName({ variant, size, disabled, className })}
         {...props}
       >
         {children}

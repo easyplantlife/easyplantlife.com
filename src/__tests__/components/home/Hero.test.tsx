@@ -1,260 +1,164 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { Hero } from "@/components/home/Hero";
+import { subscribeToNewsletter } from "@/lib/api/forms";
+
+jest.mock("@/lib/api/forms", () => ({
+  subscribeToNewsletter: jest.fn(),
+}));
+
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackNewsletterSubmit: jest.fn(),
+  trackOutboundClick: jest.fn(),
+}));
+
+const mockSubscribe = subscribeToNewsletter as jest.MockedFunction<
+  typeof subscribeToNewsletter
+>;
 
 /**
- * Hero Component Tests
+ * Hero
  *
- * Tests for the home page Hero section following TDD approach.
- * Based on acceptance criteria from issue #26 (M4-01):
- * - Logo prominently displayed
- * - Short tagline (2-4 words) visible immediately
- * - Brief brand explanation (2-3 sentences max)
- * - Generous white space
- * - No feature lists or complex layouts
- * - Feels "calm and intentional"
+ * One headline, one promise and the newsletter form, beside the books photo.
+ * The hero is the only place on the home page that asks for anything.
  */
+describe("Hero", () => {
+  beforeEach(() => {
+    mockSubscribe.mockReset();
+  });
 
-describe("Hero Component", () => {
-  describe("Rendering", () => {
-    it("renders as a section element with appropriate landmark", () => {
+  describe("Structure", () => {
+    it("renders a section labelled by its h1", () => {
       render(<Hero />);
-      const hero = screen.getByRole("region", { name: /hero/i });
-      expect(hero).toBeInTheDocument();
+      const hero = screen.getByTestId("hero-section");
       expect(hero.tagName).toBe("SECTION");
+      expect(hero).toHaveAttribute("aria-labelledby", "hero-title");
+      expect(
+        screen.getByRole("region", { name: /living vegan/i })
+      ).toBeInTheDocument();
     });
 
-    it("renders with data-testid for identification", () => {
+    it("renders the brand eyebrow", () => {
       render(<Hero />);
-      expect(screen.getByTestId("hero-section")).toBeInTheDocument();
+      expect(screen.getByText("Easy Plant Life")).toBeInTheDocument();
+    });
+
+    it("renders the headline as the only h1", () => {
+      render(<Hero />);
+      const headings = screen.getAllByRole("heading", { level: 1 });
+      expect(headings).toHaveLength(1);
+      expect(headings[0]).toHaveTextContent(
+        "Living vegan without turning it into a project."
+      );
+      expect(headings[0]).toHaveAttribute("id", "hero-title");
+    });
+
+    it("renders a short lead", () => {
+      render(<Hero />);
+      const lead = screen.getByTestId("hero-explanation");
+      expect(lead).toHaveTextContent(/calm, practical writing/i);
+      expect(lead.textContent?.split(/\.\s+/).length).toBeLessThanOrEqual(3);
+    });
+
+    it("does not render the lockup logo image or decorative dividers", () => {
+      render(<Hero />);
+      const images = document.querySelectorAll("img");
+      expect(images).toHaveLength(1);
+      expect(images[0]).not.toHaveAttribute(
+        "src",
+        expect.stringContaining("lockup")
+      );
+      expect(document.querySelector(".bg-gradient-to-r")).toBeNull();
     });
   });
 
-  describe("Logo Display", () => {
-    it("displays the brand name prominently", () => {
+  describe("Newsletter form", () => {
+    it("renders an inline form with a hidden label", () => {
       render(<Hero />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
-      expect(logo).toBeInTheDocument();
+      const form = screen.getByRole("form", { name: /newsletter/i });
+      const input = within(form).getByLabelText("Email address");
+      expect(input).toHaveAttribute("type", "email");
+      expect(screen.getByText("Email address").className).toContain("sr-only");
     });
 
-    it("renders logo with heading structure for prominence", () => {
+    it("uses the calm call to action and help text", () => {
       render(<Hero />);
-      const h1 = screen.getByRole("heading", {
-        level: 1,
-        name: /easy plant life/i,
+      expect(
+        screen.getByRole("button", { name: "Get the notes" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Occasional notes. No schedule. Unsubscribe any time.")
+      ).toBeInTheDocument();
+    });
+
+    it("submits the address and shows the success note", async () => {
+      const user = userEvent.setup();
+      mockSubscribe.mockResolvedValue();
+      render(<Hero />);
+
+      await user.type(screen.getByLabelText("Email address"), "jo@example.com");
+      await user.click(screen.getByRole("button", { name: "Get the notes" }));
+
+      await waitFor(() => {
+        expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
       });
-      expect(h1).toHaveClass("font-heading");
+      expect(mockSubscribe).toHaveBeenCalledWith("jo@example.com");
+      expect(screen.getByRole("status")).toHaveTextContent(/on the list/i);
     });
 
-    it("logo is visually prominent with appropriate size", () => {
+    it("shows an error for an invalid address without calling the API", async () => {
+      const user = userEvent.setup();
       render(<Hero />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
-      // Should have responsive width classes for prominence
-      expect(logo.className).toMatch(/w-64|md:w-80|lg:w-96/);
-    });
-  });
 
-  describe("Tagline Display", () => {
-    it("displays a short tagline", () => {
-      render(<Hero />);
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeInTheDocument();
-    });
+      await user.type(screen.getByLabelText("Email address"), "not-an-email");
+      await user.click(screen.getByRole("button", { name: "Get the notes" }));
 
-    it("tagline is between 2-4 words", () => {
-      render(<Hero />);
-      const tagline = screen.getByTestId("hero-tagline");
-      const wordCount = tagline.textContent?.trim().split(/\s+/).length || 0;
-      expect(wordCount).toBeGreaterThanOrEqual(2);
-      expect(wordCount).toBeLessThanOrEqual(4);
-    });
-
-    it("tagline is immediately visible (not hidden)", () => {
-      render(<Hero />);
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeVisible();
+      expect(await screen.findByRole("alert")).toHaveTextContent(
+        /does not look like an email/i
+      );
+      expect(mockSubscribe).not.toHaveBeenCalled();
     });
   });
 
-  describe("Brand Explanation", () => {
-    it("displays a brief brand explanation", () => {
+  describe("Links", () => {
+    it("offers the blog and the books as secondary paths", () => {
       render(<Hero />);
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(explanation).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "Read the blog" })
+      ).toHaveAttribute("href", "/blog");
+      expect(
+        screen.getByRole("link", { name: "See the books" })
+      ).toHaveAttribute("href", "/books");
     });
 
-    it("explanation has no more than 3 sentences", () => {
+    it("renders the books photo as a link to the books page", () => {
       render(<Hero />);
-      const explanation = screen.getByTestId("hero-explanation");
-      const text = explanation.textContent || "";
-      // Count sentences by looking for sentence-ending punctuation
-      const sentenceCount = (text.match(/[.!?]+/g) || []).length;
-      expect(sentenceCount).toBeLessThanOrEqual(3);
-      expect(sentenceCount).toBeGreaterThanOrEqual(1);
-    });
-
-    it("explanation uses readable text size", () => {
-      render(<Hero />);
-      const explanation = screen.getByTestId("hero-explanation");
-      // Should use body text sizing
-      expect(explanation.className).toMatch(/text-(base|lg|xl)/);
-    });
-  });
-
-  describe("Visual Design - White Space", () => {
-    it("has generous vertical padding", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      // Should have vertical padding classes
-      expect(hero.className).toMatch(/py-(\d+|section)/);
-    });
-
-    it("content is centered for balance", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      expect(hero).toHaveClass("text-center");
-    });
-
-    it("uses brand background color", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      // Should use background color
-      expect(hero.className).toMatch(/bg-/);
-    });
-  });
-
-  describe("Layout Simplicity", () => {
-    it("does not render any lists", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      const lists = hero.querySelectorAll("ul, ol");
-      expect(lists).toHaveLength(0);
-    });
-
-    it("does not render any grid layouts", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      const gridElements = hero.querySelectorAll('[class*="grid"]');
-      expect(gridElements).toHaveLength(0);
-    });
-
-    it("does not render any cards", () => {
-      render(<Hero />);
-      const hero = screen.getByTestId("hero-section");
-      // Check for card-like elements
-      const cards = hero.querySelectorAll('[class*="card"], [role="article"]');
-      expect(cards).toHaveLength(0);
+      const photoLink = screen.getByTestId("hero-books");
+      expect(photoLink).toHaveAttribute("href", "/books");
+      const img = within(photoLink).getByRole("img");
+      expect(img).toHaveAttribute(
+        "alt",
+        expect.stringMatching(
+          /the everyday vegan playbook and the normal vegan/i
+        )
+      );
     });
   });
 
   describe("Accessibility", () => {
-    it("has proper heading hierarchy", () => {
-      render(<Hero />);
-      // Logo should be h1 (main page heading) with accessible name from image alt
-      const h1 = screen.getByRole("heading", {
-        level: 1,
-        name: /easy plant life/i,
-      });
-      expect(h1).toBeInTheDocument();
-    });
-
-    it("tagline and explanation use semantic text elements", () => {
-      render(<Hero />);
-      const tagline = screen.getByTestId("hero-tagline");
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(tagline.tagName).toBe("P");
-      // Explanation is a div container with paragraph children
-      expect(explanation.querySelectorAll("p").length).toBeGreaterThanOrEqual(
-        1
-      );
-    });
-
-    it("section has appropriate aria-label", () => {
-      render(<Hero />);
-      const hero = screen.getByRole("region");
-      expect(hero).toHaveAttribute("aria-label");
-    });
-  });
-
-  describe("Typography", () => {
-    it("uses heading font for logo container", () => {
-      render(<Hero />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      expect(h1).toHaveClass("font-heading");
-    });
-
-    it("uses body font for explanation text", () => {
-      render(<Hero />);
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(explanation).toHaveClass("font-body");
-    });
-
-    it("uses appropriate text colors from brand palette", () => {
-      render(<Hero />);
-      const h1 = screen.getByRole("heading", { level: 1 });
-      const explanation = screen.getByTestId("hero-explanation");
-      // Should use brand structure and colors
-      expect(h1).toBeInTheDocument();
-      expect(explanation.className).toMatch(/text-(text|secondary|neutral)/);
-    });
-  });
-
-  describe("Custom Styling", () => {
-    it("accepts and applies custom className", () => {
-      render(<Hero className="custom-class" />);
-      const hero = screen.getByTestId("hero-section");
-      expect(hero).toHaveClass("custom-class");
-    });
-
-    it("custom className does not override essential styles", () => {
-      render(<Hero className="custom-class" />);
-      const hero = screen.getByTestId("hero-section");
-      // Should still have centering and padding
-      expect(hero).toHaveClass("text-center");
-    });
-  });
-
-  describe("Brand Message - Understanding Test", () => {
-    /**
-     * GIVEN the home page loads
-     * WHEN I view the hero section
-     * THEN I can understand the brand in under 30 seconds
-     *
-     * This test verifies the essential brand elements are present
-     * for quick comprehension.
-     */
-    it("contains all elements needed for brand understanding", () => {
+    it("keyboard users reach the input, button and links in order", async () => {
+      const user = userEvent.setup();
       render(<Hero />);
 
-      // Brand name/logo is visible (logo is the image inside the h1)
-      const h1 = screen.getByRole("heading", { level: 1 });
+      await user.tab();
+      expect(screen.getByLabelText("Email address")).toHaveFocus();
+      await user.tab();
       expect(
-        within(h1).getByRole("img", { name: /easy plant life/i })
-      ).toBeVisible();
-
-      // Tagline provides quick context
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeVisible();
-      expect(tagline.textContent?.trim().length).toBeGreaterThan(0);
-
-      // Brief explanation is available
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(explanation).toBeVisible();
-      expect(explanation.textContent?.trim().length).toBeGreaterThan(0);
-    });
-
-    /**
-     * GIVEN the hero section
-     * WHEN I count the sentences in the explanation
-     * THEN there are no more than 3 sentences
-     */
-    it("keeps explanation concise for quick reading", () => {
-      render(<Hero />);
-      const explanation = screen.getByTestId("hero-explanation");
-      const text = explanation.textContent || "";
-      const sentences = text.match(/[.!?]+/g) || [];
-      expect(sentences.length).toBeLessThanOrEqual(3);
+        screen.getByRole("button", { name: "Get the notes" })
+      ).toHaveFocus();
+      await user.tab();
+      expect(screen.getByRole("link", { name: "Read the blog" })).toHaveFocus();
     });
   });
 });

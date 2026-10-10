@@ -1,68 +1,49 @@
 "use client";
 
 import {
-  useState,
   useEffect,
   useId,
-  type HTMLAttributes,
-  type FormEvent,
+  useState,
   type ChangeEvent,
+  type FormEvent,
+  type HTMLAttributes,
 } from "react";
+import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { trackFormView, trackContactSubmit } from "@/lib/analytics/events";
+import { StatusNote } from "@/components/ui/StatusNote";
+import { Text } from "@/components/ui/Text";
+import { Textarea } from "@/components/ui/Textarea";
+import { siteConfig } from "@/content/site";
+import { trackContactSubmit, trackFormView } from "@/lib/analytics/events";
+import { sendContactMessage, type ContactMessage } from "@/lib/api/forms";
+import { cn } from "@/lib/utils";
 
-/**
- * Form data shape for contact form submission
- */
-export interface ContactFormData {
-  name: string;
-  email: string;
-  message: string;
-}
+export type ContactFormData = ContactMessage;
 
 export interface ContactFormProps extends Omit<
   HTMLAttributes<HTMLFormElement>,
   "onSubmit"
 > {
-  /** Additional CSS classes */
-  className?: string;
-  /** Callback when form is submitted with valid data */
+  /** Defaults to posting to /api/contact. */
   onSubmit?: (data: ContactFormData) => Promise<void>;
 }
 
-/**
- * Validates an email address format
- */
+type Status = "idle" | "loading" | "success" | "error";
+
 function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /**
- * ContactForm Component
+ * ContactForm
  *
- * A contact form component with validation, honeypot spam protection, and state handling.
- * Fields: name, email, message.
- *
- * Features:
- * - Name, email, and message fields with validation
- * - Honeypot field for spam prevention (hidden)
- * - Submit button with loading state
- * - Success state with confirmation message
- * - Error state with helpful message
- * - Accessible (labels, error announcements)
- * - No marketing hype in copy
- *
- * @example
- * ```tsx
- * <ContactForm />
- * <ContactForm onSubmit={async (data) => await sendContactMessage(data)} />
- * ```
+ * Name, email and message. A hidden honeypot field catches bots: when it is
+ * filled the form "succeeds" silently without sending anything.
  */
 export function ContactForm({
+  onSubmit = sendContactMessage,
   className = "",
-  onSubmit,
   ...props
 }: ContactFormProps) {
   const formId = useId();
@@ -72,102 +53,91 @@ export function ContactForm({
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [honeypot, setHoneypot] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Track form view on mount
   useEffect(() => {
     trackFormView("contact");
   }, []);
+
+  const fail = (text: string) => {
+    setStatus("error");
+    setErrorMessage(text);
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage(null);
 
-    // Check honeypot - if filled, silently "succeed" without sending or tracking
     if (honeypot.trim()) {
       setStatus("success");
       return;
     }
 
-    // Client-side validation
-    if (!name.trim()) {
-      setStatus("error");
-      setErrorMessage("Please enter your name.");
-      return;
-    }
-
-    if (!email.trim()) {
-      setStatus("error");
-      setErrorMessage("Please enter your email address.");
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      setStatus("error");
-      setErrorMessage("Please enter a valid email address.");
-      return;
-    }
-
-    if (!message.trim()) {
-      setStatus("error");
-      setErrorMessage("Please enter your message.");
-      return;
-    }
+    if (!name.trim()) return fail("Please enter your name.");
+    if (!email.trim()) return fail("Please enter your email address.");
+    if (!isValidEmail(email))
+      return fail("Please enter a valid email address.");
+    if (!message.trim()) return fail("Please enter your message.");
 
     setStatus("loading");
 
     try {
-      if (onSubmit) {
-        await onSubmit({
-          name: name.trim(),
-          email: email.trim(),
-          message: message.trim(),
-        });
-      }
+      await onSubmit({
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim(),
+      });
       setStatus("success");
       trackContactSubmit("success");
     } catch {
-      setStatus("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      fail("Something went wrong. Please try again.");
       trackContactSubmit("error");
     }
   };
 
-  const handleInputChange = (
-    setter: (value: string) => void,
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setter(e.target.value);
-    // Clear error when user starts typing
-    if (status === "error") {
-      setStatus("idle");
-      setErrorMessage(null);
-    }
+  const handleChange =
+    (setter: (value: string) => void) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setter(e.target.value);
+      if (status === "error") {
+        setStatus("idle");
+        setErrorMessage(null);
+      }
+    };
+
+  const reset = () => {
+    setName("");
+    setEmail("");
+    setMessage("");
+    setHoneypot("");
+    setStatus("idle");
+    setErrorMessage(null);
   };
 
   const isLoading = status === "loading";
 
-  // Success state
   if (status === "success") {
     return (
-      <div
-        data-testid="contact-form"
-        className={className}
-        role="status"
-        aria-live="polite"
-      >
-        <div
+      <div data-testid="contact-form" className={className}>
+        <StatusNote
           data-testid="contact-success"
-          className="text-primary font-body text-lg"
+          size="lg"
+          title="Message sent."
+          actions={
+            <>
+              <ArrowLink href="/" className="text-[15px]">
+                Back to the home page
+              </ArrowLink>
+              <Button variant="ghost" size="sm" onClick={reset}>
+                Send another
+              </Button>
+            </>
+          }
         >
-          <p className="mb-2 font-medium">Thank you for your message.</p>
-          <p className="text-text-secondary">
-            We have received your inquiry and will get back to you soon.
-          </p>
-        </div>
+          Thanks for writing. A reply will come to the address you gave, from a
+          person.
+        </StatusNote>
       </div>
     );
   }
@@ -177,72 +147,48 @@ export function ContactForm({
       aria-label="Contact form"
       aria-describedby={errorMessage ? errorId : undefined}
       data-testid="contact-form"
+      noValidate
       onSubmit={handleSubmit}
-      className={`flex flex-col gap-4 ${className}`.trim()}
+      className={cn("flex w-full max-w-[520px] flex-col gap-5", className)}
       {...props}
     >
-      {/* Name Field */}
       <Input
         type="text"
+        name="name"
         label="Name"
-        placeholder="Your name"
+        autoComplete="name"
         value={name}
-        onChange={(e) => handleInputChange(setName, e)}
+        onChange={handleChange(setName)}
         required
         disabled={isLoading}
       />
 
-      {/* Email Field */}
       <Input
         type="email"
+        name="email"
         label="Email"
-        placeholder="Your email"
+        autoComplete="email"
+        placeholder="you@example.com"
+        hint="Only used to reply to you."
         value={email}
-        onChange={(e) => handleInputChange(setEmail, e)}
+        onChange={handleChange(setEmail)}
         required
         disabled={isLoading}
       />
 
-      {/* Message Field */}
-      <div className="flex flex-col gap-1">
-        <label
-          htmlFor={`${formId}-message`}
-          className="font-body text-sm font-medium text-text"
-        >
-          Message
-        </label>
-        <textarea
-          id={`${formId}-message`}
-          placeholder="Your message"
-          value={message}
-          onChange={(e) => handleInputChange(setMessage, e)}
-          required
-          disabled={isLoading}
-          rows={5}
-          className={`
-            w-full
-            px-4 py-2
-            font-body text-base
-            rounded-md
-            border
-            bg-background
-            text-text
-            transition-colors duration-200
-            placeholder:text-text-secondary
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
-            border-neutral-200
-            ${isLoading ? "opacity-50 cursor-not-allowed bg-neutral-100" : ""}
-            resize-y
-          `
-            .trim()
-            .replace(/\s+/g, " ")}
-        />
-      </div>
+      <Textarea
+        name="message"
+        label="Message"
+        value={message}
+        onChange={handleChange(setMessage)}
+        required
+        disabled={isLoading}
+      />
 
-      {/* Honeypot Field - Hidden from users, bots fill it in */}
+      {/* Honeypot: hidden from people, filled in by bots */}
       <div
         aria-hidden="true"
-        className="absolute left-[-9999px] top-[-9999px] opacity-0 h-0 w-0 overflow-hidden"
+        className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden opacity-0"
       >
         <label htmlFor={`${formId}-website`}>Website (leave blank)</label>
         <input
@@ -257,26 +203,30 @@ export function ContactForm({
         />
       </div>
 
-      {/* Submit Button */}
-      <Button
-        type="submit"
-        variant="primary"
-        disabled={isLoading}
-        className="w-full sm:w-auto self-start"
-      >
-        {isLoading ? "Sending..." : "Send Message"}
-      </Button>
+      <div className="flex flex-wrap items-center gap-4 pt-1">
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isLoading}
+          aria-busy={isLoading || undefined}
+          className="min-w-40"
+        >
+          {isLoading ? "Sending…" : "Send message"}
+        </Button>
+        <Text size="sm" color="faint">
+          Replies come from {siteConfig.contactEmail}
+        </Text>
+      </div>
 
-      {/* Error State */}
       {status === "error" && errorMessage && (
-        <div
+        <p
           data-testid="contact-error"
           id={errorId}
           role="alert"
-          className="mt-2 text-red-600 font-body text-sm"
+          className="font-sans text-[15px] text-error"
         >
           {errorMessage}
-        </div>
+        </p>
       )}
     </form>
   );

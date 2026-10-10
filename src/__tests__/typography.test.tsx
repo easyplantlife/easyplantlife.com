@@ -11,22 +11,13 @@ import { render, screen } from "@testing-library/react";
  * - Highly readable with proper line heights
  */
 
-// Mock next/font/google - must be hoisted
-jest.mock("next/font/google", () => {
-  const mockLora = jest.fn(() => ({
-    variable: "--font-heading",
-    className: "mock-lora",
+// Mock next/font/local - must be hoisted
+jest.mock("next/font/local", () => {
+  const localFont = jest.fn((options: { variable: string }) => ({
+    variable: options.variable,
+    className: `mock-${options.variable.replace("--font-", "")}`,
   }));
-
-  const mockSourceSans3 = jest.fn(() => ({
-    variable: "--font-body",
-    className: "mock-source-sans",
-  }));
-
-  return {
-    Lora: mockLora,
-    Source_Sans_3: mockSourceSans3,
-  };
+  return { __esModule: true, default: localFont };
 });
 
 // Import after mocking
@@ -34,26 +25,41 @@ import RootLayout from "@/app/layout";
 
 describe("Typography Configuration", () => {
   describe("Font Loading", () => {
-    it("loads Lora font for headings", () => {
+    it("loads Lora from a local file for headings", () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Lora } = require("next/font/google");
-      expect(Lora).toHaveBeenCalledWith(
+      const localFont = require("next/font/local").default as jest.Mock;
+      expect(localFont).toHaveBeenCalledWith(
         expect.objectContaining({
-          subsets: ["latin"],
+          src: expect.stringContaining("lora"),
           variable: "--font-heading",
+          fallback: ["Georgia", "serif"],
         })
       );
     });
 
-    it("loads Source Sans 3 font for body text", () => {
+    it("loads Source Sans 3 from a local file for body text", () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Source_Sans_3 } = require("next/font/google");
-      expect(Source_Sans_3).toHaveBeenCalledWith(
+      const localFont = require("next/font/local").default as jest.Mock;
+      expect(localFont).toHaveBeenCalledWith(
         expect.objectContaining({
-          subsets: ["latin"],
+          src: expect.stringContaining("source-sans-3"),
           variable: "--font-body",
+          fallback: ["system-ui", "sans-serif"],
         })
       );
+    });
+
+    it("does not depend on Google Fonts at build time", () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const fs = require("fs");
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const path = require("path");
+      const fontsFile = fs.readFileSync(
+        path.join(process.cwd(), "src", "app", "fonts.ts"),
+        "utf-8"
+      );
+      expect(fontsFile).toContain('from "next/font/local"');
+      expect(fontsFile).not.toMatch(/from "next\/font\/google"/);
     });
   });
 

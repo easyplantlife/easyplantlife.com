@@ -26,23 +26,13 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * About Page
- *
- * Explains the Easy Plant Life brand philosophy through three sections:
- * 1. Why Easy Plant Life exists
- * 2. What we believe
- * 3. What we're not
- *
- * Design principles:
- * - Calm, honest, non-authoritative tone
- * - Simple single-column layout for readability
- * - Generous white space between sections
- * - No complex grid layouts or cards
- */
 export default function AboutPage() {
   return (
-    <PageLayout title="About">
+    <PageLayout
+      eyebrow="About"
+      title="Living vegan does not need to feel like a project."
+      lead="Somewhere along the way, a simple choice turned into something complicated. Rules to follow, recipes to perfect, pressure to optimize. This site is the quieter alternative."
+    >
       <AboutContent />
     </PageLayout>
   );

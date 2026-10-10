@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { PageLayout } from "@/components/PageLayout";
 import { BlogPostsList } from "@/components/blog/BlogPostsList";
-import { fetchMediumPosts } from "@/lib/api/medium";
-import type { BlogPost } from "@/lib/types/blog";
+import { ArrowLink } from "@/components/ui/ArrowLink";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Panel } from "@/components/ui/Panel";
+import { Text } from "@/components/ui/Text";
+import { siteConfig } from "@/content/site";
+import { getBlogPosts } from "@/lib/api/blog";
 
 export const metadata: Metadata = {
   title: "Blog | Easy Plant Life",
@@ -10,87 +14,59 @@ export const metadata: Metadata = {
     "Read our latest articles about plant care and living with plants.",
 };
 
-/**
- * Converts Medium posts to the BlogPost format used by components.
- */
-function convertToBlogPost(mediumPost: {
-  title: string;
-  excerpt: string;
-  url: string;
-  publishedDate: Date;
-  thumbnail?: string;
-}): BlogPost {
-  return {
-    title: mediumPost.title,
-    excerpt: mediumPost.excerpt,
-    url: mediumPost.url,
-    publishedDate: mediumPost.publishedDate,
-    thumbnail: mediumPost.thumbnail,
-  };
-}
+/** Re-fetch the Medium feed at most once an hour. */
+export const revalidate = 3600;
 
-/**
- * Extracts the username from a Medium publication URL.
- * Handles formats like:
- * - https://medium.com/@username
- * - https://username.medium.com
- */
-function extractUsernameFromUrl(url: string): string {
-  // Handle https://medium.com/@username format
-  const atMatch = url.match(/medium\.com\/@([^\/]+)/);
-  if (atMatch) return atMatch[1];
-
-  // Handle https://username.medium.com format
-  const subdomainMatch = url.match(/^https?:\/\/([^.]+)\.medium\.com/);
-  if (subdomainMatch) return subdomainMatch[1];
-
-  // Fallback: return the URL as-is (let fetchMediumPosts handle it)
-  return url;
-}
-
-/**
- * Blog Page
- *
- * Displays blog posts fetched from Medium via RSS feed.
- * Posts are displayed as preview cards that link to the full
- * articles on Medium.
- *
- * Design principles:
- * - Calm, honest presentation of content
- * - Clear indication that posts link to Medium
- * - Responsive layout for all devices
- * - Graceful error handling for failed fetches
- */
 export default async function BlogPage() {
-  let posts: BlogPost[] = [];
-  let error: string | undefined;
-
-  try {
-    const publicationUrl = process.env.MEDIUM_PUBLICATION_URL;
-    const username = publicationUrl
-      ? extractUsernameFromUrl(publicationUrl)
-      : "easyplantlife";
-
-    const mediumPosts = await fetchMediumPosts({
-      username,
-      maxPosts: 10,
-    });
-    posts = mediumPosts.map(convertToBlogPost);
-  } catch {
-    error = "Unable to load blog posts. Please try again later.";
-  }
+  const { posts, error } = await getBlogPosts({ maxPosts: 10 });
 
   return (
-    <PageLayout title="Blog">
-      <p data-testid="blog-intro" className="mb-12 text-lg text-text-secondary">
-        Our latest thoughts on plant care and living with nature. These articles
-        are published on Medium—click any post to read the full article there.
+    <PageLayout
+      eyebrow="Blog"
+      title="Short pieces on easy plant-based living."
+      lead="The writing is published on Medium. The newest pieces are listed here; each one opens there in a new tab."
+      action={
+        <ButtonLink href={siteConfig.mediumUrl} variant="secondary">
+          Follow on Medium <span aria-hidden="true">↗</span>
+        </ButtonLink>
+      }
+    >
+      <p data-testid="blog-intro" className="mb-2 font-sans text-sm text-faint">
+        Newest first
       </p>
+
       <BlogPostsList
         posts={posts}
         error={error}
+        headingLevel={2}
         data-testid="blog-posts-list"
       />
+
+      <div className="pt-7">
+        <ArrowLink href={siteConfig.mediumUrl}>Older posts on Medium</ArrowLink>
+      </div>
+
+      <Panel
+        as="aside"
+        columns
+        aria-labelledby="prefer-email"
+        className="mt-16"
+      >
+        <div className="flex flex-col gap-2">
+          <p
+            id="prefer-email"
+            className="font-serif text-[22px] font-medium leading-snug text-ink"
+          >
+            Prefer email?
+          </p>
+          <Text color="secondary">
+            One short note when there is something worth sharing. No schedule.
+          </Text>
+        </div>
+        <div>
+          <ButtonLink href="/newsletter">Get the notes</ButtonLink>
+        </div>
+      </Panel>
     </PageLayout>
   );
 }

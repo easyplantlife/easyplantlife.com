@@ -1,170 +1,94 @@
-/**
- * BlogPostsList Component Tests
- *
- * Tests for the BlogPostsList component following TDD approach.
- * Verifies rendering of blog post lists with loading, empty, and error states.
- *
- * Acceptance Criteria from issue #45:
- * - [ ] BlogPostsList component created
- * - [ ] Accepts posts array as prop
- * - [ ] Handles empty state gracefully
- * - [ ] Loading state handled
- * - [ ] Error state handled
- *
- * Test Cases:
- * - GIVEN an empty posts array
- *   WHEN the list renders
- *   THEN a "no posts" message displays
- *
- * - GIVEN posts are loading
- *   WHEN the list renders
- *   THEN a loading indicator displays
- */
-
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { BlogPostsList } from "@/components/blog/BlogPostsList";
 import type { BlogPost } from "@/lib/types/blog";
 
-const mockPosts: BlogPost[] = [
+jest.mock("@/lib/analytics/events", () => ({
+  trackOutboundClick: jest.fn(),
+}));
+
+const posts: BlogPost[] = [
   {
-    title: "Finding Peace Through Plant Care",
-    excerpt:
-      "A short guide on how caring for plants can bring calm to your daily routine.",
-    url: "https://medium.com/@easyplantlife/finding-peace-through-plant-care",
-    publishedDate: new Date("2024-01-15"),
+    title: "First post",
+    excerpt: "First excerpt",
+    url: "https://medium.com/@easyplantlife/first",
+    publishedDate: new Date("2026-03-01T00:00:00Z"),
   },
   {
-    title: "The Art of Slow Growth",
-    excerpt:
-      "Why patience is the most important skill in gardening and in life.",
-    url: "https://medium.com/@easyplantlife/the-art-of-slow-growth",
-    publishedDate: new Date("2024-02-20"),
-    thumbnail: "/images/blog/slow-growth.jpg",
-    readTime: 5,
+    title: "Second post",
+    excerpt: "Second excerpt",
+    url: "https://medium.com/@easyplantlife/second",
+    publishedDate: new Date("2026-02-01T00:00:00Z"),
   },
   {
-    title: "Understanding Your Plants",
-    excerpt:
-      "A comprehensive guide to understanding what your plants are telling you.",
-    url: "https://medium.com/@easyplantlife/understanding-your-plants",
-    publishedDate: new Date("2024-03-10"),
+    title: "Third post",
+    excerpt: "Third excerpt",
+    url: "https://medium.com/@easyplantlife/third",
+    publishedDate: new Date("2026-01-01T00:00:00Z"),
   },
 ];
 
-describe("BlogPostsList Component", () => {
-  describe("Rendering Posts", () => {
-    it("renders a list of blog posts", () => {
-      render(<BlogPostsList posts={mockPosts} />);
+describe("BlogPostsList", () => {
+  describe("Posts", () => {
+    it("renders a labelled list with one row per post", () => {
+      render(<BlogPostsList posts={posts} />);
+      const list = screen.getByRole("list", { name: "Blog posts" });
+      expect(within(list).getAllByRole("listitem")).toHaveLength(3);
+      expect(within(list).getAllByRole("article")).toHaveLength(3);
+    });
+
+    it("closes the hairline list with a bottom border", () => {
+      render(<BlogPostsList posts={posts} />);
+      expect(screen.getByRole("list").className).toContain("border-b");
+    });
+
+    it("renders titles, excerpts and Medium links", () => {
+      render(<BlogPostsList posts={posts} />);
+      expect(screen.getByText("First excerpt")).toBeInTheDocument();
       expect(
-        screen.getByText("Finding Peace Through Plant Care")
-      ).toBeInTheDocument();
-      expect(screen.getByText("The Art of Slow Growth")).toBeInTheDocument();
-      expect(screen.getByText("Understanding Your Plants")).toBeInTheDocument();
+        screen.getByRole("link", { name: 'Read "Second post" on Medium' })
+      ).toHaveAttribute("href", posts[1].url);
     });
 
-    it("renders each post as a clickable card link", () => {
-      render(<BlogPostsList posts={mockPosts} />);
-      // BlogPostCard renders as a link (Card with href)
-      const links = screen.getAllByRole("link");
-      expect(links).toHaveLength(3);
+    it("uses h2 headings by default and h3 on request", () => {
+      const { unmount } = render(<BlogPostsList posts={posts} />);
+      expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(3);
+      unmount();
+
+      render(<BlogPostsList posts={posts} headingLevel={3} />);
+      expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(3);
     });
 
-    it("uses semantic list markup", () => {
-      render(<BlogPostsList posts={mockPosts} />);
-      const list = screen.getByRole("list");
-      expect(list).toBeInTheDocument();
-      const listItems = screen.getAllByRole("listitem");
-      expect(listItems).toHaveLength(3);
-    });
-  });
-
-  describe("Empty State", () => {
-    it("displays a no posts message when posts array is empty", () => {
-      render(<BlogPostsList posts={[]} />);
-      expect(
-        screen.getByText(/no posts/i, { exact: false })
-      ).toBeInTheDocument();
+    it("limits the number of rows when asked", () => {
+      render(<BlogPostsList posts={posts} limit={2} />);
+      expect(screen.getAllByRole("article")).toHaveLength(2);
+      expect(screen.queryByText("Third post")).not.toBeInTheDocument();
     });
 
-    it("does not render list when empty", () => {
-      render(<BlogPostsList posts={[]} />);
-      expect(screen.queryByRole("list")).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Loading State", () => {
-    it("displays a loading indicator when loading", () => {
-      render(<BlogPostsList posts={[]} isLoading />);
-      expect(screen.getByText(/loading/i)).toBeInTheDocument();
-    });
-
-    it("does not render posts while loading", () => {
-      render(<BlogPostsList posts={mockPosts} isLoading />);
-      expect(
-        screen.queryByText("Finding Peace Through Plant Care")
-      ).not.toBeInTheDocument();
-    });
-
-    it("has accessible loading state", () => {
-      render(<BlogPostsList posts={[]} isLoading />);
-      // Check for aria-live or status role for screen reader announcement
-      const loadingElement = screen.getByText(/loading/i);
-      expect(
-        loadingElement.closest("[aria-live]") ||
-          loadingElement.closest("[role='status']")
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("Error State", () => {
-    it("displays error message when error is provided", () => {
-      render(<BlogPostsList posts={[]} error="Failed to load posts" />);
-      expect(screen.getByText(/failed to load posts/i)).toBeInTheDocument();
-    });
-
-    it("does not render posts when error occurs", () => {
-      render(<BlogPostsList posts={mockPosts} error="Failed to load posts" />);
-      expect(
-        screen.queryByText("Finding Peace Through Plant Care")
-      ).not.toBeInTheDocument();
-    });
-
-    it("has accessible error state", () => {
-      render(<BlogPostsList posts={[]} error="Failed to load posts" />);
-      // Check for alert role for screen reader announcement
-      const errorElement = screen.getByText(/failed to load posts/i);
-      expect(errorElement.closest('[role="alert"]')).toBeInTheDocument();
-    });
-  });
-
-  describe("Props and Customization", () => {
-    it("accepts and applies custom className", () => {
-      render(<BlogPostsList posts={mockPosts} className="custom-class" />);
-      const list = screen.getByRole("list");
-      expect(list).toHaveClass("custom-class");
-    });
-
-    it("passes through HTML attributes", () => {
-      render(<BlogPostsList posts={mockPosts} data-testid="blog-posts-list" />);
+    it("forwards props to the list", () => {
+      render(<BlogPostsList posts={posts} data-testid="blog-posts-list" />);
       expect(screen.getByTestId("blog-posts-list")).toBeInTheDocument();
     });
   });
 
-  describe("Accessibility", () => {
-    it("has accessible name for the list", () => {
-      render(<BlogPostsList posts={mockPosts} />);
-      // List should have an accessible name via aria-label or aria-labelledby
-      const list = screen.getByRole("list");
-      expect(
-        list.hasAttribute("aria-label") || list.hasAttribute("aria-labelledby")
-      ).toBe(true);
+  describe("States", () => {
+    it("shows a polite loading status", () => {
+      render(<BlogPostsList posts={[]} isLoading />);
+      const status = screen.getByRole("status");
+      expect(status).toHaveAttribute("aria-live", "polite");
+      expect(status).toHaveTextContent(/loading posts/i);
+      expect(screen.queryByRole("list")).not.toBeInTheDocument();
     });
 
-    it("empty state message is accessible", () => {
+    it("shows an error as an alert", () => {
+      render(<BlogPostsList posts={posts} error="Feed unavailable" />);
+      expect(screen.getByRole("alert")).toHaveTextContent("Feed unavailable");
+      expect(screen.queryByRole("list")).not.toBeInTheDocument();
+    });
+
+    it("shows a calm empty message", () => {
       render(<BlogPostsList posts={[]} />);
-      const message = screen.getByText(/no posts/i, { exact: false });
-      // Should not be hidden from screen readers
-      expect(message).not.toHaveAttribute("aria-hidden", "true");
+      expect(screen.getByText(/nothing published yet/i)).toBeInTheDocument();
+      expect(screen.queryByRole("list")).not.toBeInTheDocument();
     });
   });
 });

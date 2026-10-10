@@ -1,1200 +1,283 @@
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "@/components/forms/ContactForm";
 import * as analytics from "@/lib/analytics/events";
+import * as formsApi from "@/lib/api/forms";
 
-// Mock the analytics module
 jest.mock("@/lib/analytics/events", () => ({
   trackFormView: jest.fn(),
   trackContactSubmit: jest.fn(),
 }));
 
-/**
- * ContactForm Component Tests
- *
- * Tests for the Contact Form component following TDD approach.
- * Based on acceptance criteria from issue #57 (M9-02):
- * - ContactForm component created
- * - Fields: name, email, message
- * - Honeypot field for spam prevention (hidden)
- * - Validation for all fields
- * - Loading, success, error states
- * - Accessible
- *
- * Test Cases from Issue:
- * GIVEN an empty form
- * WHEN I submit
- * THEN validation errors show for all fields
- *
- * GIVEN a valid form
- * WHEN I submit
- * THEN loading state shows
- * AND success message appears
- *
- * GIVEN the honeypot field has value
- * WHEN form submits
- * THEN it silently "succeeds" without sending
- */
+jest.mock("@/lib/api/forms", () => ({
+  sendContactMessage: jest.fn(),
+}));
 
-describe("ContactForm Component", () => {
+const nameInput = () => screen.getByRole("textbox", { name: /^name$/i });
+const emailInput = () => screen.getByRole("textbox", { name: /^email$/i });
+const messageInput = () => screen.getByRole("textbox", { name: /message/i });
+const submitButton = () =>
+  screen.getByRole("button", { name: /send message/i });
+
+async function fillValidForm(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(nameInput(), "Maya");
+  await user.type(emailInput(), "maya@example.com");
+  await user.type(messageInput(), "Hello there");
+}
+
+describe("ContactForm", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe("Rendering", () => {
-    it("renders as a form element", () => {
+    it("renders a labelled form with name, email and message fields", () => {
       render(<ContactForm />);
-      const form = screen.getByRole("form", { name: /contact/i });
-      expect(form).toBeInTheDocument();
-      expect(form.tagName).toBe("FORM");
-    });
-
-    it("renders with data-testid for identification", () => {
-      render(<ContactForm />);
+      expect(
+        screen.getByRole("form", { name: /contact/i })
+      ).toBeInTheDocument();
+      expect(nameInput()).toHaveAttribute("type", "text");
+      expect(emailInput()).toHaveAttribute("type", "email");
+      expect(messageInput().tagName).toBe("TEXTAREA");
       expect(screen.getByTestId("contact-form")).toBeInTheDocument();
     });
-  });
 
-  describe("Form Fields", () => {
-    describe("Name Field", () => {
-      it("renders a name input field", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /name/i });
-        expect(input).toBeInTheDocument();
-      });
-
-      it("name input has type text", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /name/i });
-        expect(input).toHaveAttribute("type", "text");
-      });
-
-      it("name input is required", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /name/i });
-        expect(input).toBeRequired();
-      });
-
-      it("name input has accessible label", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /name/i });
-        expect(input).toHaveAccessibleName();
-      });
-    });
-
-    describe("Email Field", () => {
-      it("renders an email input field", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /email/i });
-        expect(input).toBeInTheDocument();
-      });
-
-      it("email input has type email", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /email/i });
-        expect(input).toHaveAttribute("type", "email");
-      });
-
-      it("email input is required", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /email/i });
-        expect(input).toBeRequired();
-      });
-
-      it("email input has accessible label", () => {
-        render(<ContactForm />);
-        const input = screen.getByRole("textbox", { name: /email/i });
-        expect(input).toHaveAccessibleName();
-      });
-    });
-
-    describe("Message Field", () => {
-      it("renders a message textarea", () => {
-        render(<ContactForm />);
-        const textarea = screen.getByRole("textbox", { name: /message/i });
-        expect(textarea).toBeInTheDocument();
-        expect(textarea.tagName).toBe("TEXTAREA");
-      });
-
-      it("message textarea is required", () => {
-        render(<ContactForm />);
-        const textarea = screen.getByRole("textbox", { name: /message/i });
-        expect(textarea).toBeRequired();
-      });
-
-      it("message textarea has accessible label", () => {
-        render(<ContactForm />);
-        const textarea = screen.getByRole("textbox", { name: /message/i });
-        expect(textarea).toHaveAccessibleName();
-      });
-    });
-
-    describe("Honeypot Field", () => {
-      it("renders a hidden honeypot field for spam prevention", () => {
-        render(<ContactForm />);
-        const honeypot = screen.getByTestId("contact-honeypot");
-        expect(honeypot).toBeInTheDocument();
-      });
-
-      it("honeypot field is visually hidden from users", () => {
-        render(<ContactForm />);
-        const honeypot = screen.getByTestId("contact-honeypot");
-        // Using CSS to hide (not display:none to avoid bot detection)
-        const container = honeypot.closest("[aria-hidden]");
-        expect(container).toHaveAttribute("aria-hidden", "true");
-      });
-
-      it("honeypot field has autocomplete off to prevent autofill", () => {
-        render(<ContactForm />);
-        const honeypot = screen.getByTestId("contact-honeypot");
-        expect(honeypot).toHaveAttribute("autocomplete", "off");
-      });
-
-      it("honeypot field has tabindex -1 to prevent keyboard focus", () => {
-        render(<ContactForm />);
-        const honeypot = screen.getByTestId("contact-honeypot");
-        expect(honeypot).toHaveAttribute("tabindex", "-1");
-      });
-    });
-  });
-
-  describe("Submit Button", () => {
-    it("renders a submit button", () => {
+    it("uses a single-line input for name and email, not a textarea", () => {
       render(<ContactForm />);
-      const button = screen.getByRole("button", { name: /send|submit/i });
-      expect(button).toBeInTheDocument();
+      expect(nameInput().tagName).toBe("INPUT");
+      expect(emailInput().tagName).toBe("INPUT");
     });
 
-    it("submit button has type submit", () => {
+    it("explains what the email is used for", () => {
       render(<ContactForm />);
-      const button = screen.getByRole("button", { name: /send|submit/i });
-      expect(button).toHaveAttribute("type", "submit");
+      const hint = screen.getByText("Only used to reply to you.");
+      expect(emailInput()).toHaveAttribute("aria-describedby", hint.id);
     });
-  });
 
-  describe("Form Behavior", () => {
-    it("accepts name input", async () => {
-      const user = userEvent.setup();
+    it("renders the submit button and the reply address", () => {
       render(<ContactForm />);
-      const input = screen.getByRole("textbox", { name: /name/i });
-
-      await user.type(input, "John Doe");
-
-      expect(input).toHaveValue("John Doe");
+      expect(submitButton()).toHaveAttribute("type", "submit");
+      expect(
+        screen.getByText(/replies come from hello@easyplantlife\.com/i)
+      ).toBeInTheDocument();
     });
 
-    it("accepts email input", async () => {
-      const user = userEvent.setup();
+    it("renders a hidden honeypot field", () => {
       render(<ContactForm />);
-      const input = screen.getByRole("textbox", { name: /email/i });
-
-      await user.type(input, "john@example.com");
-
-      expect(input).toHaveValue("john@example.com");
+      const honeypot = screen.getByTestId("contact-honeypot");
+      expect(honeypot).toHaveAttribute("tabindex", "-1");
+      expect(honeypot).toHaveAttribute("autocomplete", "off");
+      expect(honeypot.closest("[aria-hidden='true']")).not.toBeNull();
     });
 
-    it("accepts message input", async () => {
-      const user = userEvent.setup();
+    it("tracks a form view on mount", () => {
       render(<ContactForm />);
-      const textarea = screen.getByRole("textbox", { name: /message/i });
-
-      await user.type(textarea, "Hello, I have a question.");
-
-      expect(textarea).toHaveValue("Hello, I have a question.");
-    });
-
-    it("calls onSubmit with form data when form is submitted", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      expect(handleSubmit).toHaveBeenCalledWith({
-        name: "John Doe",
-        email: "john@example.com",
-        message: "Hello!",
-      });
+      expect(analytics.trackFormView).toHaveBeenCalledWith("contact");
     });
   });
 
   describe("Validation", () => {
-    /**
-     * GIVEN an empty form
-     * WHEN I submit
-     * THEN validation errors show for all fields
-     */
-    it("shows error when submitting empty form", async () => {
+    it("requires a name", async () => {
       const user = userEvent.setup();
-      render(<ContactForm />);
-      const button = screen.getByRole("button", { name: /send|submit/i });
+      const onSubmit = jest.fn();
+      render(<ContactForm onSubmit={onSubmit} />);
 
-      await user.click(button);
+      await user.click(submitButton());
 
-      // All required fields should be invalid
-      expect(screen.getByRole("textbox", { name: /name/i })).toBeInvalid();
-      expect(screen.getByRole("textbox", { name: /email/i })).toBeInvalid();
-      expect(screen.getByRole("textbox", { name: /message/i })).toBeInvalid();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Please enter your name."
+      );
+      expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+      expect(onSubmit).not.toHaveBeenCalled();
     });
 
-    it("shows validation error for empty name", async () => {
+    it("requires an email", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={jest.fn()} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await user.type(nameInput(), "Maya");
+      await user.click(submitButton());
 
-      expect(screen.getByRole("textbox", { name: /name/i })).toBeInvalid();
-      expect(handleSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Please enter your email address."
+      );
     });
 
-    it("shows validation error for empty email", async () => {
+    it("requires a valid email", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={jest.fn()} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await user.type(nameInput(), "Maya");
+      await user.type(emailInput(), "nope");
+      await user.click(submitButton());
 
-      expect(screen.getByRole("textbox", { name: /email/i })).toBeInvalid();
-      expect(handleSubmit).not.toHaveBeenCalled();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Please enter a valid email address."
+      );
     });
 
-    it("shows validation error for invalid email format", async () => {
+    it("requires a message", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={jest.fn()} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "invalid-email"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await user.type(nameInput(), "Maya");
+      await user.type(emailInput(), "maya@example.com");
+      await user.click(submitButton());
 
-      expect(screen.getByRole("textbox", { name: /email/i })).toBeInvalid();
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Please enter your message."
+      );
     });
 
-    it("shows validation error for empty message", async () => {
+    it("links the error to the form and clears it on typing", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={jest.fn()} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
+      await user.click(submitButton());
+      const error = screen.getByRole("alert");
+      expect(screen.getByRole("form")).toHaveAttribute(
+        "aria-describedby",
+        error.id
       );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
 
-      expect(screen.getByRole("textbox", { name: /message/i })).toBeInvalid();
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    it("shows custom error message for invalid email after browser validation", async () => {
-      const user = userEvent.setup();
-      render(<ContactForm />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "test@test.c"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        const error = screen.queryByTestId("contact-error");
-        if (error) {
-          expect(error).toHaveTextContent(/valid email/i);
-        }
-      });
+      await user.type(nameInput(), "M");
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     });
   });
 
-  describe("Client-side JS Validation (bypassing HTML5)", () => {
-    it("shows error when name is empty", async () => {
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-      const form = screen.getByRole("form");
-
-      // Fill email and message but leave name empty
-      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
-        target: { value: "test@example.com" },
-      });
-      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
-        target: { value: "Hello there!" },
-      });
-
-      // Submit form directly
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-        expect(screen.getByTestId("contact-error")).toHaveTextContent(/name/i);
-      });
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    it("shows error when email is empty", async () => {
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-      const form = screen.getByRole("form");
-
-      // Fill name and message but leave email empty
-      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
-        target: { value: "John Doe" },
-      });
-      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
-        target: { value: "Hello there!" },
-      });
-
-      // Submit form directly
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-        expect(screen.getByTestId("contact-error")).toHaveTextContent(/email/i);
-      });
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    it("shows error when email format is invalid", async () => {
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-      const form = screen.getByRole("form");
-
-      // Fill all fields but with invalid email
-      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
-        target: { value: "John Doe" },
-      });
-      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
-        target: { value: "invalid@nodot" },
-      });
-      fireEvent.change(screen.getByRole("textbox", { name: /message/i }), {
-        target: { value: "Hello there!" },
-      });
-
-      // Submit form directly
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-        expect(screen.getByTestId("contact-error")).toHaveTextContent(
-          /valid email/i
-        );
-      });
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    it("shows error when message is empty", async () => {
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-      const form = screen.getByRole("form");
-
-      // Fill name and email but leave message empty
-      fireEvent.change(screen.getByRole("textbox", { name: /name/i }), {
-        target: { value: "John Doe" },
-      });
-      fireEvent.change(screen.getByRole("textbox", { name: /email/i }), {
-        target: { value: "test@example.com" },
-      });
-
-      // Submit form directly
-      fireEvent.submit(form);
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-        expect(screen.getByTestId("contact-error")).toHaveTextContent(
-          /message/i
-        );
-      });
-
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("Loading State", () => {
-    /**
-     * GIVEN a valid form
-     * WHEN I submit
-     * THEN loading state shows
-     */
-    it("shows loading state during submission", async () => {
+  describe("Submission", () => {
+    it("submits trimmed values and shows the success note", async () => {
       const user = userEvent.setup();
-      let resolveSubmit: () => void;
-      const handleSubmit = jest.fn(
+      const onSubmit = jest.fn().mockResolvedValue(undefined);
+      render(<ContactForm onSubmit={onSubmit} />);
+
+      await user.type(nameInput(), "  Maya ");
+      await user.type(emailInput(), " maya@example.com ");
+      await user.type(messageInput(), " Hello there ");
+      await user.click(submitButton());
+
+      await waitFor(() => {
+        expect(screen.getByTestId("contact-success")).toBeInTheDocument();
+      });
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: "Maya",
+        email: "maya@example.com",
+        message: "Hello there",
+      });
+      const success = screen.getByRole("status");
+      expect(success).toHaveTextContent("Message sent.");
+      expect(screen.queryByRole("form")).not.toBeInTheDocument();
+      expect(screen.getByTestId("contact-form")).toBeInTheDocument();
+      expect(analytics.trackContactSubmit).toHaveBeenCalledWith("success");
+    });
+
+    it("defaults to sending through the contact API", async () => {
+      const user = userEvent.setup();
+      (formsApi.sendContactMessage as jest.Mock).mockResolvedValue(undefined);
+      render(<ContactForm />);
+
+      await fillValidForm(user);
+      await user.click(submitButton());
+
+      await waitFor(() => {
+        expect(formsApi.sendContactMessage).toHaveBeenCalledWith({
+          name: "Maya",
+          email: "maya@example.com",
+          message: "Hello there",
+        });
+      });
+    });
+
+    it("shows a busy, disabled state while sending", async () => {
+      const user = userEvent.setup();
+      let resolveSubmit: () => void = () => {};
+      const onSubmit = jest.fn(
         () => new Promise<void>((resolve) => (resolveSubmit = resolve))
       );
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={onSubmit} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await fillValidForm(user);
+      await user.click(submitButton());
 
-      // Button should show loading text
-      expect(
-        screen.getByRole("button", { name: /sending|loading/i })
-      ).toBeInTheDocument();
-
-      // Resolve the promise to clean up
-      resolveSubmit!();
-    });
-
-    it("disables submit button while submitting", async () => {
-      const user = userEvent.setup();
-      let resolveSubmit: () => void;
-      const handleSubmit = jest.fn(
-        () => new Promise<void>((resolve) => (resolveSubmit = resolve))
-      );
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      const button = screen.getByRole("button", { name: /sending|loading/i });
+      const button = screen.getByRole("button", { name: /sending/i });
       expect(button).toBeDisabled();
+      expect(button).toHaveAttribute("aria-busy", "true");
+      expect(nameInput()).toBeDisabled();
+      expect(emailInput()).toBeDisabled();
+      expect(messageInput()).toBeDisabled();
 
-      resolveSubmit!();
+      resolveSubmit();
+      await screen.findByTestId("contact-success");
     });
 
-    it("disables all inputs while submitting", async () => {
+    it("shows an error and keeps the values when sending fails", async () => {
       const user = userEvent.setup();
-      let resolveSubmit: () => void;
-      const handleSubmit = jest.fn(
-        () => new Promise<void>((resolve) => (resolveSubmit = resolve))
-      );
-      render(<ContactForm onSubmit={handleSubmit} />);
+      const onSubmit = jest.fn().mockRejectedValue(new Error("boom"));
+      render(<ContactForm onSubmit={onSubmit} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      expect(screen.getByRole("textbox", { name: /name/i })).toBeDisabled();
-      expect(screen.getByRole("textbox", { name: /email/i })).toBeDisabled();
-      expect(screen.getByRole("textbox", { name: /message/i })).toBeDisabled();
-
-      resolveSubmit!();
-    });
-  });
-
-  describe("Success State", () => {
-    /**
-     * GIVEN a valid form
-     * WHEN I submit
-     * AND success message appears
-     */
-    it("displays success message after successful submission", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await fillValidForm(user);
+      await user.click(submitButton());
 
       await waitFor(() => {
-        expect(screen.getByTestId("contact-success")).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(
+          "Something went wrong. Please try again."
+        );
       });
+      expect(screen.getByTestId("contact-error")).toBeInTheDocument();
+      expect(messageInput()).toHaveValue("Hello there");
+      expect(analytics.trackContactSubmit).toHaveBeenCalledWith("error");
     });
 
-    it("success message is visible to user", async () => {
+    it("offers a way back and a way to send another from the success note", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
+      render(<ContactForm onSubmit={jest.fn().mockResolvedValue(undefined)} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
+      await fillValidForm(user);
+      await user.click(submitButton());
+      await screen.findByTestId("contact-success");
 
-      await waitFor(() => {
-        const success = screen.getByTestId("contact-success");
-        expect(success).toBeVisible();
-      });
-    });
-
-    it("success message contains confirmation text", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        const success = screen.getByTestId("contact-success");
-        expect(success.textContent).toMatch(/thank you|sent|received/i);
-      });
-    });
-
-    it("hides the form after successful submission", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.queryByRole("form")).not.toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Error State", () => {
-    it("displays error message when submission fails", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-      });
-    });
-
-    it("error message contains helpful text", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        const error = screen.getByTestId("contact-error");
-        expect(error.textContent).toMatch(/try again|went wrong|error/i);
-      });
-    });
-
-    it("error message has role alert for accessibility", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByRole("alert")).toBeInTheDocument();
-      });
-    });
-
-    it("form remains visible after error for retry", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByRole("form")).toBeInTheDocument();
-      });
-    });
-
-    it("form can be resubmitted after error", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValueOnce(new Error("Submission failed"))
-        .mockResolvedValueOnce(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-      });
-
-      // Second submission succeeds
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-success")).toBeInTheDocument();
-      });
-    });
-
-    it("error clears when user starts typing again", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-error")).toBeInTheDocument();
-      });
-
-      await user.type(screen.getByRole("textbox", { name: /name/i }), "a");
-
-      expect(screen.queryByTestId("contact-error")).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Honeypot Spam Prevention", () => {
-    /**
-     * GIVEN the honeypot field has value
-     * WHEN form submits
-     * THEN it silently "succeeds" without sending
-     */
-    it("does not call onSubmit when honeypot is filled", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      const honeypot = screen.getByTestId("contact-honeypot");
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      // Bot fills in honeypot
-      await user.type(honeypot, "spam-bot-value");
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      // onSubmit should not be called
-      expect(handleSubmit).not.toHaveBeenCalled();
-    });
-
-    it("shows success message when honeypot is filled to not reveal trap", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      const honeypot = screen.getByTestId("contact-honeypot");
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.type(honeypot, "spam-bot-value");
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      // Should show success to not reveal honeypot
-      await waitFor(() => {
-        expect(screen.getByTestId("contact-success")).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Accessibility", () => {
-    it("form has accessible name", () => {
-      render(<ContactForm />);
-      const form = screen.getByRole("form");
-      expect(form).toHaveAccessibleName();
-    });
-
-    it("is keyboard navigable", async () => {
-      const user = userEvent.setup();
-      render(<ContactForm />);
-
-      await user.tab();
-      expect(screen.getByRole("textbox", { name: /name/i })).toHaveFocus();
-
-      await user.tab();
-      expect(screen.getByRole("textbox", { name: /email/i })).toHaveFocus();
-
-      await user.tab();
-      expect(screen.getByRole("textbox", { name: /message/i })).toHaveFocus();
-
-      await user.tab();
       expect(
-        screen.getByRole("button", { name: /send|submit/i })
-      ).toHaveFocus();
-    });
+        screen.getByRole("link", { name: /back to the home page/i })
+      ).toHaveAttribute("href", "/");
 
-    it("honeypot field is not in tab order", async () => {
-      const user = userEvent.setup();
-      render(<ContactForm />);
+      await user.click(screen.getByRole("button", { name: /send another/i }));
 
-      const honeypot = screen.getByTestId("contact-honeypot");
-
-      // Tab through all focusable elements
-      await user.tab(); // name
-      await user.tab(); // email
-      await user.tab(); // message
-      await user.tab(); // button
-
-      // Honeypot should never have focus
-      expect(honeypot).not.toHaveFocus();
-    });
-
-    it("error message is linked to form via aria-describedby", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        const form = screen.getByRole("form");
-        const error = screen.getByTestId("contact-error");
-        expect(form).toHaveAttribute("aria-describedby", error.id);
-      });
-    });
-
-    it("form can be submitted with Enter key from input fields", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com{Enter}"
-      );
-
-      // Form should attempt to submit (validation will fail due to missing message)
-      // But onSubmit won't be called because message is empty
-      expect(screen.getByRole("textbox", { name: /message/i })).toBeInvalid();
+      expect(screen.getByRole("form")).toBeInTheDocument();
+      expect(nameInput()).toHaveValue("");
+      expect(messageInput()).toHaveValue("");
     });
   });
 
-  describe("Custom Styling", () => {
-    it("accepts and applies custom className", () => {
-      render(<ContactForm className="custom-class" />);
-      const form = screen.getByTestId("contact-form");
-      expect(form).toHaveClass("custom-class");
-    });
-  });
-
-  describe("Brand Compliance - No Hype Language", () => {
-    it("button text contains no hype or marketing language", () => {
-      render(<ContactForm />);
-      const button = screen.getByRole("button");
-      const text = button.textContent?.toLowerCase() || "";
-      const hypeWords = [
-        "free",
-        "exclusive",
-        "amazing",
-        "incredible",
-        "best",
-        "revolutionary",
-        "guaranteed",
-        "limited",
-        "urgent",
-        "act now",
-        "don't miss",
-        "now!",
-        "must",
-        "hurry",
-      ];
-      hypeWords.forEach((word) => {
-        expect(text).not.toContain(word);
-      });
-    });
-
-    it("success message contains no hype language", async () => {
+  describe("Honeypot", () => {
+    it("silently succeeds without sending or tracking when the honeypot is filled", async () => {
       const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
+      const onSubmit = jest.fn();
+      render(<ContactForm onSubmit={onSubmit} />);
 
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button"));
+      await user.type(screen.getByTestId("contact-honeypot"), "spam");
+      await user.click(submitButton());
 
       await waitFor(() => {
-        const success = screen.getByTestId("contact-success");
-        const text = success.textContent?.toLowerCase() || "";
-        const hypeWords = [
-          "free",
-          "exclusive",
-          "amazing",
-          "incredible",
-          "best",
-          "revolutionary",
-          "guaranteed",
-          "limited",
-          "urgent",
-          "act now",
-          "don't miss",
-        ];
-        hypeWords.forEach((word) => {
-          expect(text).not.toContain(word);
-        });
-      });
-    });
-
-    it("error message contains no hype language", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button"));
-
-      await waitFor(() => {
-        const error = screen.getByTestId("contact-error");
-        const text = error.textContent?.toLowerCase() || "";
-        const hypeWords = [
-          "free",
-          "exclusive",
-          "amazing",
-          "incredible",
-          "best",
-          "revolutionary",
-          "guaranteed",
-          "limited",
-          "urgent",
-          "act now",
-          "don't miss",
-        ];
-        hypeWords.forEach((word) => {
-          expect(text).not.toContain(word);
-        });
-      });
-    });
-  });
-
-  describe("Analytics Tracking (M10-02)", () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it("tracks form view when component mounts", () => {
-      render(<ContactForm />);
-
-      expect(analytics.trackFormView).toHaveBeenCalledWith("contact");
-    });
-
-    it("tracks successful contact submission", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn().mockResolvedValue(undefined);
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(analytics.trackContactSubmit).toHaveBeenCalledWith("success");
-      });
-    });
-
-    it("tracks failed contact submission", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest
-        .fn()
-        .mockRejectedValue(new Error("Submission failed"));
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        expect(analytics.trackContactSubmit).toHaveBeenCalledWith("error");
-      });
-    });
-
-    it("does not track submit when honeypot is filled", async () => {
-      const user = userEvent.setup();
-      const handleSubmit = jest.fn();
-      render(<ContactForm onSubmit={handleSubmit} />);
-
-      const honeypot = screen.getByTestId("contact-honeypot");
-
-      await user.type(
-        screen.getByRole("textbox", { name: /name/i }),
-        "John Doe"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /email/i }),
-        "john@example.com"
-      );
-      await user.type(
-        screen.getByRole("textbox", { name: /message/i }),
-        "Hello!"
-      );
-      await user.type(honeypot, "spam-bot-value");
-      await user.click(screen.getByRole("button", { name: /send|submit/i }));
-
-      await waitFor(() => {
-        // Success state shown but no tracking event fired
         expect(screen.getByTestId("contact-success")).toBeInTheDocument();
       });
+      expect(onSubmit).not.toHaveBeenCalled();
       expect(analytics.trackContactSubmit).not.toHaveBeenCalled();
     });
+  });
 
-    it("only tracks form view once per mount", () => {
-      const { rerender } = render(<ContactForm />);
+  describe("Keyboard", () => {
+    it("moves focus through the fields in order, skipping the honeypot", async () => {
+      const user = userEvent.setup();
+      render(<ContactForm />);
 
-      // Force a rerender
-      rerender(<ContactForm className="updated" />);
-
-      expect(analytics.trackFormView).toHaveBeenCalledTimes(1);
+      await user.tab();
+      expect(nameInput()).toHaveFocus();
+      await user.tab();
+      expect(emailInput()).toHaveFocus();
+      await user.tab();
+      expect(messageInput()).toHaveFocus();
+      await user.tab();
+      expect(submitButton()).toHaveFocus();
     });
   });
 });

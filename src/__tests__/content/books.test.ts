@@ -44,6 +44,20 @@ describe("Book Data Model", () => {
       expect(booksFileContent).toMatch(/title\s*:\s*string/);
     });
 
+    test("Book interface has tagline field of type string", () => {
+      expect(booksFileContent).toMatch(/tagline\s*:\s*string/);
+    });
+
+    test("Book interface has optional pages field of type number", () => {
+      expect(booksFileContent).toMatch(/pages\?\s*:\s*number/);
+    });
+
+    test("getBookStatusLabel helper is exported", () => {
+      expect(booksFileContent).toMatch(
+        /export\s+function\s+getBookStatusLabel/
+      );
+    });
+
     test("Book interface has description field of type string", () => {
       expect(booksFileContent).toMatch(/description\s*:\s*string/);
     });
@@ -53,9 +67,11 @@ describe("Book Data Model", () => {
     });
 
     test("Book interface has status field with available or coming-soon values", () => {
+      // The union lives on the exported BookStatus type the field refers to
       expect(booksFileContent).toMatch(
-        /status\s*:\s*['"]available['"]\s*\|\s*['"]coming-soon['"]/
+        /export\s+type\s+BookStatus\s*=\s*['"]available['"]\s*\|\s*['"]coming-soon['"]/
       );
+      expect(booksFileContent).toMatch(/status\s*:\s*BookStatus/);
     });
 
     test("Book interface has purchaseLinks array", () => {
@@ -112,6 +128,24 @@ describe("Book Data Model", () => {
       });
     });
 
+    test("each book has a short tagline", () => {
+      books.forEach((book: unknown) => {
+        const b = book as { tagline?: unknown };
+        expect(typeof b.tagline).toBe("string");
+        expect((b.tagline as string).length).toBeGreaterThan(0);
+      });
+    });
+
+    test("page counts are positive integers when present", () => {
+      books.forEach((book: unknown) => {
+        const b = book as { pages?: unknown };
+        if (b.pages !== undefined) {
+          expect(Number.isInteger(b.pages)).toBe(true);
+          expect(b.pages as number).toBeGreaterThan(0);
+        }
+      });
+    });
+
     test("each book has required coverImage field", () => {
       books.forEach((book: unknown) => {
         const b = book as { coverImage?: unknown };
@@ -143,6 +177,35 @@ describe("Book Data Model", () => {
           expect(typeof l.url).toBe("string");
         });
       });
+    });
+  });
+
+  describe("Published books", () => {
+    let booksModule: typeof import("@/content/books");
+
+    beforeAll(async () => {
+      booksModule = await import("@/content/books");
+    });
+
+    test("The Everyday Vegan Playbook is 76 pages", () => {
+      const playbook = booksModule.books.find(
+        (book) => book.title === "The Everyday Vegan Playbook"
+      );
+      expect(playbook?.pages).toBe(76);
+      expect(playbook?.tagline).toBe("The practical one");
+    });
+
+    test("The Normal Vegan is 125 pages", () => {
+      const novel = booksModule.books.find(
+        (book) => book.title === "The Normal Vegan"
+      );
+      expect(novel?.pages).toBe(125);
+      expect(novel?.tagline).toBe("The story");
+    });
+
+    test("getBookStatusLabel returns calm, human labels", () => {
+      expect(booksModule.getBookStatusLabel("available")).toBe("Available now");
+      expect(booksModule.getBookStatusLabel("coming-soon")).toBe("Coming soon");
     });
   });
 

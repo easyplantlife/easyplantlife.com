@@ -1,441 +1,167 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Home from "@/app/page";
+import { fetchMediumPosts } from "@/lib/api/medium";
+import { trackNewsletterSubmit } from "@/lib/analytics/events";
 
-/**
- * Home Page Integration Tests
- *
- * Comprehensive integration tests for the home page verifying
- * that all components work together correctly from a user's perspective.
- *
- * Based on acceptance criteria from issue #31 (M4-06):
- *
- * GIVEN the home page
- * WHEN it loads
- * THEN the logo is visible
- * AND the tagline is visible
- * AND the newsletter form is present
- * AND links to blog and books exist
- *
- * GIVEN the home page newsletter form
- * WHEN I enter a valid email and submit
- * THEN the form shows success state
- *
- * GIVEN the home page
- * WHEN viewed on mobile
- * THEN all content is accessible
- */
+jest.mock("@/lib/api/medium", () => ({
+  fetchMediumPosts: jest.fn(),
+}));
 
-// Mock fetch for newsletter API calls
+jest.mock("@/lib/analytics/events", () => ({
+  trackFormView: jest.fn(),
+  trackNewsletterSubmit: jest.fn(),
+  trackOutboundClick: jest.fn(),
+}));
+
+const mockFetchPosts = fetchMediumPosts as jest.MockedFunction<
+  typeof fetchMediumPosts
+>;
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
 
-describe("Home Page Integration Tests", () => {
+async function renderHome() {
+  return render(await Home());
+}
+
+async function subscribe(email: string) {
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText("Email address"), email);
+  await user.click(screen.getByRole("button", { name: "Get the notes" }));
+  return user;
+}
+
+/**
+ * Home page integration: the real Hero, newsletter form and data flow
+ * working together, with only the network mocked.
+ */
+describe("Home Page Integration", () => {
   beforeEach(() => {
     mockFetch.mockReset();
-    // Default to successful API response
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true }),
-    });
+    mockFetchPosts.mockReset();
+    mockFetchPosts.mockResolvedValue([
+      {
+        id: "1",
+        title: "Default meals",
+        excerpt: "Why a boring default is the whole trick.",
+        url: "https://medium.com/@easyplantlife/default-meals",
+        publishedDate: new Date("2026-03-01"),
+      },
+    ]);
+    jest.mocked(trackNewsletterSubmit).mockClear();
   });
-  describe("GIVEN the home page WHEN it loads", () => {
-    /**
-     * THEN the logo is visible
-     */
-    it("displays the Easy Plant Life logo/brand name", () => {
-      render(<Home />);
 
-      const h1 = screen.getByRole("heading", { level: 1 });
-      const logo = within(h1).getByRole("img", { name: /easy plant life/i });
-      expect(logo).toBeVisible();
+  describe("First impression", () => {
+    it("communicates the brand in the hero without a logo image as h1", async () => {
+      await renderHome();
+      const hero = screen.getByTestId("hero-section");
+      expect(within(hero).getByRole("heading", { level: 1 })).toHaveTextContent(
+        /without turning it into a project/i
+      );
+      expect(within(hero).getByText("Easy Plant Life")).toBeInTheDocument();
     });
 
-    /**
-     * AND the tagline is visible
-     */
-    it("displays the tagline immediately visible", () => {
-      render(<Home />);
-
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeVisible();
-      expect(tagline.textContent?.trim()).not.toBe("");
-    });
-
-    /**
-     * AND the newsletter form is present
-     */
-    it("displays the newsletter signup form with all required elements", () => {
-      render(<Home />);
-
-      // Form is present
+    it("places the primary action above the writing and the books", async () => {
+      await renderHome();
       const form = screen.getByRole("form", { name: /newsletter/i });
-      expect(form).toBeInTheDocument();
-
-      // Email input is present
-      const emailInput = screen.getByRole("textbox", { name: /email/i });
-      expect(emailInput).toBeInTheDocument();
-
-      // Subscribe button is present
-      const submitButton = screen.getByRole("button", { name: /subscribe/i });
-      expect(submitButton).toBeInTheDocument();
-    });
-
-    /**
-     * AND links to blog and books exist
-     */
-    it("provides navigation links to Blog and Books pages", () => {
-      render(<Home />);
-
-      const blogLink = screen.getByRole("link", { name: /blog/i });
-      expect(blogLink).toBeInTheDocument();
-      expect(blogLink).toHaveAttribute("href", "/blog");
-
-      const booksLinks = screen.getAllByRole("link", { name: /book/i });
-      expect(booksLinks.length).toBeGreaterThanOrEqual(1);
-      expect(booksLinks[0]).toHaveAttribute("href", "/books");
-    });
-
-    /**
-     * Complete page load scenario - all essential elements visible
-     */
-    it("renders all essential brand elements on initial load", () => {
-      render(<Home />);
-
-      // Logo (inside h1)
-      const h1 = screen.getByRole("heading", { level: 1 });
+      const writing = screen.getByTestId("recent-writing");
       expect(
-        within(h1).getByRole("img", { name: /easy plant life/i })
-      ).toBeVisible();
-
-      // Tagline
-      expect(screen.getByTestId("hero-tagline")).toBeVisible();
-
-      // Newsletter form
-      expect(
-        screen.getByRole("form", { name: /newsletter/i })
-      ).toBeInTheDocument();
-
-      // Navigation links
-      expect(screen.getByRole("link", { name: /blog/i })).toBeInTheDocument();
-      expect(
-        screen.getAllByRole("link", { name: /book/i }).length
-      ).toBeGreaterThanOrEqual(1);
+        form.compareDocumentPosition(writing) & Node.DOCUMENT_POSITION_FOLLOWING
+      ).toBeTruthy();
     });
   });
 
-  describe("GIVEN the home page newsletter form", () => {
-    /**
-     * WHEN I enter a valid email and submit
-     * THEN the form shows success state
-     */
-    it("shows success state after submitting a valid email", async () => {
-      const user = userEvent.setup();
-      render(<Home />);
+  describe("Newsletter flow", () => {
+    it("validates before calling the API", async () => {
+      await renderHome();
+      await subscribe("nope");
+      expect(await screen.findByTestId("newsletter-error")).toBeInTheDocument();
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
 
-      // Find the newsletter section
-      const newsletterSection = screen.getByTestId("newsletter-cta");
+    it("sends the address and replaces the form with the success note", async () => {
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+      await renderHome();
+      await subscribe("jo@example.com");
 
-      // Enter a valid email
-      const emailInput = within(newsletterSection).getByRole("textbox", {
-        name: /email/i,
-      });
-      await user.type(emailInput, "test@example.com");
-
-      // Submit the form
-      const submitButton = within(newsletterSection).getByRole("button", {
-        name: /subscribe/i,
-      });
-      await user.click(submitButton);
-
-      // Wait for success state
       await waitFor(() => {
         expect(screen.getByTestId("newsletter-success")).toBeInTheDocument();
       });
-
-      // Success message should be visible
-      expect(screen.getByTestId("newsletter-success")).toBeVisible();
-    });
-
-    /**
-     * Complete newsletter signup flow - user journey
-     */
-    it("completes full newsletter signup flow", async () => {
-      const user = userEvent.setup();
-      render(<Home />);
-
-      // 1. User sees the value proposition
-      expect(screen.getByTestId("newsletter-value-proposition")).toBeVisible();
-
-      // 2. User enters their email
-      const emailInput = screen.getByRole("textbox", { name: /email/i });
-      await user.type(emailInput, "user@example.com");
-      expect(emailInput).toHaveValue("user@example.com");
-
-      // 3. User clicks subscribe
-      const submitButton = screen.getByRole("button", { name: /subscribe/i });
-      await user.click(submitButton);
-
-      // 4. User sees success confirmation
-      await waitFor(() => {
-        expect(screen.getByTestId("newsletter-success")).toBeVisible();
-      });
-
-      // 5. Form is hidden after success
       expect(
         screen.queryByRole("form", { name: /newsletter/i })
       ).not.toBeInTheDocument();
+      const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+      expect(body).toEqual({ email: "jo@example.com" });
+      expect(trackNewsletterSubmit).toHaveBeenCalledWith("success");
     });
 
-    /**
-     * Error handling - invalid email
-     */
-    it("shows error state for invalid email format", async () => {
-      const user = userEvent.setup();
-      render(<Home />);
+    it("lets the visitor start over after success", async () => {
+      mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+      await renderHome();
+      const user = await subscribe("jo@example.com");
+      await screen.findByTestId("newsletter-success");
 
-      // Enter an invalid email that passes browser validation but fails our validation
-      const emailInput = screen.getByRole("textbox", { name: /email/i });
-      await user.type(emailInput, "invalid");
-
-      // Try to submit
-      const submitButton = screen.getByRole("button", { name: /subscribe/i });
-      await user.click(submitButton);
-
-      // Input should show as invalid (browser validation)
-      expect(emailInput).toBeInvalid();
+      await user.click(
+        screen.getByRole("button", { name: /use a different address/i })
+      );
+      expect(screen.getByLabelText("Email address")).toHaveValue("");
     });
-  });
 
-  describe("GIVEN the home page WHEN viewed on mobile", () => {
-    /**
-     * THEN all content is accessible
-     *
-     * Note: Since JSDOM doesn't support actual viewport changes,
-     * we test that responsive classes are applied and content
-     * structure supports mobile viewing.
-     */
-    it("has responsive padding that adapts to screen size", () => {
-      render(<Home />);
-
-      const heroSection = screen.getByTestId("hero-section");
-      const newsletterSection = screen.getByTestId("newsletter-cta");
-      const secondarySection = screen.getByTestId("secondary-ctas");
-
-      // All sections should have responsive padding classes
-      [heroSection, newsletterSection, secondarySection].forEach((section) => {
-        // Base padding (mobile)
-        expect(section.className).toMatch(/py-\d+/);
-        // Responsive padding (tablet/desktop)
-        expect(section.className).toMatch(/md:py-|lg:py-/);
+    it("keeps the form and shows an error when the API fails", async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: "Service unavailable" }),
       });
-    });
+      await renderHome();
+      await subscribe("jo@example.com");
 
-    it("constrains content width for mobile readability", () => {
-      render(<Home />);
-
-      // Hero content should be constrained
-      const heroSection = screen.getByTestId("hero-section");
-      expect(heroSection.querySelector('[class*="max-w-"]')).not.toBeNull();
-
-      // Newsletter content should be constrained
-      const newsletterSection = screen.getByTestId("newsletter-cta");
+      expect(await screen.findByTestId("newsletter-error")).toHaveTextContent(
+        /something went wrong/i
+      );
       expect(
-        newsletterSection.querySelector('[class*="max-w-"]')
-      ).not.toBeNull();
+        screen.getByRole("form", { name: /newsletter/i })
+      ).toBeInTheDocument();
+      expect(trackNewsletterSubmit).toHaveBeenCalledWith("error");
     });
 
-    it("uses mobile-first responsive padding", () => {
-      render(<Home />);
-
-      const heroSection = screen.getByTestId("hero-section");
-
-      // Should have mobile padding (px classes)
-      expect(heroSection.className).toMatch(/px-\d+/);
-    });
-
-    it("newsletter form is usable on mobile", () => {
-      render(<Home />);
-
-      // Form should be accessible
-      const form = screen.getByRole("form", { name: /newsletter/i });
-      expect(form).toBeInTheDocument();
-
-      // Input should be focusable
-      const emailInput = screen.getByRole("textbox", { name: /email/i });
-      expect(emailInput).not.toBeDisabled();
-
-      // Button should be clickable
-      const submitButton = screen.getByRole("button", { name: /subscribe/i });
-      expect(submitButton).not.toBeDisabled();
-    });
-
-    it("navigation links are accessible on mobile", () => {
-      render(<Home />);
-
-      const blogLink = screen.getByRole("link", { name: /blog/i });
-      const booksLinks = screen.getAllByRole("link", { name: /book/i });
-      expect(booksLinks.length).toBeGreaterThanOrEqual(1);
-      const booksLink = booksLinks[0];
-
-      // Links should be accessible (not hidden, not disabled)
-      expect(blogLink).toBeVisible();
-      expect(booksLink).toBeVisible();
-
-      // Links should be keyboard accessible
-      expect(blogLink).not.toHaveAttribute("tabindex", "-1");
-      expect(booksLink).not.toHaveAttribute("tabindex", "-1");
+    it("clears the error once the visitor edits the address", async () => {
+      await renderHome();
+      const user = await subscribe("nope");
+      await screen.findByTestId("newsletter-error");
+      await user.type(screen.getByLabelText("Email address"), "x");
+      expect(screen.queryByTestId("newsletter-error")).not.toBeInTheDocument();
     });
   });
 
-  describe("Page Accessibility", () => {
-    it("has proper heading hierarchy", () => {
-      render(<Home />);
-
-      // Should have exactly one h1 with brand name
-      const h1 = screen.getByRole("heading", {
-        level: 1,
-        name: /easy plant life/i,
-      });
-      expect(h1).toBeInTheDocument();
-    });
-
-    it("all sections have aria-labels for screen readers", () => {
-      render(<Home />);
-
-      const sections = screen.getAllByRole("region");
-      sections.forEach((section) => {
-        expect(section).toHaveAttribute("aria-label");
-      });
-    });
-
-    it("has a main landmark element", () => {
-      render(<Home />);
-
-      const main = screen.getByRole("main");
-      expect(main).toBeInTheDocument();
-    });
-
-    it("is fully keyboard navigable", async () => {
-      const user = userEvent.setup();
-      render(<Home />);
-
-      // Tab through the page (hero book image link, then newsletter, then secondary CTAs)
-      await user.tab();
+  describe("Navigation out of the page", () => {
+    it("links to the blog, the books and the about page", async () => {
+      await renderHome();
       expect(
-        screen.getByRole("link", { name: /view easy plant life books/i })
-      ).toHaveFocus();
-
-      await user.tab();
-      expect(screen.getByRole("textbox", { name: /email/i })).toHaveFocus();
-
-      await user.tab();
-      expect(screen.getByRole("button", { name: /subscribe/i })).toHaveFocus();
-
-      await user.tab();
-      expect(screen.getByRole("link", { name: /blog/i })).toHaveFocus();
-
-      await user.tab();
-      // Any of the books links (hero, secondary CTAs, or book imagery) may have focus
-      expect(document.activeElement).toHaveAttribute("href", "/books");
-    });
-  });
-
-  describe("Page Layout and Structure", () => {
-    it("renders sections in correct order", () => {
-      render(<Home />);
-
-      const hero = screen.getByTestId("hero-section");
-      const newsletter = screen.getByTestId("newsletter-cta");
-      const secondary = screen.getByTestId("secondary-ctas");
-      const bookImagery = screen.getByTestId("book-imagery");
-
-      // Hero before Newsletter
+        screen.getByRole("link", { name: "Read the blog" })
+      ).toHaveAttribute("href", "/blog");
       expect(
-        hero.compareDocumentPosition(newsletter) &
-          Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-
-      // Newsletter before Secondary
+        screen.getByRole("link", { name: "See the books" })
+      ).toHaveAttribute("href", "/books");
+      expect(screen.getByRole("link", { name: "All posts" })).toHaveAttribute(
+        "href",
+        "/blog"
+      );
       expect(
-        newsletter.compareDocumentPosition(secondary) &
-          Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-
-      // Secondary before Book imagery
-      expect(
-        secondary.compareDocumentPosition(bookImagery) &
-          Node.DOCUMENT_POSITION_FOLLOWING
-      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+        screen.getByRole("link", { name: "More about why this exists" })
+      ).toHaveAttribute("href", "/about");
     });
 
-    it("has exactly five main sections", () => {
-      render(<Home />);
-
-      const sections = screen.getAllByRole("region");
-      expect(sections).toHaveLength(5);
-    });
-
-    it("all sections have consistent background styling", () => {
-      render(<Home />);
-
-      const main = screen.getByRole("main");
-      const hero = screen.getByTestId("hero-section");
-      const newsletter = screen.getByTestId("newsletter-cta");
-      const secondary = screen.getByTestId("secondary-ctas");
-      const bookImagery = screen.getByTestId("book-imagery");
-
-      // Main container has background
-      expect(main.className).toMatch(/bg-/);
-
-      // All sections have backgrounds
-      expect(hero.className).toMatch(/bg-/);
-      expect(newsletter.className).toMatch(/bg-/);
-      expect(bookImagery.className).toMatch(/bg-/);
-      expect(secondary.className).toMatch(/bg-/);
-    });
-  });
-
-  describe("Brand Message Clarity", () => {
-    /**
-     * User should be able to understand the brand in under 30 seconds
-     */
-    it("displays all essential brand elements above the fold conceptually", () => {
-      render(<Home />);
-
-      // Brand name/logo (inside h1)
-      const h1 = screen.getByRole("heading", { level: 1 });
-      expect(
-        within(h1).getByRole("img", { name: /easy plant life/i })
-      ).toBeVisible();
-
-      // Tagline
-      const tagline = screen.getByTestId("hero-tagline");
-      expect(tagline).toBeVisible();
-
-      // Explanation
-      const explanation = screen.getByTestId("hero-explanation");
-      expect(explanation).toBeVisible();
-    });
-
-    it("presents a clear value proposition without hype", () => {
-      render(<Home />);
-
-      const proposition = screen.getByTestId("newsletter-value-proposition");
-      const text = proposition.textContent?.toLowerCase() || "";
-
-      // No hype words
-      const hypeWords = [
-        "free",
-        "exclusive",
-        "amazing",
-        "incredible",
-        "best",
-        "revolutionary",
+    it("opens Medium and Amazon in new tabs", async () => {
+      await renderHome();
+      const external = [
+        ...screen.getAllByRole("link", { name: /on medium/i }),
+        ...screen.getAllByRole("link", { name: /buy on amazon/i }),
       ];
-      hypeWords.forEach((word) => {
-        expect(text).not.toContain(word);
-      });
+      expect(external.length).toBeGreaterThan(0);
+      for (const link of external) {
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", "noopener noreferrer");
+      }
     });
   });
 });

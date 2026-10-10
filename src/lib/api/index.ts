@@ -1,24 +1,26 @@
-// Re-export API utilities
+export { fetchMediumPosts } from "./medium";
+export type { MediumPost, MediumServiceConfig } from "./medium";
 export {
-  fetchMediumPosts,
-  type MediumPost,
-  type MediumServiceConfig,
-} from "./medium";
-
+  getBlogPosts,
+  getMediumUsername,
+  extractMediumUsername,
+  toBlogPost,
+  BLOG_FEED_ERROR,
+} from "./blog";
+export type { BlogFeedResult } from "./blog";
+export { sendContactMessage, subscribeToNewsletter } from "./forms";
+export type { ContactMessage } from "./forms";
 export {
   getResendClient,
   isResendConfigured,
   validateResendConfig,
   ResendConfigError,
-  type ResendConfigValidation,
 } from "./resend";
-
-export {
-  addToNewsletter,
-  sendEmail,
-  EmailServiceError,
-  type AddToNewsletterParams,
-  type AddToNewsletterResult,
-  type SendEmailParams,
-  type SendEmailResult,
+export type { ResendConfigValidation } from "./resend";
+export { addToNewsletter, sendEmail, EmailServiceError } from "./email";
+export type {
+  AddToNewsletterParams,
+  AddToNewsletterResult,
+  SendEmailParams,
+  SendEmailResult,
 } from "./email";

@@ -1,66 +1,72 @@
 "use client";
 
 import {
-  useState,
   useEffect,
-  type HTMLAttributes,
+  useId,
+  useState,
+  type ChangeEvent,
   type FormEvent,
+  type HTMLAttributes,
+  type ReactNode,
 } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { StatusNote } from "@/components/ui/StatusNote";
 import { trackFormView, trackNewsletterSubmit } from "@/lib/analytics/events";
+import { subscribeToNewsletter } from "@/lib/api/forms";
+import { cn } from "@/lib/utils";
+
+export type NewsletterFormLayout = "inline" | "stacked";
 
 export interface NewsletterFormProps extends Omit<
   HTMLAttributes<HTMLFormElement>,
   "onSubmit"
 > {
-  /** Additional CSS classes */
-  className?: string;
-  /** Callback when form is submitted with valid email */
+  /** "inline" puts the button beside the field (hero); "stacked" labels it. */
+  layout?: NewsletterFormLayout;
+  hideLabel?: boolean;
+  submitLabel?: string;
+  helpText?: string;
+  /** Extra links shown in the success note. */
+  successActions?: ReactNode;
+  /** Defaults to posting to /api/newsletter. */
   onSubmit?: (email: string) => Promise<void>;
 }
 
-/**
- * Validates an email address format
- */
+type Status = "idle" | "loading" | "success" | "error";
+
+export const NEWSLETTER_INVALID_EMAIL =
+  "That does not look like an email address. Check it and try again.";
+export const NEWSLETTER_SUBMIT_FAILED =
+  "Something went wrong. Please try again.";
+
 function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 /**
- * NewsletterForm Component
+ * NewsletterForm
  *
- * A reusable newsletter signup form component with validation and state handling.
- * This is a focused form component that can be used across different contexts
- * (newsletter page, home page, etc.).
- *
- * Features:
- * - Email input with validation
- * - Submit button with loading state
- * - Success state with confirmation message
- * - Error state with helpful message
- * - Accessible (labels, error announcements)
- * - No marketing hype in copy
- *
- * @example
- * ```tsx
- * <NewsletterForm />
- * <NewsletterForm onSubmit={async (email) => await subscribeNewsletter(email)} />
- * ```
+ * One field, one button, explicit idle, sending, error and success states.
  */
 export function NewsletterForm({
+  layout = "stacked",
+  hideLabel = layout === "inline",
+  submitLabel = "Subscribe",
+  helpText = "Unsubscribe with one click, any time. Your address is never shared.",
+  successActions,
+  onSubmit = subscribeToNewsletter,
   className = "",
-  onSubmit,
   ...props
 }: NewsletterFormProps) {
+  const id = useId();
+  const errorId = `${id}-error`;
+  const helpId = `${id}-help`;
+
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Track form view on mount
   useEffect(() => {
     trackFormView("newsletter");
   }, []);
@@ -69,57 +75,60 @@ export function NewsletterForm({
     e.preventDefault();
     setErrorMessage(null);
 
-    // Client-side validation
     if (!isValidEmail(email)) {
       setStatus("error");
-      setErrorMessage("Please enter a valid email address.");
+      setErrorMessage(NEWSLETTER_INVALID_EMAIL);
       return;
     }
 
     setStatus("loading");
 
     try {
-      if (onSubmit) {
-        await onSubmit(email);
-      }
+      await onSubmit(email);
       setStatus("success");
       trackNewsletterSubmit("success");
     } catch {
       setStatus("error");
-      setErrorMessage("Something went wrong. Please try again.");
+      setErrorMessage(NEWSLETTER_SUBMIT_FAILED);
       trackNewsletterSubmit("error");
     }
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    // Clear error when user starts typing
     if (status === "error") {
       setStatus("idle");
       setErrorMessage(null);
     }
   };
 
-  const isLoading = status === "loading";
+  const reset = () => {
+    setEmail("");
+    setStatus("idle");
+    setErrorMessage(null);
+  };
 
-  // Success state
+  const isLoading = status === "loading";
+  const hasError = status === "error" && Boolean(errorMessage);
+
   if (status === "success") {
     return (
-      <div
-        data-testid="newsletter-form"
-        className={className}
-        role="status"
-        aria-live="polite"
-      >
-        <div
+      <div data-testid="newsletter-form" className={className}>
+        <StatusNote
           data-testid="newsletter-success"
-          className="text-primary font-body text-lg"
+          title="You're on the list."
+          actions={
+            <>
+              {successActions}
+              <Button variant="ghost" size="sm" onClick={reset}>
+                Use a different address
+              </Button>
+            </>
+          }
         >
-          <p className="mb-2 font-medium">Thank you for subscribing.</p>
-          <p className="text-text-secondary">
-            We will be in touch with thoughtful updates.
-          </p>
-        </div>
+          A short confirmation is on its way to <strong>{email}</strong>. After
+          that, nothing arrives until there is something worth sending.
+        </StatusNote>
       </div>
     );
   }
@@ -128,44 +137,59 @@ export function NewsletterForm({
     <form
       aria-label="Newsletter signup form"
       data-testid="newsletter-form"
+      noValidate
       onSubmit={handleSubmit}
-      className={`flex flex-col sm:flex-row gap-3 sm:items-end ${className}`.trim()}
+      className={cn("flex flex-col gap-2.5", className)}
       {...props}
     >
-      <div className="w-full sm:flex-1">
+      <div
+        className={cn(
+          "flex gap-2.5",
+          layout === "inline" ? "flex-wrap items-start" : "flex-col"
+        )}
+      >
         <Input
           type="email"
+          name="email"
           label="Email address"
-          placeholder="Your email"
+          hideLabel={hideLabel}
+          placeholder="you@example.com"
+          autoComplete="email"
           value={email}
           onChange={handleEmailChange}
           required
           disabled={isLoading}
-          aria-describedby={
-            errorMessage ? "newsletter-error-message" : undefined
+          aria-invalid={hasError ? "true" : undefined}
+          aria-describedby={hasError ? errorId : helpId}
+          wrapperClassName={
+            layout === "inline" ? "min-w-0 flex-1 basis-56" : undefined
           }
         />
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={isLoading}
+          aria-busy={isLoading || undefined}
+          className={layout === "inline" ? "shrink-0" : "self-start"}
+        >
+          {isLoading ? "Sending…" : submitLabel}
+        </Button>
       </div>
-      <Button
-        type="submit"
-        variant="primary"
-        disabled={isLoading}
-        className="w-full sm:w-auto whitespace-nowrap"
-      >
-        {isLoading ? "Subscribing..." : "Subscribe"}
-      </Button>
 
-      {/* Error State */}
-      {status === "error" && errorMessage && (
-        <div
+      {hasError && (
+        <p
           data-testid="newsletter-error"
-          id="newsletter-error-message"
+          id={errorId}
           role="alert"
-          className="w-full mt-2 text-red-600 font-body text-sm"
+          className="font-sans text-[15px] text-error"
         >
           {errorMessage}
-        </div>
+        </p>
       )}
+
+      <p id={helpId} className="font-sans text-sm text-faint">
+        {helpText}
+      </p>
     </form>
   );
 }

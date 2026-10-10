@@ -34,6 +34,11 @@ describe("Text Component", () => {
       const text = screen.getByText("Span text");
       expect(text.tagName).toBe("SPAN");
     });
+
+    it("renders as div when as='div'", () => {
+      render(<Text as="div">Div text</Text>);
+      expect(screen.getByText("Div text").tagName).toBe("DIV");
+    });
   });
 
   describe("Size Variants", () => {
@@ -84,7 +89,7 @@ describe("Text Component", () => {
     it("applies body font family", () => {
       render(<Text>Styled text</Text>);
       const text = screen.getByText("Styled text");
-      expect(text).toHaveClass("font-body");
+      expect(text).toHaveClass("font-sans");
     });
 
     it("applies relaxed line height for body text", () => {
@@ -98,25 +103,35 @@ describe("Text Component", () => {
     it("renders with default color", () => {
       render(<Text>Default color</Text>);
       const text = screen.getByText("Default color");
-      expect(text).toHaveClass("text-text");
+      expect(text).toHaveClass("text-ink");
+    });
+
+    it("renders with soft color variant for prose", () => {
+      render(<Text color="soft">Soft</Text>);
+      expect(screen.getByText("Soft")).toHaveClass("text-ink-soft");
     });
 
     it("renders with secondary color variant", () => {
       render(<Text color="secondary">Secondary</Text>);
       const text = screen.getByText("Secondary");
-      expect(text).toHaveClass("text-text-secondary");
+      expect(text).toHaveClass("text-muted");
+    });
+
+    it("renders with faint color variant for captions", () => {
+      render(<Text color="faint">Faint</Text>);
+      expect(screen.getByText("Faint")).toHaveClass("text-faint");
     });
 
     it("renders with accent color variant", () => {
       render(<Text color="accent">Accent</Text>);
       const text = screen.getByText("Accent");
-      expect(text).toHaveClass("text-text-accent");
+      expect(text).toHaveClass("text-accent");
     });
 
     it("renders with inverse color variant", () => {
       render(<Text color="inverse">Inverse</Text>);
       const text = screen.getByText("Inverse");
-      expect(text).toHaveClass("text-text-inverse");
+      expect(text).toHaveClass("text-on-accent");
     });
   });
 
@@ -130,7 +145,7 @@ describe("Text Component", () => {
     it("preserves default styles when custom className is added", () => {
       render(<Text className="custom-class">Custom</Text>);
       const text = screen.getByText("Custom");
-      expect(text).toHaveClass("font-body");
+      expect(text).toHaveClass("font-sans");
       expect(text).toHaveClass("custom-class");
     });
   });
@@ -158,7 +173,7 @@ describe("Text Component", () => {
       const text = screen.getByText("Combined props");
       expect(text.tagName).toBe("SPAN");
       expect(text).toHaveClass("text-lg");
-      expect(text).toHaveClass("text-text-accent");
+      expect(text).toHaveClass("text-accent");
       expect(text).toHaveClass("mt-4");
     });
   });
