@@ -74,7 +74,12 @@ describe("Published posts", () => {
       expect(post.html).not.toContain("cdn-images");
     });
 
-    it("links back to the original on Medium", () => {
+    // The back-link to Medium only applies to posts migrated from there;
+    // self-original posts have no original URL by design.
+    const isMigrated = migratedSlugs.includes(slug);
+    const linksBackIt = isMigrated ? it : it.skip;
+
+    linksBackIt("links back to the original on Medium", () => {
       expect(post.originalUrl).toMatch(
         /^https:\/\/easyplantlife\.medium\.com\//
       );
