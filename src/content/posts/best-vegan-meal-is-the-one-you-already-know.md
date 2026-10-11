@@ -3,11 +3,11 @@ title: "The Best Vegan Meal Is the One You Already Know"
 date: "2026-10-11T12:00:00.000Z"
 excerpt: "A calm case for default meals: fewer decisions, less friction, and a plant-based routine that still works when you are tired."
 lead: "Why a small rotation of familiar meals can make plant-based eating easier on ordinary days."
-image: "/images/blog/best-vegan-meal-is-the-one-you-already-know/01.jpeg"
+image: "/images/blog/best-vegan-meal-is-the-one-you-already-know/best-vegan-meal-default-bowl-hero.jpg"
 tags: ["food", "habits", "veganism", "cooking"]
 ---
 
-![A simple vegan grain bowl with rice, tofu, broccoli, and carrots on a quiet kitchen table.](/images/blog/best-vegan-meal-is-the-one-you-already-know/01.jpeg)
+![A simple vegan grain bowl with rice, tofu, broccoli, and carrots on a quiet kitchen table.](/images/blog/best-vegan-meal-is-the-one-you-already-know/best-vegan-meal-default-bowl-hero.jpg)
 
 There is a particular kind of hunger that arrives at the end of a long day.
 
@@ -63,7 +63,7 @@ You know what the kitchen looks like afterward.
 
 That familiarity removes more effort than most shortcuts do.
 
-![Simple vegan meal components including grains, sweet potato, chickpeas, kale, avocado, and a creamy sauce.](/images/blog/best-vegan-meal-is-the-one-you-already-know/02.jpeg)
+![Simple vegan meal components including grains, sweet potato, chickpeas, kale, avocado, and a creamy sauce.](/images/blog/best-vegan-meal-is-the-one-you-already-know/default-vegan-meal-familiar-ingredients.jpg)
 
 ## Stop Asking Every Meal to Be Interesting
 
@@ -119,7 +119,7 @@ The fridge becomes easier to read.
 
 Nothing has to announce itself as a recipe before it becomes a meal.
 
-![Three glass containers holding simple plant-based meals made from vegetables, grains, chickpeas, and pasta.](/images/blog/best-vegan-meal-is-the-one-you-already-know/03.jpeg)
+![Three glass containers holding simple plant-based meals made from vegetables, grains, chickpeas, and pasta.](/images/blog/best-vegan-meal-is-the-one-you-already-know/five-default-vegan-meals.jpg)
 
 ## Repetition Is Not a Failure of Creativity
 
@@ -173,7 +173,7 @@ Not something your most organized self thinks you should eat.
 
 Something your real self reaches for without resistance.
 
-![Basic plant-based staples and vegetables arranged on a kitchen counter for easy everyday meals.](/images/blog/best-vegan-meal-is-the-one-you-already-know/04.jpeg)
+![Basic plant-based staples and vegetables arranged on a kitchen counter for easy everyday meals.](/images/blog/best-vegan-meal-is-the-one-you-already-know/low-energy-vegan-staples.jpg)
 
 ## You Can Still Eat Something Else
 
