@@ -42,6 +42,10 @@ export interface BlogPostEntry extends BlogPost {
   tags?: string[];
   /** Where the piece was first published, when that was not this site */
   originalUrl?: string;
+  /** When the post was last meaningfully revised, if after publication */
+  updatedDate?: Date;
+  /** Number of words in the body */
+  wordCount?: number;
 }
 
 /**

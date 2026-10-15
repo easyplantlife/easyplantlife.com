@@ -3,7 +3,7 @@
  *
  * Tests for the Contact page SEO metadata following TDD approach.
  * Based on acceptance criteria from issue #59 (M9-04):
- * - Page title: "Contact | Easy Plant Life"
+ * - Page title: "Contact", rendered as "Contact | Easy Plant Life"
  * - Meta description
  * - Open Graph tags
  */
@@ -24,8 +24,12 @@ describe("Contact Page SEO Metadata", () => {
       expect(metadata.title).toBeDefined();
     });
 
-    it("title is exactly 'Contact | Easy Plant Life'", () => {
-      expect(metadata.title).toBe("Contact | Easy Plant Life");
+    it("title is exactly 'Contact' (the layout template adds the brand)", () => {
+      expect(metadata.title).toBe("Contact");
+    });
+
+    it("has a canonical URL", () => {
+      expect(metadata.alternates?.canonical).toBe("/contact");
     });
   });
 

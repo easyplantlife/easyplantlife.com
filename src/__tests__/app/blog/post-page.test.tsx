@@ -4,12 +4,13 @@ import BlogPostPage, {
   generateMetadata,
   generateStaticParams,
 } from "@/app/blog/[slug]/page";
-import { getPostBySlug, getPostSlugs } from "@/lib/blog/posts";
+import { getPostBySlug, getPostSlugs, getRelatedPosts } from "@/lib/blog/posts";
 import type { BlogPostContent } from "@/lib/types/blog";
 
 jest.mock("@/lib/blog/posts", () => ({
   getPostBySlug: jest.fn(),
   getPostSlugs: jest.fn(),
+  getRelatedPosts: jest.fn(),
 }));
 
 jest.mock("@/lib/analytics/events", () => ({
@@ -29,6 +30,9 @@ const mockGetPostBySlug = getPostBySlug as jest.MockedFunction<
 const mockGetPostSlugs = getPostSlugs as jest.MockedFunction<
   typeof getPostSlugs
 >;
+const mockGetRelatedPosts = getRelatedPosts as jest.MockedFunction<
+  typeof getRelatedPosts
+>;
 
 const post: BlogPostContent = {
   slug: "default-meals",
@@ -42,6 +46,15 @@ const post: BlogPostContent = {
   originalUrl: "https://easyplantlife.medium.com/default-meals-abc123",
   cover: { src: "/images/blog/default-meals/01.jpeg", alt: "A pot" },
   html: "<p>The body of the post.</p>\n<h2>A section</h2>\n",
+};
+
+const related = {
+  slug: "good-enough",
+  title: "Good enough",
+  excerpt: "On meals that are fine.",
+  url: "/blog/good-enough",
+  publishedDate: new Date("2026-01-01T12:00:00Z"),
+  readTime: 3,
 };
 
 const params = Promise.resolve({ slug: "default-meals" });
@@ -59,6 +72,8 @@ describe("Blog Post Page", () => {
       slug === post.slug ? post : null
     );
     mockGetPostSlugs.mockReturnValue(["default-meals", "good-enough"]);
+    mockGetRelatedPosts.mockReset();
+    mockGetRelatedPosts.mockReturnValue([related]);
   });
 
   describe("Static generation", () => {
@@ -115,6 +130,36 @@ describe("Blog Post Page", () => {
       expect(data.url).toBe("https://easyplantlife.com/blog/default-meals");
     });
 
+    it("includes breadcrumb structured data from home to the post", async () => {
+      const { container } = await renderPost();
+      const schemas = Array.from(
+        container.querySelectorAll('script[type="application/ld+json"]')
+      ).map((script) => JSON.parse(script.textContent || "{}"));
+      const breadcrumb = schemas.find(
+        (schema) => schema["@type"] === "BreadcrumbList"
+      );
+      expect(
+        breadcrumb.itemListElement.map(
+          (item: { name: string; item: string }) => [item.name, item.item]
+        )
+      ).toEqual([
+        ["Home", "https://easyplantlife.com"],
+        ["Blog", "https://easyplantlife.com/blog"],
+        ["Default meals", "https://easyplantlife.com/blog/default-meals"],
+      ]);
+    });
+
+    it("links to related posts", async () => {
+      await renderPost();
+      expect(mockGetRelatedPosts).toHaveBeenCalledWith("default-meals", 3);
+      const section = screen.getByRole("region", {
+        name: "More on the same idea",
+      });
+      expect(
+        within(section).getAllByRole("link", { name: /Good enough/ })[0]
+      ).toHaveAttribute("href", "/blog/good-enough");
+    });
+
     it("links back to all posts and to the newsletter", async () => {
       await renderPost();
       expect(screen.getByRole("link", { name: "All posts" })).toHaveAttribute(
@@ -149,6 +194,29 @@ describe("Blog Post Page", () => {
         images: [{ url: "/images/blog/default-meals/01.jpeg" }],
       });
       expect(metadata.twitter).toMatchObject({ card: "summary_large_image" });
+    });
+
+    it("sets the canonical URL and article details", async () => {
+      const metadata = await generateMetadata({ params });
+      expect(metadata.alternates?.canonical).toBe("/blog/default-meals");
+      expect(metadata.openGraph).toMatchObject({
+        title: "Default meals | Easy Plant Life",
+        modifiedTime: "2026-01-15T12:00:00.000Z",
+        section: "Blog",
+        images: [{ alt: "A pot" }],
+      });
+    });
+
+    it("uses the brand banner when the post has no image", async () => {
+      mockGetPostBySlug.mockReturnValue({
+        ...post,
+        thumbnail: undefined,
+        cover: undefined,
+      });
+      const metadata = await generateMetadata({ params });
+      expect(metadata.openGraph).toMatchObject({
+        images: [{ url: "/images/banner.png" }],
+      });
     });
 
     it("falls back to a plain title for an unknown slug", async () => {

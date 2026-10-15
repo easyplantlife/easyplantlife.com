@@ -3,6 +3,8 @@ import GoogleAnalytics from "@/components/analytics/GoogleAnalytics";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ThemeProvider, ThemeScript } from "@/components/theme";
+import { siteConfig } from "@/content/site";
+import { DEFAULT_SOCIAL_IMAGE, FEED_ALTERNATES } from "@/lib/seo";
 import { bodyFont, headingFont } from "./fonts";
 import "./globals.css";
 
@@ -14,24 +16,21 @@ import "./globals.css";
  * - Default description for brand messaging
  * - Open Graph defaults for social sharing
  * - Twitter card configuration
+ * - RSS feed discovery and large image previews for search
  * - Favicon and Apple touch icon
  */
-const defaultTitle = "Easy Plant Life";
+const defaultTitle = siteConfig.name;
 const defaultDescription =
   "A calm approach to plant-based living. Simple, sustainable guidance without complexity or perfection.";
-const ogImageAlt =
-  "Easy Plant Life — Living Vegan Made Simple. A calm approach to plant-based living.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "https://easyplantlife.com"
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || siteConfig.url),
   title: {
     default: defaultTitle,
-    template: "%s | Easy Plant Life",
+    template: `%s | ${siteConfig.name}`,
   },
   description: defaultDescription,
-  applicationName: "Easy Plant Life",
+  applicationName: siteConfig.name,
   keywords: [
     "plant-based",
     "vegan",
@@ -40,32 +39,40 @@ export const metadata: Metadata = {
     "lifestyle",
     "Easy Plant Life",
   ],
-  authors: [{ name: "Easy Plant Life", url: "https://easyplantlife.com" }],
-  creator: "Easy Plant Life",
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "food",
+  alternates: { types: FEED_ALTERNATES },
   openGraph: {
     type: "website",
-    siteName: "Easy Plant Life",
+    siteName: siteConfig.name,
     locale: "en_US",
     title: defaultTitle,
     description: defaultDescription,
-    images: [
-      {
-        url: "/images/banner.png",
-        width: 1200,
-        height: 630,
-        alt: ogImageAlt,
-      },
-    ],
+    images: [DEFAULT_SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: defaultTitle,
     description: defaultDescription,
-    images: ["/images/banner.png"],
+    images: [DEFAULT_SOCIAL_IMAGE.url],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
   },
   icons: {
     icon: [

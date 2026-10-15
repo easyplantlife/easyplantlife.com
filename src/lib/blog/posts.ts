@@ -7,6 +7,7 @@
  *   ---
  *   title: "Default meals"
  *   date: "2026-03-01T12:00:00.000Z"
+ *   updated: "2026-04-01T12:00:00.000Z"                  (optional)
  *   excerpt: "Why a boring default is the whole trick."   (optional)
  *   lead: "A one-line subtitle."                          (optional)
  *   image: "/images/blog/default-meals/01.jpeg"           (optional)
@@ -42,6 +43,7 @@ const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 interface PostFrontMatter {
   title?: unknown;
   date?: unknown;
+  updated?: unknown;
   excerpt?: unknown;
   lead?: unknown;
   image?: unknown;
@@ -64,11 +66,17 @@ function toPlainText(markdown: string): string {
 }
 
 /**
+ * Number of words in the body, Markdown syntax aside.
+ */
+export function countWords(markdown: string): number {
+  return toPlainText(markdown).split(" ").filter(Boolean).length;
+}
+
+/**
  * Estimated reading time in minutes, never less than one.
  */
 export function estimateReadTime(markdown: string): number {
-  const words = toPlainText(markdown).split(" ").filter(Boolean).length;
-  return Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+  return Math.max(1, Math.round(countWords(markdown) / WORDS_PER_MINUTE));
 }
 
 /**
@@ -143,7 +151,13 @@ export function parsePost(slug: string, source: string): ParsedPost {
     url: `/blog/${slug}`,
     publishedDate,
     readTime: estimateReadTime(body),
+    wordCount: countWords(body),
   };
+
+  const updatedDate = readDate(frontMatter.updated);
+  if (updatedDate && updatedDate > publishedDate) {
+    entry.updatedDate = updatedDate;
+  }
 
   const lead = readString(frontMatter.lead);
   if (lead) entry.lead = lead;
@@ -210,4 +224,35 @@ export function getPostBySlug(slug: string): BlogPostContent | null {
   };
   if (cover) content.cover = cover;
   return content;
+}
+
+/** "Vegan Living", "vegan-living" and "vegan living" are the same tag. */
+function normalizeTag(tag: string): string {
+  return tag
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-");
+}
+
+/**
+ * Other posts to read after this one: the ones sharing the most tags come
+ * first, ties go to the newer post. Posts without shared tags fill the
+ * remaining places, newest first, so every post links onward.
+ */
+export function getRelatedPosts(slug: string, limit = 3): BlogPostEntry[] {
+  const posts = getAllPosts();
+  const current = posts.find((post) => post.slug === slug);
+  const tags = new Set((current?.tags ?? []).map(normalizeTag));
+
+  return posts
+    .filter((post) => post.slug !== slug)
+    .map((post, index) => ({
+      post,
+      index,
+      shared: (post.tags ?? []).filter((tag) => tags.has(normalizeTag(tag)))
+        .length,
+    }))
+    .sort((a, b) => b.shared - a.shared || a.index - b.index)
+    .slice(0, limit)
+    .map(({ post }) => post);
 }

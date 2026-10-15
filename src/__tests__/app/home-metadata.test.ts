@@ -26,6 +26,16 @@ describe("Home Page SEO Metadata", () => {
   });
 
   describe("Page Title", () => {
+    it("uses an absolute title so the brand is not repeated", () => {
+      expect(metadata.title).toEqual({
+        absolute: "Easy Plant Life — A Calm Approach to Plant-Based Living",
+      });
+    });
+
+    it("has a canonical URL", () => {
+      expect(metadata.alternates?.canonical).toBe("/");
+    });
+
     it("has a title set", () => {
       expect(metadata.title).toBeDefined();
     });
@@ -34,7 +44,7 @@ describe("Home Page SEO Metadata", () => {
       const title =
         typeof metadata.title === "string"
           ? metadata.title
-          : metadata.title?.toString() || "";
+          : (metadata.title as { absolute?: string })?.absolute || "";
       expect(title.toLowerCase()).toContain("easy plant life");
     });
   });

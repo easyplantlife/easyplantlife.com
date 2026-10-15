@@ -1,51 +1,57 @@
 import type { MetadataRoute } from "next";
+import { books } from "@/content/books";
 import { getAllPosts } from "@/lib/blog/posts";
-
-const BASE_URL = "https://easyplantlife.com";
+import { absoluteUrl } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const currentDate = new Date();
+  const allPosts = getAllPosts();
 
-  const posts: MetadataRoute.Sitemap = getAllPosts().map((post) => ({
-    url: `${BASE_URL}${post.url}`,
-    lastModified: post.publishedDate,
+  const posts: MetadataRoute.Sitemap = allPosts.map((post) => ({
+    url: absoluteUrl(post.url),
+    lastModified: post.updatedDate ?? post.publishedDate,
     changeFrequency: "yearly",
-    priority: 0.6,
+    priority: 0.7,
+    ...(post.thumbnail ? { images: [absoluteUrl(post.thumbnail)] } : {}),
   }));
+
+  // The blog and the home page change when a post is published.
+  const latestPost = allPosts[0]?.publishedDate ?? currentDate;
 
   return [
     {
-      url: BASE_URL,
-      lastModified: currentDate,
-      changeFrequency: "monthly",
+      url: absoluteUrl("/"),
+      lastModified: latestPost,
+      changeFrequency: "weekly",
       priority: 1,
     },
     {
-      url: `${BASE_URL}/about`,
+      url: absoluteUrl("/about"),
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/books`,
+      url: absoluteUrl("/books"),
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.8,
+      images: books.map((book) => absoluteUrl(book.coverImage)),
     },
     {
-      url: `${BASE_URL}/blog`,
-      lastModified: currentDate,
+      url: absoluteUrl("/blog"),
+      lastModified: latestPost,
       changeFrequency: "weekly",
-      priority: 0.8,
+      priority: 0.9,
     },
     {
-      url: `${BASE_URL}/newsletter`,
+      url: absoluteUrl("/newsletter"),
       lastModified: currentDate,
       changeFrequency: "monthly",
       priority: 0.6,
     },
     {
-      url: `${BASE_URL}/contact`,
+      url: absoluteUrl("/contact"),
       lastModified: currentDate,
       changeFrequency: "yearly",
       priority: 0.5,

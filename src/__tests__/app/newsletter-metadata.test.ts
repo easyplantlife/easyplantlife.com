@@ -3,7 +3,7 @@
  *
  * Tests for the Newsletter page SEO metadata following TDD approach.
  * Based on acceptance criteria from issue #54 (M8-07):
- * - Page title: "Newsletter | Easy Plant Life"
+ * - Page title: "Newsletter", rendered as "Newsletter | Easy Plant Life"
  * - Meta description emphasizing value
  * - Open Graph tags
  */
@@ -24,8 +24,12 @@ describe("Newsletter Page SEO Metadata", () => {
       expect(metadata.title).toBeDefined();
     });
 
-    it("title is exactly 'Newsletter | Easy Plant Life'", () => {
-      expect(metadata.title).toBe("Newsletter | Easy Plant Life");
+    it("title is exactly 'Newsletter' (the layout template adds the brand)", () => {
+      expect(metadata.title).toBe("Newsletter");
+    });
+
+    it("has a canonical URL", () => {
+      expect(metadata.alternates?.canonical).toBe("/newsletter");
     });
   });
 

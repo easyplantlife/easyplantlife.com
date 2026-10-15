@@ -28,10 +28,10 @@ function formatDateISO(date: Date): string {
  * PostArticle
  *
  * One full post. The header (eyebrow, title, optional lead) and the cover
- * run the full content width. Below them a meta rail (date, read time)
- * sits beside the prose column, which fills the rest of the width so its
- * right edge lines up with the cover; on narrow screens the rail wraps
- * above the text. A hairline footer holds the way back to the list and, when the
+ * run the full content width. Below them a meta rail (date, revision date
+ * when there is one, read time) sits beside the prose column, which fills
+ * the rest of the width so its right edge lines up with the cover; on
+ * narrow screens the rail wraps above the text. A hairline footer holds the way back to the list and, when the
  * piece was first published elsewhere, a quiet pointer to the original.
  */
 export function PostArticle({
@@ -39,8 +39,16 @@ export function PostArticle({
   className = "",
   ...props
 }: PostArticleProps) {
-  const { title, lead, html, cover, publishedDate, readTime, originalUrl } =
-    post;
+  const {
+    title,
+    lead,
+    html,
+    cover,
+    publishedDate,
+    updatedDate,
+    readTime,
+    originalUrl,
+  } = post;
 
   return (
     <article
@@ -88,6 +96,14 @@ export function PostArticle({
           <time dateTime={formatDateISO(publishedDate)}>
             {formatDate(publishedDate)}
           </time>
+          {updatedDate && (
+            <span>
+              Updated{" "}
+              <time dateTime={formatDateISO(updatedDate)}>
+                {formatDate(updatedDate)}
+              </time>
+            </span>
+          )}
           {readTime && <span>{readTime} min read</span>}
         </p>
 

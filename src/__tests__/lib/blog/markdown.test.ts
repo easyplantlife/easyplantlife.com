@@ -3,10 +3,24 @@ import { renderMarkdown, splitLeadImage } from "@/lib/blog/markdown";
 describe("renderMarkdown", () => {
   it("renders headings, paragraphs and emphasis", () => {
     const html = renderMarkdown("## Title\n\nSome *soft* and **strong** text.");
-    expect(html).toContain("<h2>Title</h2>");
+    expect(html).toContain('<h2 id="title">Title</h2>');
     expect(html).toContain(
       "<p>Some <em>soft</em> and <strong>strong</strong> text.</p>"
     );
+  });
+
+  it("gives every heading a unique, linkable id", () => {
+    const html = renderMarkdown(
+      "## Why it *works*\n\n### Café & co\n\n## Why it works"
+    );
+    expect(html).toContain('<h2 id="why-it-works">Why it <em>works</em></h2>');
+    expect(html).toContain('<h3 id="cafe-co">Café &amp; co</h3>');
+    expect(html).toContain('<h2 id="why-it-works-2">Why it works</h2>');
+  });
+
+  it("starts heading ids afresh for each document", () => {
+    renderMarkdown("## Again");
+    expect(renderMarkdown("## Again")).toContain('<h2 id="again">');
   });
 
   it("turns a lone image into a figure instead of a paragraph", () => {
