@@ -3,11 +3,11 @@ title: "You Don’t Need a Sunday Meal Prep Routine"
 excerpt: "Meal prep doesn’t need to take your whole Sunday. Discover a calmer way to make vegan meals easier with small portions, familiar ingredients, and less planning."
 lead: "A little extra food today can make tomorrow easier, without turning your weekend into kitchen work."
 date: "2026-10-15T12:00:00.000Z"
-image: "/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.png"
+image: "/images/blog/you-dont-need-a-sunday-meal-prep-routine/sunday-one-extra-portion.jpg"
 tags: ["Vegan Living", "Meal Prep", "Simple Meals", "Plant-Based Eating"]
 ---
 
-![A simple vegan grain bowl with chickpeas, vegetables, and rice on a warm wooden kitchen table.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.png)
+![A single glass container of lentil stew set aside on a quiet kitchen counter, with the pot still on the stove.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/sunday-one-extra-portion.jpg)
 
 There is a particular version of Sunday that appears often in advice about eating well.
 
