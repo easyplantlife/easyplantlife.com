@@ -8,40 +8,26 @@ import {
 } from "@/components/home";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/JsonLd";
 import { getAllPosts } from "@/lib/blog/posts";
+import { pageMetadata } from "@/lib/seo";
 
 /**
  * Home Page SEO Metadata
  */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
+  absoluteTitle: true,
   description:
-    "Easy Plant Life is about living vegan without turning it into a project. Simple, sustainable, calm guidance for a plant-based lifestyle.",
+    "Easy Plant Life is about living vegan without turning it into a project. Simple, calm writing and books on plant-based eating that fits ordinary days.",
+  path: "/",
   keywords: [
-    "plant-based",
-    "vegan",
-    "simple living",
-    "sustainable",
-    "lifestyle",
+    "plant-based living",
+    "easy vegan",
+    "vegan for beginners",
+    "simple vegan meals",
+    "vegan habits",
+    "Easy Plant Life",
   ],
-  openGraph: {
-    title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
-    description:
-      "Simple, sustainable, calm guidance for a plant-based lifestyle. No complexity, no perfection—just easy living.",
-    type: "website",
-    siteName: "Easy Plant Life",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Easy Plant Life — A Calm Approach to Plant-Based Living",
-    description:
-      "Simple, sustainable, calm guidance for a plant-based lifestyle.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+});
 
 /**
  * Home Page

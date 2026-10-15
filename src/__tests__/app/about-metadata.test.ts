@@ -3,7 +3,7 @@
  *
  * Tests for the About page SEO metadata following TDD approach.
  * Based on acceptance criteria from issue #34 (M5-03):
- * - Page title: "About | Easy Plant Life"
+ * - Page title: "About", rendered as "About | Easy Plant Life"
  * - Meta description set
  * - Open Graph tags
  */
@@ -24,8 +24,12 @@ describe("About Page SEO Metadata", () => {
       expect(metadata.title).toBeDefined();
     });
 
-    it("title is exactly 'About | Easy Plant Life'", () => {
-      expect(metadata.title).toBe("About | Easy Plant Life");
+    it("title is exactly 'About' (the layout template adds the brand)", () => {
+      expect(metadata.title).toBe("About");
+    });
+
+    it("has a canonical URL", () => {
+      expect(metadata.alternates?.canonical).toBe("/about");
     });
   });
 

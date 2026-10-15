@@ -89,7 +89,11 @@ describe("Page Routes", () => {
     it("exports metadata with a title", async () => {
       const { metadata } = await route.load();
       expect(metadata).toBeDefined();
-      expect(String(metadata.title)).toMatch(route.title);
+      const title =
+        typeof metadata.title === "object" && metadata.title !== null
+          ? (metadata.title as { absolute?: string }).absolute
+          : metadata.title;
+      expect(String(title)).toMatch(route.title);
     });
   });
 

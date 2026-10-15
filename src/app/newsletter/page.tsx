@@ -1,30 +1,14 @@
 import type { Metadata } from "next";
 import { PageLayout } from "@/components/PageLayout";
 import { NewsletterContent } from "@/components/newsletter";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Newsletter | Easy Plant Life",
+export const metadata: Metadata = pageMetadata({
+  title: "Newsletter",
   description:
-    "Subscribe to thoughtful updates on calm, plant-based living. Simple ideas for bringing nature into your everyday life.",
-  openGraph: {
-    title: "Newsletter | Easy Plant Life",
-    description:
-      "Join our newsletter for thoughtful updates on calm, plant-based living. Simple ideas, no pressure—just easy ways to connect with nature.",
-    type: "website",
-    siteName: "Easy Plant Life",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Newsletter | Easy Plant Life",
-    description:
-      "Thoughtful updates on calm, plant-based living. Simple ideas for bringing nature into your everyday life.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    "An occasional email on calm, plant-based living. New posts and the odd idea, only when there is something worth sending. No schedule.",
+  path: "/newsletter",
+});
 
 export default function NewsletterPage() {
   return (

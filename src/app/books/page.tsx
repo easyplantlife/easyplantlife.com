@@ -6,11 +6,14 @@ import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Panel } from "@/components/ui/Panel";
 import { Text } from "@/components/ui/Text";
 import { books } from "@/content/books";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Books | Easy Plant Life",
-  description: "Explore our collection of books about living with plants.",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Books",
+  description:
+    "Two short books on easy plant-based living: The Everyday Vegan Playbook, a calm practical guide, and The Normal Vegan, a story. Both on Amazon.",
+  path: "/books",
+});
 
 export default function BooksPage() {
   return (

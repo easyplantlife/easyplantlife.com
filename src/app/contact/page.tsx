@@ -1,30 +1,14 @@
 import type { Metadata } from "next";
 import { PageLayout } from "@/components/PageLayout";
 import { ContactContent } from "@/components/contact";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact | Easy Plant Life",
+export const metadata: Metadata = pageMetadata({
+  title: "Contact",
   description:
-    "Have a question or want to say hello? Get in touch with Easy Plant Life through our simple contact form.",
-  openGraph: {
-    title: "Contact | Easy Plant Life",
-    description:
-      "Have a question or want to say hello? Reach out to Easy Plant Life—we'd love to hear from you.",
-    type: "website",
-    siteName: "Easy Plant Life",
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Contact | Easy Plant Life",
-    description:
-      "Have a question or want to say hello? Get in touch with Easy Plant Life.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    "Have a question or want to say hello? Write to Easy Plant Life through a simple contact form.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (
