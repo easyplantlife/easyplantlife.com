@@ -6,3 +6,5 @@ export { PostArticle } from "./PostArticle";
 export type { PostArticleProps } from "./PostArticle";
 export { PreferEmail } from "./PreferEmail";
 export type { PreferEmailProps } from "./PreferEmail";
+export { RelatedPosts } from "./RelatedPosts";
+export type { RelatedPostsProps } from "./RelatedPosts";

@@ -2,11 +2,13 @@ import * as fs from "fs";
 import * as path from "path";
 import {
   POSTS_DIRECTORY,
+  countWords,
   estimateReadTime,
   excerptFromBody,
   getAllPosts,
   getPostBySlug,
   getPostSlugs,
+  getRelatedPosts,
   isValidSlug,
   parsePost,
 } from "@/lib/blog/posts";
@@ -89,6 +91,30 @@ describe("parsePost", () => {
     expect(entry.publishedDate).toEqual(new Date("2026-03-01"));
   });
 
+  it("counts the words of the body", () => {
+    const { entry } = parsePost(
+      "short",
+      '---\ntitle: Short\ndate: "2026-03-01"\n---\n\nFour *small* plain words.\n'
+    );
+    expect(entry.wordCount).toBe(4);
+  });
+
+  it("keeps a revision date that comes after publication", () => {
+    const { entry } = parsePost(
+      "revised",
+      '---\ntitle: Revised\ndate: "2026-03-01"\nupdated: "2026-04-01"\n---\n\nBody.\n'
+    );
+    expect(entry.updatedDate).toEqual(new Date("2026-04-01"));
+  });
+
+  it("ignores a revision date that is not after publication", () => {
+    const { entry } = parsePost(
+      "not-revised",
+      '---\ntitle: Same\ndate: "2026-03-01"\nupdated: "2026-02-01"\n---\n\nBody.\n'
+    );
+    expect(entry.updatedDate).toBeUndefined();
+  });
+
   it("ignores tags that are not strings", () => {
     const { entry } = parsePost(
       "odd-tags",
@@ -122,6 +148,44 @@ describe("getAllPosts", () => {
       expect(post.url).toBe(`/blog/${post.slug}`);
       expect(post).not.toHaveProperty("html");
     }
+  });
+});
+
+describe("getRelatedPosts", () => {
+  const normalize = (tag: string) => tag.toLowerCase().replace(/\s+/g, "-");
+
+  it("returns other posts only, up to the limit", () => {
+    const [slug] = getPostSlugs();
+    const related = getRelatedPosts(slug, 3);
+    expect(related.length).toBe(Math.min(3, getPostSlugs().length - 1));
+    expect(related.map((post) => post.slug)).not.toContain(slug);
+  });
+
+  it("puts posts sharing more tags first", () => {
+    for (const slug of getPostSlugs()) {
+      const tags = new Set(
+        (getAllPosts().find((post) => post.slug === slug)?.tags ?? []).map(
+          normalize
+        )
+      );
+      const shared = getRelatedPosts(slug, 10).map(
+        (post) =>
+          (post.tags ?? []).filter((tag) => tags.has(normalize(tag))).length
+      );
+      expect(shared).toEqual([...shared].sort((a, b) => b - a));
+    }
+  });
+
+  it("falls back to the newest posts for an unknown slug", () => {
+    expect(getRelatedPosts("not-a-post", 2)).toEqual(getAllPosts().slice(0, 2));
+  });
+});
+
+describe("countWords", () => {
+  it("ignores Markdown syntax and image alt text", () => {
+    expect(
+      countWords("## A heading\n\n![alt text here](/x.jpg) Two [links](/a)")
+    ).toBe(4);
   });
 });
 

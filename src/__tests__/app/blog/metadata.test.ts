@@ -23,12 +23,16 @@ describe("Blog Page SEO Metadata", () => {
       expect(metadata.title).toBeDefined();
     });
 
-    it("title includes brand name", () => {
-      const title =
-        typeof metadata.title === "string"
-          ? metadata.title
-          : metadata.title?.toString() || "";
-      expect(title.toLowerCase()).toContain("easy plant life");
+    it("title leaves the brand to the layout template", () => {
+      expect(metadata.title).toBe("Blog");
+    });
+
+    it("social title includes brand name", () => {
+      expect(String(metadata.openGraph?.title)).toBe("Blog | Easy Plant Life");
+    });
+
+    it("has a canonical URL", () => {
+      expect(metadata.alternates?.canonical).toBe("/blog");
     });
 
     it("title indicates blog section", () => {
