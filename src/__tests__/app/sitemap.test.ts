@@ -158,4 +158,33 @@ describe("Sitemap Generation", () => {
       });
     });
   });
+
+  describe("Blog freshness and images", () => {
+    const posts = getAllPosts();
+
+    it("dates the blog by its newest post", () => {
+      const blog = sitemap.find(
+        (entry) => entry.url === "https://easyplantlife.com/blog"
+      );
+      expect(blog?.lastModified).toEqual(posts[0].publishedDate);
+    });
+
+    it("lists each post's cover image", () => {
+      for (const post of posts.filter((entry) => entry.thumbnail)) {
+        const entry = sitemap.find(
+          (item) => item.url === `https://easyplantlife.com${post.url}`
+        );
+        expect(entry?.images).toEqual([
+          `https://easyplantlife.com${post.thumbnail}`,
+        ]);
+      }
+    });
+
+    it("lists the book covers on the books page", () => {
+      const books = sitemap.find(
+        (entry) => entry.url === "https://easyplantlife.com/books"
+      );
+      expect(books?.images?.length).toBeGreaterThan(0);
+    });
+  });
 });
