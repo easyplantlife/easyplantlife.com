@@ -3,11 +3,11 @@ title: "You Don’t Need a Sunday Meal Prep Routine"
 excerpt: "Meal prep doesn’t need to take your whole Sunday. Discover a calmer way to make vegan meals easier with small portions, familiar ingredients, and less planning."
 lead: "A little extra food today can make tomorrow easier, without turning your weekend into kitchen work."
 date: "2026-10-15T12:00:00.000Z"
-image: "/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.jpeg"
+image: "/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.png"
 tags: ["Vegan Living", "Meal Prep", "Simple Meals", "Plant-Based Eating"]
 ---
 
-![A simple vegan grain bowl with chickpeas, vegetables, and rice on a warm wooden kitchen table.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.jpeg)
+![A simple vegan grain bowl with chickpeas, vegetables, and rice on a warm wooden kitchen table.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/simple-vegan-meal-hero.png)
 
 There is a particular version of Sunday that appears often in advice about eating well.
 
@@ -81,7 +81,7 @@ You only need to make the next few meals a little easier.
 
 ## Cook Once, Leave Something for Tomorrow
 
-![A simple plant-based meal with familiar ingredients, prepared components, and organized kitchen staples.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/vegan-meal-prep-without-planning.jpeg)
+![A simple plant-based meal with familiar ingredients, prepared components, and organized kitchen staples.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/vegan-meal-prep-without-planning.png)
 
 Imagine making rice for dinner.
 
@@ -161,7 +161,7 @@ The goal is to make a familiar meal easier to assemble when you need it.
 
 ## Two or Three Portions Can Be Enough
 
-![A small collection of prepared plant-based meals and ingredients in reusable glass containers.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/small-batch-vegan-meal-prep.jpeg)
+![A small collection of prepared plant-based meals and ingredients in reusable glass containers.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/small-batch-vegan-meal-prep.png)
 
 There is something reassuring about preparing food for an entire week.
 
@@ -237,7 +237,7 @@ All of these approaches can belong in the same routine.
 
 ## Let Tomorrow Benefit From Today
 
-![A familiar vegan grain bowl alongside prepared ingredients and pantry staples in a naturally lit kitchen.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/easy-vegan-meals-for-tomorrow.jpeg)
+![A familiar vegan grain bowl alongside prepared ingredients and pantry staples in a naturally lit kitchen.](/images/blog/you-dont-need-a-sunday-meal-prep-routine/easy-vegan-meals-for-tomorrow.png)
 
 If you want to try a lighter approach to meal preparation, start with your next ordinary dinner.
 
