@@ -97,7 +97,7 @@ The goal is not variety for its own sake.
 
 The goal is that when you open the freezer, you recognize dinner.
 
-![An open freezer drawer with three plain bags of broccoli, peas, and spinach, and plenty of empty space.](/images/blog/a-bag-of-frozen-vegetables-is-enough-to-start/a-few-bags-in-the-freezer.jpg "A few bags. Not a project.")
+![An open freezer drawer with separate piles of frozen broccoli, peas, and spinach, and empty space around them.](/images/blog/a-bag-of-frozen-vegetables-is-enough-to-start/a-readable-freezer.jpg "A few vegetables. Plenty of room.")
 
 ## Frozen Does Not Have to Taste Like a Compromise
 
